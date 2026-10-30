@@ -1,0 +1,205 @@
+import { fetchJson, requireEnv, today } from "../fetch.ts";
+import type { DatabaseSync } from "node:sqlite";
+import { insertPlaces, makeFactWriter, type FactRow } from "../db.ts";
+
+/**
+ * Census loader.
+ *
+ * Three calls per dataset, one per geography level: state, county, place. The
+ * API returns every geography in the country in a single response, which is why
+ * this pipeline rebuilds the whole file in under a minute rather than overnight.
+ *
+ * ACS margins of error are pulled where they matter and carried onto the fact
+ * row. A number without its margin is a claim, not a measurement.
+ *
+ * Suffixes are sliced, not regex-replaced. `_E$` never matches `B01003_001E`,
+ * because the string ends in `1E`. That mistake put the estimate in the margin
+ * column on the first run.
+ */
+
+const YEAR = "2024";
+const PERIOD = "2020-2024";
+const AGENCY = "U.S. Census Bureau";
+const DATASET = "American Community Survey 5-Year";
+
+/** Places below this are dropped from the file. Counties and states never are. */
+export const MIN_PLACE_POPULATION = Number(process.env.MIN_PLACE_POPULATION ?? 1000);
+
+interface Variable {
+  code: string;
+  metric: string;
+  label: string;
+  unit: string;
+  direction: string;
+  table: string;
+  note?: string;
+}
+
+const DETAIL: Variable[] = [
+  { code: "B01003_001E", metric: "population", label: "Population", unit: "people", direction: "neutral", table: "B01003" },
+  { code: "B19013_001E", metric: "median_household_income", label: "Median household income", unit: "usd", direction: "higher_is_better", table: "B19013" },
+  { code: "B25064_001E", metric: "median_gross_rent", label: "Median gross rent", unit: "usd_per_month", direction: "lower_is_better", table: "B25064", note: "2024 dollars, as published" },
+  { code: "B25077_001E", metric: "median_home_value", label: "Median home value", unit: "usd", direction: "neutral", table: "B25077", note: "Owner-occupied units, 2024 dollars" },
+  { code: "B01002_001E", metric: "median_age", label: "Median age", unit: "years", direction: "neutral", table: "B01002" },
+];
+
+const PROFILE: Variable[] = [
+  { code: "DP03_0009PE", metric: "unemployment_rate", label: "Unemployment rate", unit: "percent", direction: "lower_is_better", table: "DP03" },
+  { code: "DP03_0002PE", metric: "labor_force_participation_rate", label: "Labor force participation rate", unit: "percent", direction: "higher_is_better", table: "DP03" },
+  { code: "DP02_0068PE", metric: "bachelors_or_higher", label: "Bachelor's degree or higher", unit: "percent", direction: "higher_is_better", table: "DP02" },
+  { code: "DP03_0128PE", metric: "poverty_rate", label: "Poverty rate", unit: "percent", direction: "lower_is_better", table: "DP03" },
+];
+
+const MOE_FOR = new Set(["B01003", "B19013"]);
+
+const SENTINELS = new Set([
+  "-666666666", // not applicable
+  "-999999999", // not available
+  "-888888888", // not available
+  "-222222222", // controlled / suppressed
+  "-555555555", // too few samples to compute a margin
+  "null",
+  "",
+]);
+
+const STATE_CODES: Record<string, string> = {
+  "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT", "10": "DE",
+  "11": "DC", "12": "FL", "13": "GA", "15": "HI", "16": "ID", "17": "IL", "18": "IN", "19": "IA",
+  "20": "KS", "21": "KY", "22": "LA", "23": "ME", "24": "MD", "25": "MA", "26": "MI", "27": "MN",
+  "28": "MS", "29": "MO", "30": "MT", "31": "NE", "32": "NV", "33": "NH", "34": "NJ", "35": "NM",
+  "36": "NY", "37": "NC", "38": "ND", "39": "OH", "40": "OK", "41": "OR", "42": "PA", "44": "RI",
+  "45": "SC", "46": "SD", "47": "TN", "48": "TX", "49": "UT", "50": "VT", "51": "VA", "53": "WA",
+  "54": "WV", "55": "WI", "56": "WY", "60": "AS", "66": "GU", "69": "MP", "72": "PR", "78": "VI",
+};
+
+type Level = "state" | "county" | "place" | "us";
+type Row = Record<string, string>;
+
+function parseTable(payload: unknown): Row[] {
+  if (!Array.isArray(payload) || payload.length < 2) return [];
+  const [headers, ...rows] = payload as string[][];
+  return rows.map((cells) => {
+    const record: Row = {};
+    headers.forEach((header, index) => { record[header] = cells[index]; });
+    return record;
+  });
+}
+
+function num(value: string | undefined): number | null {
+  if (value === undefined || SENTINELS.has(value)) return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function geoidFor(level: Level, row: Row): string | null {
+  if (level === "us") return "0100000US";
+  if (level === "state") return row.state ?? null;
+  if (level === "county") return row.state && row.county ? `${row.state}${row.county}` : null;
+  if (level === "place") return row.state && row.place ? `${row.state}${row.place}` : null;
+  return null;
+}
+
+function splitName(name: string, level: Level): { name: string; short: string } {
+  if (level === "us") return { name: "United States", short: "United States" };
+  if (level === "state") return { name, short: name };
+  const parts = name.split(", ");
+  return { name, short: parts[0] ?? name };
+}
+
+async function getLevel(level: Level, dataset: "acs5" | "acs5/profile", variables: Variable[]): Promise<Row[]> {
+  const key = requireEnv("CENSUS_API_KEY");
+  const codes = variables.map((v) => v.code);
+  const moes = variables.filter((v) => MOE_FOR.has(v.table)).map((v) => `${v.code.slice(0, -1)}M`);
+  const get = ["NAME", ...codes, ...moes].join(",");
+  const geography = level === "us" ? "for=us:1" : `for=${level}:*`;
+  const url = `https://api.census.gov/data/${YEAR}/acs/${dataset}?get=${get}&${geography}&key=${key}`;
+  return parseTable(await fetchJson<unknown>(url, { retries: 2 }));
+}
+
+export async function loadCensus(db: DatabaseSync): Promise<{ places: number; facts: number; skipped: number }> {
+  const retrieved = today();
+  const levels: Level[] = ["state", "county", "place", "us"];
+
+  const detail: Record<string, Row[]> = {};
+  const profile: Record<string, Row[]> = {};
+  for (const level of levels) {
+    detail[level] = await getLevel(level, "acs5", DETAIL);
+    profile[level] = await getLevel(level, "acs5/profile", PROFILE);
+    console.log(`  census ${level.padEnd(7)} ${detail[level].length.toLocaleString()} rows`);
+  }
+
+  // ---- places, filtered ---------------------------------------------------
+  const places: Array<Record<string, unknown>> = [];
+  const kept = new Set<string>();
+  let skipped = 0;
+
+  for (const level of levels) {
+    for (const row of detail[level]) {
+      const geoid = geoidFor(level, row);
+      if (!geoid) continue;
+      const population = num(row.B01003_001E);
+      if (level === "place" && (population ?? 0) < MIN_PLACE_POPULATION) { skipped += 1; continue; }
+
+      const { name, short } = splitName(row.NAME ?? "", level);
+      const stateFips = level === "state" ? geoid : (row.state ?? null);
+      kept.add(geoid);
+      places.push({
+        geoid,
+        kind: level,
+        name,
+        short_name: short,
+        state_fips: stateFips,
+        state_code: stateFips ? (STATE_CODES[stateFips] ?? null) : null,
+        parent_geoid: level === "county" || level === "place" ? (row.state ?? null) : null,
+        population: population === null ? null : Math.round(population),
+      });
+    }
+  }
+  insertPlaces(db, places);
+
+  // ---- metrics dimension --------------------------------------------------
+  const insertMetric = db.prepare(
+    "INSERT OR REPLACE INTO metric (id,label,unit,direction,description) VALUES (?,?,?,?,?)",
+  );
+  for (const v of [...DETAIL, ...PROFILE]) {
+    insertMetric.run(v.metric, v.label, v.unit, v.direction, `Census ${DATASET}, table ${v.table}`);
+  }
+
+  // ---- facts --------------------------------------------------------------
+  const writer = makeFactWriter(db);
+  let facts = 0;
+
+  const emit = (level: Level, variables: Variable[], rows: Row[], datasetLabel: string) => {
+    for (const row of rows) {
+      const geoid = geoidFor(level, row);
+      if (!geoid || !kept.has(geoid)) continue;
+      for (const v of variables) {
+        const value = num(row[v.code]);
+        if (value === null) continue;
+        const fact: FactRow = {
+          geoid,
+          metric: v.metric,
+          period: PERIOD,
+          value,
+          agency: AGENCY,
+          dataset: datasetLabel,
+          table_id: v.table,
+          vintage: YEAR,
+          retrieved_at: retrieved,
+          moe: MOE_FOR.has(v.table) ? num(row[`${v.code.slice(0, -1)}M`]) : null,
+          revision: "annual",
+          note: v.note ?? null,
+        };
+        writer.write(fact);
+        facts += 1;
+      }
+    }
+  };
+
+  for (const level of levels) emit(level, DETAIL, detail[level], DATASET);
+  for (const level of levels) emit(level, PROFILE, profile[level], `${DATASET}, Data Profile`);
+
+  writer.commit();
+  if (skipped) console.log(`  dropped ${skipped.toLocaleString()} places under ${MIN_PLACE_POPULATION.toLocaleString()} people`);
+  return { places: places.length, facts, skipped };
+}
