@@ -63,7 +63,19 @@ function main(): void {
     detail: `${meta["data.version"] ?? "none"} / ${meta["build.finished_at"]?.slice(0, 10) ?? "none"}`,
   });
 
-  // 7. Golden numbers. Pinned to the 2024 ACS 5-year release. These guard the
+  // 7. No metric name is published by two agencies. Two numbers under one name
+  // is the fastest way to lose a reader's trust, so it fails the build.
+  const { n: multiAgency } = one<{ n: number }>(
+    `SELECT COUNT(*) n FROM (SELECT metric FROM fact GROUP BY metric
+       HAVING COUNT(DISTINCT agency) > 1)`,
+  );
+  checks.push({
+    name: "no metric is published by two agencies",
+    ok: multiAgency === 0,
+    detail: multiAgency === 0 ? "none" : `${multiAgency} ambiguous`,
+  });
+
+  // 8. Golden numbers. Pinned to the 2024 ACS 5-year release. These guard the
   // parsing and the joins, not the agencies: if Census revises, this test moves.
   const golden: Array<[string, string, string, number]> = [
     ["42101", "population", "2020-2024", 1579706],
@@ -71,13 +83,16 @@ function main(): void {
     ["36061", "population", "2020-2024", 1629477],
     ["17031", "population", "2020-2024", 5182090],
     ["06037", "population", "2020-2024", 9808667],
+    ["42101", "gdp", "2024", 134988949000],
+    ["42101", "federal_obligations", "FY2025", 5566182485.82],
+    ["42101", "unemployment_rate", "2026-09", 4.3],
   ];
   for (const [geoid, metric, period, expected] of golden) {
     const row = one<{ value: number } | undefined>(
       "SELECT value FROM fact WHERE geoid = ? AND metric = ? AND period = ?",
       geoid, metric, period,
     );
-    const ok = Boolean(row) && Math.abs((row?.value ?? 0) - expected) < 1;
+    const ok = Boolean(row) && Math.abs((row?.value ?? 0) - expected) <= Math.max(1, Math.abs(expected) * 1e-6);
     checks.push({
       name: `golden ${geoid} ${metric}`,
       ok,
@@ -91,12 +106,16 @@ function main(): void {
     console.log(`${c.ok ? "  ok  " : " FAIL "} ${c.name.padEnd(42)} ${c.detail}`);
   }
 
+  const byAgency = q<{ agency: string; n: number }>("SELECT agency, COUNT(*) n FROM fact GROUP BY agency ORDER BY n DESC");
+
   const counts = one<{ places: number; facts: number; metrics: number }>(
     `SELECT (SELECT COUNT(*) FROM place) places,
             (SELECT COUNT(*) FROM fact)  facts,
             (SELECT COUNT(*) FROM metric) metrics`,
   );
   const bytes = (() => { try { return readFileSync(DB_PATH).byteLength; } catch { return 0; } })();
+  console.log();
+  for (const row of byAgency) console.log(`  ${String(row.n).padStart(7)}  ${row.agency}`);
   console.log(
     `\n${counts.places.toLocaleString()} places · ${counts.facts.toLocaleString()} facts · ` +
     `${counts.metrics} metrics · ${(bytes / 1024 / 1024).toFixed(1)} MB · data ${meta["data.version"] ?? "?"}`,

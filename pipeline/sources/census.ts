@@ -44,7 +44,7 @@ const DETAIL: Variable[] = [
 ];
 
 const PROFILE: Variable[] = [
-  { code: "DP03_0009PE", metric: "unemployment_rate", label: "Unemployment rate", unit: "percent", direction: "lower_is_better", table: "DP03" },
+  { code: "DP03_0009PE", metric: "unemployment_rate_acs", label: "Unemployment rate, five-year average", unit: "percent", direction: "lower_is_better", table: "DP03", note: "ACS five-year average. BLS publishes the current monthly rate under unemployment_rate; the two will not match." },
   { code: "DP03_0002PE", metric: "labor_force_participation_rate", label: "Labor force participation rate", unit: "percent", direction: "higher_is_better", table: "DP03" },
   { code: "DP02_0068PE", metric: "bachelors_or_higher", label: "Bachelor's degree or higher", unit: "percent", direction: "higher_is_better", table: "DP02" },
   { code: "DP03_0128PE", metric: "poverty_rate", label: "Poverty rate", unit: "percent", direction: "lower_is_better", table: "DP03" },

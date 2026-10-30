@@ -3,6 +3,9 @@ import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { openDb, migrate, setBuildMeta, getBuildMeta, ROOT, DB_PATH } from "./db.ts";
 import { loadCensus } from "./sources/census.ts";
+import { loadBls } from "./sources/bls.ts";
+import { loadBea } from "./sources/bea.ts";
+import { loadUsaSpending } from "./sources/usaspending.ts";
 
 /**
  * The build CLI.
@@ -29,6 +32,9 @@ function loadEnvFile(): void {
 
 const SOURCES = {
   census: { run: loadCensus, needs: ["CENSUS_API_KEY"] },
+  bls: { run: loadBls, needs: ["BLS_API_KEY"] },
+  bea: { run: loadBea, needs: ["BEA_API_KEY"] },
+  usaspending: { run: loadUsaSpending, needs: [] },
 } as const;
 
 type SourceName = keyof typeof SOURCES;
@@ -47,7 +53,8 @@ async function main(): Promise<void> {
   loadEnvFile();
   const flags = parseArgs(process.argv);
   const only = typeof flags.get("only") === "string" ? (flags.get("only") as string) : null;
-  const fresh = !flags.has("keep");
+  // Only a full rebuild replaces the file. A single-source run adds to it.
+  const fresh = !only && !flags.has("keep");
 
   const names = only ? [only as SourceName] : (Object.keys(SOURCES) as SourceName[]);
   for (const name of names) {
@@ -60,9 +67,12 @@ async function main(): Promise<void> {
   const started = Date.now();
   const db = openDb(DB_PATH, { fresh });
   migrate(db);
-  db.exec("BEGIN");
-  db.exec("DELETE FROM fact; DELETE FROM place; DELETE FROM metric;");
-  db.exec("COMMIT");
+  // A single-source run adds to the file; only a full rebuild wipes it.
+  if (!only) {
+    db.exec("BEGIN");
+    db.exec("DELETE FROM fact; DELETE FROM place; DELETE FROM metric;");
+    db.exec("COMMIT");
+  }
 
   console.log(`Building ${DB_PATH}`);
   let totalFacts = 0;
@@ -88,6 +98,8 @@ async function main(): Promise<void> {
 
   db.exec("ANALYZE");
   db.exec("VACUUM");
+  // Fold the write-ahead log back into the file so the artifact is one file.
+  db.exec("PRAGMA wal_checkpoint(TRUNCATE)");
 
   const counts = db.prepare("SELECT (SELECT COUNT(*) FROM place) p, (SELECT COUNT(*) FROM fact) f").get() as {
     p: number; f: number;
