@@ -198,3 +198,57 @@ export async function askModel(
   log(ids, status, `${detail} after ${attempts} attempt${attempts === 1 ? "" : "s"}`);
   return { answer: null, status };
 }
+
+/**
+ * One sentence about a place, for the header block.
+ *
+ * Deliberately separate from `askModel`: that one turns a question into a place
+ * and a measure and must never invent either, and this one turns facts into
+ * prose and must never invent a number. Sharing a prompt between them would
+ * make one contract do two jobs.
+ *
+ * The caller validates the answer. This returns the text or null, and nothing
+ * here decides whether it is fit to show.
+ */
+export async function askSummary(placeName: string, comparisons: string): Promise<string | null> {
+  const key = process.env.OPENROUTER_API_KEY;
+  const ids = modelIds();
+  if (!key) return null;
+
+  const prompt = [
+    "You describe a United States place in at most two sentences, for a reader who can see the numbers above your sentence.",
+    "Rules: do not write any digit. Do not give advice, predictions or recommendations. Do not mention a measure that is not in the list. Plain English, present tense.",
+    `Place: ${placeName}`,
+    `Comparisons against the national figure: ${comparisons}`,
+    "Write the two sentences.",
+  ].join("\n");
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(ENDPOINT, {
+      method: "POST",
+      signal: controller.signal,
+      headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
+      body: JSON.stringify({
+        models: ids,
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0,
+        max_tokens: 400,
+        provider: { data_collection: "deny" },
+      }),
+    });
+    if (!response.ok) {
+      console.error(`[summary] model returned ${response.status}`);
+      return null;
+    }
+    const payload = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    const content = (payload.choices?.[0]?.message?.content ?? "").trim();
+    return content || null;
+  } catch (error) {
+    console.error(`[summary] call failed: ${(error as Error).message}`);
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
