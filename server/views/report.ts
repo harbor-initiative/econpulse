@@ -8,6 +8,9 @@
 
 import type { Place } from "../store.ts";
 import { esc, shell } from "./layout.ts";
+import { reportHeader } from "./header.ts";
+import { scoreFor } from "../lib/score.ts";
+import { db } from "../lib/runtime.ts";
 import { appVersion } from "../lib/runtime.ts";
 import { placeJsonLd } from "../lib/structured.ts";
 import { SITE } from "../lib/site.ts";
@@ -25,24 +28,20 @@ function descriptionFor(place: Place, panels: Panel[]): string {
 
 export function report(place: Place, panels: Panel[], meta: Record<string, string>, notice?: string, span?: DateSpan, quick?: QuickFact[]): string {
   const cards = panels.map((panel) => renderPanel(panel)).join("");
-  const pulled = span?.oldest && span.newest
-    ? (span.oldest === span.newest ? `pulled ${span.oldest}` : `pulled ${span.oldest} to ${span.newest}`)
-    : null;
-  const placeSub = [
-    place.state_code,
-    place.population ? `population ${place.population.toLocaleString("en-US")}` : null,
-    `GEOID ${place.geoid}`,
-  ].filter(Boolean).join(" · ");
+  const score = scoreFor(db, place);
+  const promoted = panels.find((panel) => panel.fact)?.fact ?? null;
 
   return shell(
     `${place.name} — EconPulse`,
-    `<p class="crumb">${esc(place.kind)}</p>
+    `${reportHeader({
+       place,
+       score,
+       span,
+       promoted,
+       dataVersion: meta["data.version"] ?? "?",
+       built: (meta["build.finished_at"] ?? "").slice(0, 10),
+     })}
      ${notice ? `<p class="notice">${esc(notice)}</p>` : ""}
-     <h1 class="place">${esc(place.name)}</h1>
-     <p class="sub">${esc(placeSub)}</p>
-     <div class="tools"><span class="tv">data ${esc(meta["data.version"] ?? "?")} · built ${esc((meta["build.finished_at"] ?? "").slice(0, 10))}</span>
-       ${pulled ? `<span class="tv">${esc(pulled)}</span>` : ""}
-       <span class="tv">${esc(meta["build.source_count"] ?? String((meta["build.sources"] ?? "").split(/[·,]/).map((x) => x.trim()).filter(Boolean).length || "?"))} agencies</span></div>
      <div class="grid">${cards}</div>
      ${quickFactsGrid(quick ?? [])}`,
     {

@@ -46,6 +46,28 @@ population 15 · federal 10`, linked to `/method`.
 - [ ] No empty band above the crumb
 - [ ] Mobile: the block stacks, score first, summary below
 
+### What changed while building it
+
+**The pillars changed, and this is the one substantive departure.** The spec named
+`jobs 30 · housing 25 · output 20 · population 15 · federal 10`. Output,
+population and federal obligations are `neutral` in `metric.direction`, so #11
+does not score them: a percentile of a population is not a statement about
+whether a place is doing well.
+
+The five pillars are the five measures that have a direction and are present
+almost everywhere: **jobs 30 · housing 25 · income 20 · education 15 · poverty
+10**. The weights keep the spec's shape, and each one is scored by #11.
+
+**A place shows one peer reading today.** Two need a city to carry its county's
+percentile, which the file cannot do until #71 gives a city the county it is
+actually in.
+
+**The score falls back to nothing.** A file built before the percentile pass has
+no table, and the header says so in one line instead of rendering a zero.
+
+**The gate drops from 24 to 15.** The place name at 28px (22 on a phone) clears
+the heading rule on every report route.
+
 ## Risks
 
 A score invites comparison between places in a way five numbers did not. That is
