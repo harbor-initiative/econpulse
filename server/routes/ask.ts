@@ -17,14 +17,14 @@ import { lookupZip, searchPlaces } from "../store.ts";
 import { db, meta } from "../lib/runtime.ts";
 import { redirect, send } from "../lib/http.ts";
 import { METRICS, REPORT_ORDER } from "../lib/metrics.ts";
-import { buildPanels, contextFor, panelFor } from "../lib/panels.ts";
+import { buildPanels, contextFor, panelFor, sharedMetrics } from "../lib/panels.ts";
 import { factDateSpan } from "../lib/freshness.ts";
 import { parseLocally, parseQuestion } from "../ask.ts";
 import { isQuestion } from "../lib/rules.ts";
 import { isModelUnavailable, type ModelOutcome } from "../lib/model.ts";
 import { report } from "../views/report.ts";
 import { searchResults } from "../views/search.ts";
-import { askCard } from "../views/ask.ts";
+import { askCard, compareCard, compareEmpty } from "../views/ask.ts";
 import { allow, clientKey } from "../lib/ratelimit.ts";
 import { askModelBusy, askNeedMetric, askNeedPlace, askNoMatch, askRateLimited, askUnreadable } from "../views/states.ts";
 
@@ -119,11 +119,28 @@ export async function routeAsk(url: URL, res: ServerResponse, req?: IncomingMess
     return true;
   }
 
+  // A comparison, when the question asked for one and both names resolved to
+  // different places. It renders before the single-place branches because a
+  // comparison is a different page, not a decoration on the report.
+  if (parsed.comparePlace && parsed.comparePlace.geoid !== place.geoid) {
+    const other = parsed.comparePlace;
+    const rows = sharedMetrics(place, other);
+    if (!rows.length) {
+      send(res, 200, compareEmpty(question, place, other));
+      return true;
+    }
+    send(res, 200, compareCard(question, place, other, rows, null));
+    return true;
+  }
+
   const ctx = contextFor(place);
 
   if (!metric) {
     if (ctx.available.size > 1) {
-      send(res, 200, report(place, buildPanels(place), meta, undefined, factDateSpan(db)));
+      const droppedNotice = parsed.dropped
+        ? `${parsed.dropped} is not in this file, so this is ${place.name} alone.`
+        : undefined;
+      send(res, 200, report(place, buildPanels(place), meta, droppedNotice, factDateSpan(db)));
       return true;
     }
     const offered = REPORT_ORDER

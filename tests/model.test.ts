@@ -97,7 +97,7 @@ test("the model list travels as OpenRouter's models array, in order", async () =
   stubFetch(() => answered(ANSWER));
   const outcome = await askModel("Is rent going up in Austin?", METRICS, context());
   assert.equal(outcome.status, "ok");
-  assert.deepEqual(outcome.answer, { placeName: "Austin", metric: "median_gross_rent" });
+  assert.deepEqual(outcome.answer, { placeName: "Austin", metric: "median_gross_rent", compareTo: null });
   assert.deepEqual(calls[0]?.models, ["openrouter/free", "anthropic/claude-sonnet-4.5"]);
   assert.equal("model" in (calls[0] ?? {}), false);
 });

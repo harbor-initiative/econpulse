@@ -193,3 +193,34 @@ export function quickFacts(place: Place): QuickFact[] {
   return facts;
 }
 
+
+export interface SharedMetric {
+  metric: string;
+  label: string;
+  a: Fact[];
+  b: Fact[];
+}
+
+/**
+ * The measures two places both publish, newest last.
+ *
+ * Ordered by the report's own order so a comparison reads like the report, and
+ * a metric only appears when both places have at least one fact for it. A
+ * comparison of one place against nothing is the single-place page again.
+ */
+export function sharedMetrics(a: Place, b: Place): SharedMetric[] {
+  const order = [...REPORT_ORDER, "median_home_value", "median_household_income", "poverty_rate"];
+  const out: SharedMetric[] = [];
+  for (const metric of order) {
+    const left = series(db, a.geoid, metric);
+    const right = series(db, b.geoid, metric);
+    if (!left.length || !right.length) continue;
+    out.push({
+      metric,
+      label: METRICS[metric]?.label ?? left[left.length - 1]?.label ?? metric,
+      a: left,
+      b: right,
+    });
+  }
+  return out;
+}

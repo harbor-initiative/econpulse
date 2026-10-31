@@ -90,7 +90,7 @@ export function seriesReadout(
   history: Fact[],
   comparison: Fact[],
   comparisonLabel: string | null,
-  options: { isCount?: boolean } = {},
+  options: { isCount?: boolean; placeLabel?: string; deltaTarget?: string } = {},
 ): SeriesReadout {
   const values = history.map((row) => row.value);
   const drawCompare = comparison.length === history.length && comparison.length > 0;
@@ -102,7 +102,7 @@ export function seriesReadout(
   // The legend lists the series in draw order, because it is built from the same
   // two arrays the paths are built from.
   const legend = drawCompare && comparisonLabel
-    ? `<p class="legend"><span><i class="sw sw-solid"></i>This place</span><span><i class="sw sw-dash"></i>${esc(comparisonLabel)}</span></p>`
+    ? `<p class="legend"><span><i class="sw sw-solid"></i>${esc(options.placeLabel ?? "This place")}</span><span><i class="sw sw-dash"></i>${esc(comparisonLabel)}</span></p>`
     : "";
 
   const latest = history[history.length - 1] ?? null;
@@ -115,10 +115,17 @@ export function seriesReadout(
     // two lines. A change since last month, next to a national line, reads as a
     // gap against the nation.
     const gap = latest.value - against.value;
-    const unit = latest.unit === "percent" ? " pts" : latest.unit === "years" ? " years" : "";
+    // A gap in dollars is not a gap in points. Printing 8577461000.0 next to
+    // "+$85.8B above" would be the same fact written two ways and only one of
+    // them readable.
+    const magnitude = latest.unit === "percent"
+      ? `${Math.abs(gap).toFixed(1)} pts`
+      : latest.unit === "years"
+        ? `${Math.abs(gap).toFixed(1)} years`
+        : formatValue(Math.abs(gap), latest.unit);
     const sign = gap >= 0 ? "+" : "−";
     const direction = gap >= 0 ? "above" : "below";
-    delta = `${sign}${Math.abs(gap).toFixed(1)}${unit} ${direction} the ${esc(comparisonLabel)}`;
+    delta = `${sign}${magnitude} ${direction} ${esc(options.deltaTarget ?? `the ${comparisonLabel}`)}`;
   } else if (latest && previous && previous.value !== 0) {
     const change = latest.value - previous.value;
     const sign = change >= 0 ? "+" : "−";
