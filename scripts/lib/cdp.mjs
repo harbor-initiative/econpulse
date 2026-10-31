@@ -56,6 +56,12 @@ export async function launchChrome(chrome) {
       // Software WebGL, so the map renders in the gate exactly as it renders in
       // CI. Without it the gate measured a page with no map on one machine and a
       // page with one on another, and the colour budget disagreed with itself.
+      // Text antialiasing is not design. Linux Chrome renders LCD subpixel text,
+      // which puts a coloured fringe on every glyph and made a phone-width page
+      // measure 9% colour where macOS measured 1%. The budget is about the
+      // palette, so the fringes are turned off and the colour profile pinned.
+      "--disable-lcd-text",
+      "--force-color-profile=srgb",
       "--enable-unsafe-swiftshader",
       "--use-gl=angle",
       "--use-angle=swiftshader",
