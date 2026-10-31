@@ -29,6 +29,19 @@ Progressive enhancement with no framework.
 - [ ] JavaScript disabled still answers
 - [ ] A failure replaces the shell with the right state from #21
 
+### What changed while building it
+
+The loading panel replaces the front of the page rather than the whole document,
+so the stylesheet is already there and nothing flashes white. The document is
+replaced once, when the answer arrives.
+
+The panel is inserted in 2 ms and the first step is set at submit. A fast answer
+therefore never shows steps two and three, which is correct: the steps describe
+waiting, and there was none.
+
+`public/ask.js` is served by the assets route with a five-minute cache. The name
+does not change between deploys, so it is not immutable like a font.
+
 ## Risks
 
 A fake progress bar is a lie if it never changes. Three named steps tied to real

@@ -21,6 +21,7 @@ import { sitemap } from "../lib/sitemap.ts";
  * a font that changes name is a font that changes file.
  */
 const FONT_DIR = path.resolve(import.meta.dirname, "..", "..", "public", "fonts");
+const PUBLIC_DIR = path.resolve(import.meta.dirname, "..", "..", "public");
 const FONTS = new Map<string, Buffer>();
 
 function font(name: string): Buffer | null {
@@ -30,6 +31,22 @@ function font(name: string): Buffer | null {
   try {
     const buffer = readFileSync(path.join(FONT_DIR, name));
     FONTS.set(name, buffer);
+    return buffer;
+  } catch {
+    return null;
+  }
+}
+
+const SCRIPTS = new Map<string, Buffer>();
+
+/** A script from `public/`, read once. The name is a closed set, like the fonts. */
+function script(name: string): Buffer | null {
+  if (!/^[a-z0-9-]+\.js$/.test(name)) return null;
+  const cached = SCRIPTS.get(name);
+  if (cached) return cached;
+  try {
+    const buffer = readFileSync(path.join(PUBLIC_DIR, name));
+    SCRIPTS.set(name, buffer);
     return buffer;
   } catch {
     return null;
@@ -57,6 +74,20 @@ export async function routeAssets(url: URL, res: ServerResponse): Promise<boolea
       return true;
     }
     send(res, 200, body, "application/xml; charset=utf-8");
+    return true;
+  }
+
+  const scriptMatch = url.pathname.match(/^\/([a-z0-9-]+\.js)$/);
+  if (scriptMatch?.[1]) {
+    const body = script(scriptMatch[1]);
+    if (!body) return false;
+    // Not immutable: the filename stays and the content changes with a deploy.
+    res.writeHead(200, {
+      "content-type": "text/javascript; charset=utf-8",
+      "content-length": String(body.length),
+      "cache-control": "public, max-age=300",
+    });
+    res.end(body);
     return true;
   }
 

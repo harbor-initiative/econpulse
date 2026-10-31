@@ -64,6 +64,13 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 .factv{font-size:1rem;font-weight:600;font-variant-numeric:tabular-nums;text-align:right;letter-spacing:-.01em}
 .factr{grid-column:1/-1;font-family:var(--mono);font-size:.55rem;color:var(--rec)}
 @media (max-width:720px){.factgrid{grid-template-columns:1fr}}
+.ask-loading{margin:0 0 2rem;padding-bottom:1.2rem;border-bottom:1px solid var(--ink)}
+.ask-q{font-family:var(--serif);font-size:1.5rem;line-height:1.15;margin:.4rem 0 .8rem;max-width:32ch}
+.ask-step{font-family:var(--mono);font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;color:var(--rec);margin:0}
+.ask-loading::after{content:"";display:block;height:2px;margin-top:.9rem;background:linear-gradient(90deg,var(--teal) 0 30%,var(--rule) 30% 100%);animation:ask-sweep 1.4s ease-in-out infinite}
+.ask-failed::after{background:var(--rule2);animation:none}
+@keyframes ask-sweep{0%{background-position:0 0}100%{background-position:100% 0}}
+@media (prefers-reduced-motion:reduce){.ask-loading::after{animation:none}}
 .legend{display:flex;gap:1rem;font-family:var(--mono);font-size:.58rem;letter-spacing:.04em;color:var(--rec);margin:.3rem 0 0}
 .legend span{display:inline-flex;align-items:center;gap:.35rem}
 .legend .sw{display:inline-block;width:16px;height:0;border-top-width:1.7px;border-top-style:solid}
@@ -138,4 +145,4 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
         <span class="rk">place · 1,487</span></a></li><li><a href="/p/3955216"><span class="rn">New Philadelphia city, Ohio, OH</span>
         <span class="rk">place · 17,520</span></a></li></ul>
 <footer><span></span><span>A Harbor Initiative project · Public data · Not financial advice</span></footer>
-</div></body></html>
+</div><script src="/ask.js" defer></script></body></html>
