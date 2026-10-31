@@ -199,6 +199,8 @@ export interface SharedMetric {
   label: string;
   a: Fact[];
   b: Fact[];
+  /** Where a borrowed figure came from, per side. Empty when each place reports its own. */
+  note?: string;
 }
 
 /**
@@ -210,16 +212,25 @@ export interface SharedMetric {
  */
 export function sharedMetrics(a: Place, b: Place): SharedMetric[] {
   const order = [...REPORT_ORDER, "median_home_value", "median_household_income", "poverty_rate"];
+  const ctxA = contextFor(a);
+  const ctxB = contextFor(b);
   const out: SharedMetric[] = [];
+
   for (const metric of order) {
-    const left = series(db, a.geoid, metric);
-    const right = series(db, b.geoid, metric);
-    if (!left.length || !right.length) continue;
+    // The same rules the report uses, including the county fallback. A city does
+    // not publish its own unemployment, so a comparison of two cities would
+    // otherwise drop the measure the product is built around.
+    const left = panelFor(a, metric, ctxA.available, ctxA.county, ctxA.countyMetrics);
+    const right = panelFor(b, metric, ctxB.available, ctxB.county, ctxB.countyMetrics);
+    if (!left.fact || !right.fact) continue;
+
+    const notes = [left.note, right.note].filter(Boolean) as string[];
     out.push({
       metric,
-      label: METRICS[metric]?.label ?? left[left.length - 1]?.label ?? metric,
-      a: left,
-      b: right,
+      label: METRICS[metric]?.label ?? left.fact.label ?? metric,
+      a: left.history,
+      b: right.history,
+      note: notes.length ? [...new Set(notes)].join(" ") : undefined,
     });
   }
   return out;

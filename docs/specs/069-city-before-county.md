@@ -51,6 +51,19 @@ resolves through the alias, because no place is named that.
 - [ ] Three-character queries stay under 5 ms
 - [ ] A test asserts the base-name match does not displace an exact full-name match
 
+### What changed while building it
+
+**The SQL tier was too slow.** The first version widened the `WHERE` clause with
+ten `OR`s, which is a full scan of 19,142 rows on every keystroke: 8.2 ms against
+a 5 ms budget, on the endpoint the combobox calls while a reader types. The exact
+tier now reads two maps built with the #6 index — base name, and first word.
+
+**An exact name does not hide a near one.** `Pittsburg` is a real city in
+California and also how people spell Pittsburgh. The list carries both: exact
+matches first, then the fuzzy results, de-duplicated. #6's test asserted
+Pittsburgh was the first result and now asserts it is in the result, which is the
+promise the search can keep.
+
 ## Risks
 
 A state name is also a base name: `Washington` matches Washington County in

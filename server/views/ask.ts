@@ -42,7 +42,7 @@ export function compareCard(
   question: string,
   a: Place,
   b: Place,
-  rows: Array<{ label: string; a: Fact[]; b: Fact[]; metric: string }>,
+  rows: Array<{ label: string; a: Fact[]; b: Fact[]; metric: string; note?: string }>,
   dropped: string | null,
 ): string {
   const blocks = rows
@@ -57,6 +57,7 @@ export function compareCard(
         const unit = latestA?.unit ?? "";
         return `<div class="metric full">
         <p class="label">${esc(row.label)}</p>
+        ${row.note ? `<p class="bench-note">${esc(row.note)}</p>` : ""}
         ${headline}
         ${compareBars([
           { label: a.name, value: latestA?.value ?? 0 },
@@ -68,6 +69,7 @@ export function compareCard(
       const readout = seriesReadout(row.a, row.b, b.name, { placeLabel: a.name, deltaTarget: b.name });
       return `<div class="metric full">
         <p class="label">${esc(row.label)}</p>
+        ${row.note ? `<p class="bench-note">${esc(row.note)}</p>` : ""}
         ${headline}
         ${readout.delta ? `<p class="delta">${readout.delta}</p>` : ""}
         ${readout.chart}${readout.legend}
