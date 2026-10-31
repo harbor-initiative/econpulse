@@ -10,7 +10,8 @@
 import { series, metricsFor, countyForPlace, getPlace, directionOf, type Place, type Fact } from "../store.ts";
 import { db } from "./runtime.ts";
 import { METRICS, REPORT_ORDER, type MetricSpec } from "./metrics.ts";
-import type { BenchRow, Panel, PanelMark } from "../views/panel.ts";
+import type { BenchRow, Panel, PanelMark, QuickFact } from "../views/panel.ts";
+import { formatValue } from "../views/format.ts";
 
 /**
  * The state a place sits in, when that is a different place.
@@ -121,3 +122,74 @@ export function buildPanels(place: Place): Panel[] {
   const ctx = contextFor(place);
   return REPORT_ORDER.map((metric) => panelFor(place, metric, ctx.available, ctx.county, ctx.countyMetrics));
 }
+
+/** The measures the report does not panel, and the two national series. */
+const QUICK_METRICS = [
+  "median_age",
+  "bachelors_or_higher",
+  "poverty_rate",
+  "labor_force_participation_rate",
+  "median_home_value",
+  "median_household_income",
+  "unemployment_rate_acs",
+] as const;
+
+const QUICK_NATIONAL = ["cpi", "mortgage_rate_30y"] as const;
+
+function latest(geoid: string, metric: string): Fact | null {
+  const rows = series(db, geoid, metric);
+  return rows.length ? (rows[rows.length - 1] ?? null) : null;
+}
+
+/**
+ * Nine facts from the file, and the one derived number: this place's share of
+ * its state.
+ *
+ * The report panels cover five measures. Seven more are in the file and were
+ * invisible, and two of those are the national series that make the local
+ * numbers mean something.
+ */
+export function quickFacts(place: Place): QuickFact[] {
+  const facts: QuickFact[] = [];
+
+  for (const metric of QUICK_METRICS) {
+    const fact = latest(place.geoid, metric);
+    if (!fact) continue;
+    facts.push({
+      label: METRICS[metric]?.label ?? fact.label,
+      value: formatValue(fact.value, fact.unit),
+      agency: fact.agency,
+      period: fact.period,
+      scope: "place",
+    });
+  }
+
+  for (const metric of QUICK_NATIONAL) {
+    const fact = latest("0100000US", metric);
+    if (!fact) continue;
+    facts.push({
+      label: `${METRICS[metric]?.label ?? fact.label} (United States)`,
+      value: formatValue(fact.value, fact.unit),
+      agency: fact.agency,
+      period: fact.period,
+      scope: "nation",
+    });
+  }
+
+  const population = latest(place.geoid, "population");
+  const state = stateFor(place);
+  const statePopulation = state ? latest(state.geoid, "population") : null;
+  if (population && statePopulation && statePopulation.value > 0) {
+    const share = (population.value / statePopulation.value) * 100;
+    facts.push({
+      label: `Share of ${state?.short_name ?? "the state"}`,
+      value: `${share.toFixed(2)}%`,
+      agency: population.agency,
+      period: population.period,
+      scope: "share",
+    });
+  }
+
+  return facts;
+}
+

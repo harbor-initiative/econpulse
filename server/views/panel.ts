@@ -28,6 +28,36 @@ export interface BenchRow {
   role: "place" | "state" | "nation";
 }
 
+/** One cell of the quick facts grid. */
+export interface QuickFact {
+  label: string;
+  value: string;
+  agency: string;
+  period: string;
+  scope: "place" | "nation" | "share";
+}
+
+/**
+ * The measures the panels do not cover.
+ *
+ * Ten numbers with their agency and period attached, because a grid of ten
+ * values invites skimming and the receipt is the only thing that makes them
+ * worth skimming. Two of the cells are national series, and say so.
+ */
+export function quickFactsGrid(facts: QuickFact[]): string {
+  if (!facts.length) return "";
+  const cells = facts
+    .map(
+      (fact) => `<div class="fact" data-scope="${fact.scope}">
+      <span class="factl">${esc(fact.label)}</span>
+      <span class="factv">${esc(fact.value)}</span>
+      <span class="factr">${esc(fact.agency)} · ${esc(fact.period)}</span>
+    </div>`,
+    )
+    .join("");
+  return `<section class="facts"><h2>More about this place</h2><div class="factgrid">${cells}</div></section>`;
+}
+
 /** Direction, in a word. A hue would carry the same meaning and fail in print. */
 export type PanelMark = "better" | "worse";
 

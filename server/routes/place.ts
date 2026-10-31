@@ -10,7 +10,7 @@ import type { ServerResponse } from "node:http";
 import { getPlace } from "../store.ts";
 import { db, meta } from "../lib/runtime.ts";
 import { send } from "../lib/http.ts";
-import { buildPanels } from "../lib/panels.ts";
+import { buildPanels, quickFacts } from "../lib/panels.ts";
 import { factDateSpan } from "../lib/freshness.ts";
 import { shell } from "../views/layout.ts";
 import { report } from "../views/report.ts";
@@ -29,6 +29,6 @@ export async function routePlace(url: URL, res: ServerResponse): Promise<boolean
   const notice = zip && /^\d{5}$/.test(zip)
     ? `ZIP ${zip}. ZIP codes follow postal routes, so these figures are for ${place.name}.`
     : undefined;
-  send(res, 200, report(place, buildPanels(place), meta, notice, factDateSpan(db)));
+  send(res, 200, report(place, buildPanels(place), meta, notice, factDateSpan(db), quickFacts(place)));
   return true;
 }
