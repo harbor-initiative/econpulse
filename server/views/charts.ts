@@ -6,6 +6,7 @@
  */
 
 
+import type { Fact } from "../store.ts";
 import { formatValue } from "./format.ts";
 import { esc } from "./layout.ts";
 const TEAL = "#009689";
@@ -69,6 +70,65 @@ export function shareBar(percent: number, label: string, placeValue: number, par
     <span class="sbtrack"><i style="width:${width.toFixed(1)}%"></i></span>
     <span class="sblabel">${esc(percent.toFixed(2))}% of ${esc(label)} · ${esc(formatValue(placeValue, unit))} of ${esc(formatValue(parentValue, unit))}</span>
   </div>`;
+}
+
+/**
+ * The chart, its legend, and the delta beside it, from one array pair.
+ *
+ * Three things describe one comparison, and the reason this is a single function
+ * is that they can disagree in a way a reader will believe: a dashed line with a
+ * delta that measures a different thing is a chart that lies while every part of
+ * it is individually correct.
+ */
+export interface SeriesReadout {
+  chart: string;
+  legend: string;
+  delta: string;
+}
+
+export function seriesReadout(
+  history: Fact[],
+  comparison: Fact[],
+  comparisonLabel: string | null,
+  options: { isCount?: boolean } = {},
+): SeriesReadout {
+  const values = history.map((row) => row.value);
+  const drawCompare = comparison.length === history.length && comparison.length > 0;
+  const chart = options.isCount
+    ? barChart(values, history.map((row) => row.period))
+    : lineChart(values, drawCompare ? comparison.map((row) => row.value) : []) +
+      `<div class="years"><span>${esc(history[0]?.period ?? "")}</span><span>${esc(history[history.length - 1]?.period ?? "")}</span></div>`;
+
+  // The legend lists the series in draw order, because it is built from the same
+  // two arrays the paths are built from.
+  const legend = drawCompare && comparisonLabel
+    ? `<p class="legend"><span><i class="sw sw-solid"></i>This place</span><span><i class="sw sw-dash"></i>${esc(comparisonLabel)}</span></p>`
+    : "";
+
+  const latest = history[history.length - 1] ?? null;
+  const previous = history[history.length - 2] ?? null;
+  const against = drawCompare ? (comparison[comparison.length - 1] ?? null) : null;
+
+  let delta = "";
+  if (latest && against && comparisonLabel) {
+    // The chart draws two lines, so the number beside it has to be about those
+    // two lines. A change since last month, next to a national line, reads as a
+    // gap against the nation.
+    const gap = latest.value - against.value;
+    const unit = latest.unit === "percent" ? " pts" : latest.unit === "years" ? " years" : "";
+    const sign = gap >= 0 ? "+" : "−";
+    const direction = gap >= 0 ? "above" : "below";
+    delta = `${sign}${Math.abs(gap).toFixed(1)}${unit} ${direction} the ${esc(comparisonLabel)}`;
+  } else if (latest && previous && previous.value !== 0) {
+    const change = latest.value - previous.value;
+    const sign = change >= 0 ? "+" : "−";
+    const body = latest.unit === "percent"
+      ? `${sign}${Math.abs(change).toFixed(1)} pts`
+      : `${sign}${Math.abs((change / previous.value) * 100).toFixed(1)}%`;
+    delta = `${body} vs ${esc(previous.period)}`;
+  }
+
+  return { chart, legend, delta };
 }
 
 export function compareBars(rows: Array<{ label: string; value: number }>, unit: string): string {
