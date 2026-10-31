@@ -28,6 +28,8 @@ const ROUTES = [
   { slug: "place-city", path: "/p/4260000" },
   { slug: "ask-question", path: "/ask?q=Is+rent+going+up+in+Austin" },
   { slug: "status", path: "/status" },
+  { slug: "method", path: "/method" },
+  { slug: "ask-local", path: "/ask?q=Population+of+Cook+County" },
   { slug: "not-found", path: "/nope" },
 ];
 
