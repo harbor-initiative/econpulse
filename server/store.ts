@@ -2,7 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { aliasGeoid, loadAliases } from "./lib/aliases.ts";
-import { buildSearchIndex, isIndexBuilt, searchIndex } from "./lib/search-index.ts";
+import { buildSearchIndex, exactMatches, isIndexBuilt, searchIndex } from "./lib/search-index.ts";
 
 // Read the three alias CSVs once, before the first request. A malformed file
 // fails the process at boot instead of returning an empty search.
@@ -95,18 +95,23 @@ export function searchPlaces(db: DatabaseSync, query: string, limit = 12): Place
   }
 
   // An exact name is an exact answer, and an alias never displaces it.
-  const exact = db
-    .prepare(
-      `SELECT geoid, kind, name, short_name, state_code, parent_geoid, population
-       FROM place
-       WHERE name = ? COLLATE NOCASE OR short_name = ? COLLATE NOCASE
-       ORDER BY
-         CASE kind WHEN 'county' THEN 0 WHEN 'place' THEN 1 WHEN 'state' THEN 2 ELSE 3 END,
-         population DESC
-       LIMIT ?`,
-    )
-    .all(q, q, limit) as unknown as Place[];
-  if (exact.length) return exact;
+  //
+  // The comparison is made in memory, on the index built for #6. A city's name
+  // is `Austin city` and a reader types `Austin`; a county is `Austin County`;
+  // `Nashville-Davidson` answers to `Nashville`. Answering that from SQL meant a
+  // full scan on every keystroke, which measured at 8 ms and would have made the
+  // combobox worse than the page it replaced.
+  if (!isIndexBuilt()) buildSearchIndex(allPlaces(db));
+  const exact = exactMatches(q, limit);
+  if (exact.length >= limit) return exact;
+  if (exact.length) {
+    // An exact name does not hide a near one. `Pittsburg` is a real city in
+    // California and also how people spell Pittsburgh, so the list carries both
+    // rather than choosing for the reader.
+    const seen = new Set(exact.map((place) => place.geoid));
+    const near = searchIndex(q, limit).filter((place) => !seen.has(place.geoid));
+    return [...exact, ...near].slice(0, limit);
+  }
 
   // An alias is an exact answer too, so it beats a substring match.
   const aliased = aliasGeoid(q);

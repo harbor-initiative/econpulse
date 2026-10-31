@@ -34,6 +34,10 @@ export interface IndexStats {
 }
 
 let entries: IndexedEntry[] = [];
+/** Base name -> entries, for the exact tier. Built with the index, read on every keystroke. */
+let byBase = new Map<string, IndexedEntry[]>();
+/** First word -> entries, so `Nashville` finds `Nashville-Davidson` without a scan. */
+let byToken = new Map<string, IndexedEntry[]>();
 let grams = new Int32Array(0);
 let stats: IndexStats | null = null;
 
@@ -124,6 +128,18 @@ export function buildSearchIndex(places: Place[]): IndexStats {
 
   entries = next;
   grams = flat;
+  byBase = new Map();
+  byToken = new Map();
+  for (const entry of next) {
+    const bucket = byBase.get(entry.norm);
+    if (bucket) bucket.push(entry);
+    else byBase.set(entry.norm, [entry]);
+
+    const token = entry.norm.split(/[\s-]+/)[0] ?? entry.norm;
+    const first = byToken.get(token);
+    if (first) first.push(entry);
+    else byToken.set(token, [entry]);
+  }
   stats = {
     places: entries.length,
     trigrams: total,
@@ -137,6 +153,41 @@ export function buildSearchIndex(places: Place[]): IndexStats {
       `${stats.buildMs.toFixed(1)} ms · ${(stats.bytes / 1048576).toFixed(2)} MB footprint`,
   );
   return stats;
+}
+
+/**
+ * The exact tier: the name a reader typed, with or without its type suffix.
+ *
+ * A city's name is `Austin city`. A reader types `Austin`. A county is `Austin
+ * County`. `Nashville-Davidson` answers to `Nashville`. All four are the same
+ * question, so they are answered from one map instead of a scan of 19,000 rows
+ * on every keystroke.
+ */
+export function exactMatches(query: string, limit = 12): Place[] {
+  const q = normalizeName(query);
+  if (!q || limit <= 0) return [];
+
+  const found = new Map<string, IndexedEntry>();
+  for (const entry of byBase.get(q) ?? []) found.set(entry.geoid, entry);
+  // `Nashville-Davidson` shares its first word with the query, and the token map
+  // is a lookup rather than a scan of every place. Normalisation turns the
+  // hyphen into a space, so the test is for either separator.
+  for (const entry of byToken.get(q) ?? []) {
+    if (entry.norm.startsWith(`${q} `) || entry.norm.startsWith(`${q}-`)) found.set(entry.geoid, entry);
+  }
+
+  return [...found.values()]
+    .sort((a, b) => {
+      const population = (b.population ?? -1) - (a.population ?? -1);
+      if (population !== 0) return population;
+      return (KIND_RANK[a.kind] ?? 4) - (KIND_RANK[b.kind] ?? 4);
+    })
+    .slice(0, limit)
+    .map((entry) => ({
+      geoid: entry.geoid, kind: entry.kind, name: entry.name,
+      short_name: entry.shortName, state_code: entry.stateCode,
+      parent_geoid: entry.parentGeoid, population: entry.population,
+    }));
 }
 
 export function isIndexBuilt(): boolean {

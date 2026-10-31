@@ -18,6 +18,10 @@ const DB = path.join(import.meta.dirname, "..", "data", "econpulse.db");
 const skip = existsSync(DB) ? false : "data/econpulse.db is not present";
 const db = skip ? null : openStore(DB);
 
+function search(query: string, limit = 8): Place[] {
+  return searchPlaces(db!, query, limit);
+}
+
 function first(query: string): Place | null {
   return searchPlaces(db!, query, 5)[0] ?? null;
 }
@@ -44,9 +48,12 @@ describe("the open database", { skip }, () => {
     assert.equal(first("Philadelpia")?.name, "Philadelphia County, Pennsylvania");
   });
 
-  test("Pittsburg resolves to Pittsburgh", () => {
-    assert.equal(first("Pittsburg")?.geoid, "4261000");
-    assert.equal(first("Pittsburg")?.name, "Pittsburgh city, Pennsylvania");
+  test("Pittsburg offers Pittsburgh, and does not hide the real Pittsburgs", () => {
+    // Pittsburg, California is a real city. An exact name shows it; the typo
+    // list still carries the city most people mean.
+    const results = search("Pittsburg", 8);
+    assert.ok(results.some((place) => place.geoid === "4261000"), "Pittsburgh is in the list");
+    assert.ok(results.some((place) => place.geoid === "0657456"), "Pittsburg, California is in the list");
   });
 
   test("Pitsburgh, the narrower typo, also resolves to Pittsburgh", () => {

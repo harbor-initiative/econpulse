@@ -10,7 +10,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { openStore } from "../server/store.ts";
+import { openStore, getPlace } from "../server/store.ts";
 import { parseLocally, parseComparison, wantsComparison } from "../server/ask.ts";
 import { sharedMetrics } from "../server/lib/panels.ts";
 import { compareCard, compareEmpty } from "../server/views/ask.ts";
@@ -42,16 +42,26 @@ test("two places share the measures they both publish", { skip }, () => {
   }
 });
 
-test("the page names both places and draws both series", { skip }, () => {
+test("two counties get two series and a legend", { skip }, () => {
+  // Counties publish unemployment, output and federal obligations as series.
+  const a = getPlace(db!, "42017")!; // Bucks County, Pennsylvania
+  const b = getPlace(db!, "42091")!; // Montgomery County, Pennsylvania
+  const rows = sharedMetrics(a, b);
+  const html = compareCard("Bucks vs Montgomery", a, b, rows, null);
+  assert.match(html, /Bucks County/, "the first place is named");
+  assert.match(html, /Montgomery County/, "the second place is named");
+  assert.match(html, /class="legend"/, "a series comparison carries a legend");
+  assert.equal((html.match(/class="metric full"/g) ?? []).length, rows.length);
+});
+
+test("two cities compare as bars, because a city publishes one period", { skip }, () => {
   const parsed = parseComparison(db!, "Austin vs Nashville")!;
   const a = parsed.place!;
   const b = parsed.comparePlace!;
   const rows = sharedMetrics(a, b);
+  assert.ok(rows.length >= 4, `${rows.length} shared measures`);
   const html = compareCard("Austin vs Nashville", a, b, rows, null);
-  assert.match(html, new RegExp(a.name.slice(0, 12)), "the first place is named");
-  assert.match(html, new RegExp(b.name.slice(0, 12)), "the second place is named");
-  assert.match(html, /class="legend"/, "at least one chart carries a legend");
-  assert.equal((html.match(/class="metric full"/g) ?? []).length, rows.length);
+  assert.match(html, /class="compare"/, "single-period measures draw two bars");
 });
 
 test("an unknown second name drops to one place and says which", { skip }, () => {
