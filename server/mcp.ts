@@ -2,6 +2,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { appVersion } from "./lib/runtime.ts";
 import {
   openStore, storePath, getPlace, searchPlaces, series, metricsFor,
   countyForPlace, counts, buildMeta,
@@ -21,7 +22,10 @@ import {
 const db = openStore(storePath());
 const meta = buildMeta(db);
 
-const server = new McpServer({ name: "econpulse", version: "0.1.0" });
+// The same version the page prints in its footer, read from package.json at
+// boot. A client that records which build answered should not be told 0.1.0 by
+// a 0.13.0 image.
+const server = new McpServer({ name: "econpulse", version: appVersion });
 
 function json(value: unknown): { content: Array<{ type: "text"; text: string }> } {
   return { content: [{ type: "text", text: JSON.stringify(value, null, 2) }] };
@@ -161,7 +165,7 @@ async function main(): Promise<void> {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   // stderr only: stdout is the protocol channel.
-  console.error(`econpulse mcp · data ${meta["data.version"] ?? "?"} · ${storePath()}`);
+  console.error(`econpulse mcp ${appVersion} · data ${meta["data.version"] ?? "?"} · ${storePath()}`);
 }
 
 main().catch((error) => {
