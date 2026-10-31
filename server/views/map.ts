@@ -21,6 +21,7 @@ export function mapBlock(input: MapInput): string {
   if (!input.center) return "";
   const [lon, lat] = input.center;
   return `<figure class="mapf" data-map data-geoid="${esc(input.geoid)}" data-center="[${lon.toFixed(4)},${lat.toFixed(4)}]" data-zoom="${input.zoom}">
+    <button class="locate" type="button" data-locate>Use my location</button>
     <noscript><p class="mapnote">The outline needs JavaScript. The GEOID is in the scope line above.</p></noscript>
   </figure>`;
 }

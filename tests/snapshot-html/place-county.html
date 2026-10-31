@@ -89,6 +89,9 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 .hsub{font-size:1.5rem;line-height:1.15;margin:.2rem 0 .6rem}
 .mapf{height:200px;margin:0 0 1.4rem;border:1px solid var(--rule);background:#F4F2EC;position:relative}
 .mapf.map-failed{padding:.9rem 1rem;display:flex;align-items:center}
+.locate{position:absolute;left:.6rem;bottom:.6rem;z-index:2;font:inherit;font-size:.68rem;padding:.3rem .55rem;border:1px solid var(--rule2);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer}
+.locate:hover{border-color:var(--ink)}
+.locate:disabled{color:var(--rec);cursor:default}
 .mapnote{font-family:var(--mono);font-size:.6rem;color:var(--rec);padding:.8rem}
 .maplibregl-canvas{display:block}
 .maplibregl-ctrl{display:none}
@@ -188,6 +191,7 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
   </header>
      
      <figure class="mapf" data-map data-geoid="42101" data-center="[-75.1180,40.0027]" data-zoom="8">
+    <button class="locate" type="button" data-locate>Use my location</button>
     <noscript><p class="mapnote">The outline needs JavaScript. The GEOID is in the scope line above.</p></noscript>
   </figure>
      <div class="grid"><div class="metric" data-freshness="fresh">
@@ -309,7 +313,7 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
       <span class="factv" data-number>12.13%</span>
       <span class="factr">U.S. Census Bureau · 2020-2024</span>
     </div></div></section>
-<footer><span>data 2026.10 · app 0.13.0 · econpulse.harborgovcon.com · Numbers are illustrative of the source.</span><span>A Harbor Initiative project · Public data · Not financial advice</span></footer>
+<footer><span>data 2026.10 · app 0.14.0 · econpulse.harborgovcon.com · Numbers are illustrative of the source.</span><span>A Harbor Initiative project · Public data · Not financial advice</span></footer>
 </div><script src="/ask.js" defer></script>
 <script src="/maplibre-gl.js" defer></script>
 <script src="/map.js" defer></script><script src="/combobox.js" defer></script></body></html>

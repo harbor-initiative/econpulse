@@ -25,6 +25,24 @@ placeholder unchanged, no dialog and no explanation.
 - [ ] A coordinate outside the US returns the not-found state
 - [ ] No coordinate is logged or stored
 
+### What changed while building it
+
+**No geocoder.** The boundaries the map already draws are the index, so the
+answer is a point-in-polygon test against our own files. A third-party geocoder
+would have been one line and one more dependency that can be down, rate-limited,
+or wrong in a way we cannot see.
+
+**Parsed on first use, not at boot.** Sixteen megabytes of GeoJSON is a lot to
+parse for an endpoint most readers never call. The shapes load when the first
+`/api/where` request arrives, and stay.
+
+**A city wins over its county.** Philadelphia city and Philadelphia County share
+a boundary; a reader standing in one expects the city.
+
+**A vertex is not guaranteed.** Ray casting excludes a point that lands exactly
+on a corner of a ring. A GPS fix does not, and the test records the behaviour
+rather than pretending it does not exist.
+
 ## Risks
 
 Precision theatre: the browser may return a coarse fix from Wi-Fi, which can put

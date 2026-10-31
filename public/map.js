@@ -77,6 +77,42 @@
     });
   });
 
+  // Use my location: ask the browser, ask the server, go to the page.
+  var locate = document.querySelector("[data-locate]");
+  if (locate && navigator.geolocation) {
+    locate.addEventListener("click", function () {
+      locate.disabled = true;
+      locate.textContent = "Finding you";
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          var lat = position.coords.latitude.toFixed(5);
+          var lon = position.coords.longitude.toFixed(5);
+          fetch("/api/where?lat=" + lat + "&lon=" + lon, { headers: { accept: "application/json" } })
+            .then(function (response) { return response.json().then(function (body) { return { ok: response.ok, body: body }; }); })
+            .then(function (result) {
+              if (result.ok && result.body.href) {
+                window.location.assign(result.body.href);
+                return;
+              }
+              locate.disabled = false;
+              locate.textContent = "No place found here";
+            })
+            .catch(function () {
+              locate.disabled = false;
+              locate.textContent = "Could not find you";
+            });
+        },
+        function () {
+          locate.disabled = false;
+          locate.textContent = "Location not available";
+        },
+        { timeout: 8000, maximumAge: 600000 },
+      );
+    });
+  } else if (locate) {
+    locate.remove();
+  }
+
   // With no tiles, the outline is still drawn: the source is ours.
   map.on("error", function () {
     host.classList.add("map-tiles-down");
