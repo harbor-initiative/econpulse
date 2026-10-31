@@ -31,6 +31,7 @@ file.
 | **#34** | **Design clean-up** | **P1** | [epic](../remediation/specs/05-design-system.md) |
 | #37 | The measurement gate | P1 | [037-design-gate.md](037-design-gate.md) |
 | #49 | Cache only a success | P0 | [049-cache-safety.md](049-cache-safety.md) |
+| #58 | The gates wait on a port, not a mood | P1 | [058-gate-readiness.md](058-gate-readiness.md) |
 | #29 | Panel substance | P1 | [029-panel-substance.md](029-panel-substance.md) |
 | #30 | Legends | P1 | [030-legends.md](030-legends.md) |
 | #31 | Docked search | P1 | [031-docked-search.md](031-docked-search.md) |
