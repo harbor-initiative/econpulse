@@ -1,6 +1,6 @@
 import { fetchJson, fetchText, requireEnv, today } from "../fetch.ts";
 import type { DatabaseSync } from "node:sqlite";
-import { insertPlaces, makeFactWriter, type FactRow } from "../db.ts";
+import { insertPlaces, makeFactWriter, setBuildMeta, type FactRow } from "../db.ts";
 
 /**
  * Census loader.
@@ -22,8 +22,19 @@ const PERIOD = "2020-2024";
 const AGENCY = "U.S. Census Bureau";
 const DATASET = "American Community Survey 5-Year";
 
-/** Places below this are dropped from the file. Counties and states never are. */
-export const MIN_PLACE_POPULATION = Number(process.env.MIN_PLACE_POPULATION ?? 1000);
+/**
+ * Places below this are dropped from the file. Counties and states never are.
+ *
+ * The default is 0, which keeps every place in the Census file. A place a
+ * reader can find with no figure beside it is still a place a reader can find;
+ * a place that was never loaded is a dead end. Set `MIN_PLACE_POPULATION` to a
+ * number for a lean build.
+ *
+ * A place with no population value is never dropped, at any floor. The file is
+ * the list of places, and the count is one fact about a place rather than the
+ * reason to include it.
+ */
+export const MIN_PLACE_POPULATION = Number(process.env.MIN_PLACE_POPULATION ?? 0);
 
 interface Variable {
   code: string;
@@ -52,14 +63,17 @@ const PROFILE: Variable[] = [
 
 const MOE_FOR = new Set(["B01003", "B19013"]);
 
+/**
+ * The five values Census uses where no number exists. Compared as numbers,
+ * because one sentinel arrives as "-666666666" on some tables and as
+ * "-666666666.0" on others, and a string test for the first misses the second.
+ */
 const SENTINELS = new Set([
-  "-666666666", // not applicable
-  "-999999999", // not available
-  "-888888888", // not available
-  "-222222222", // controlled / suppressed
-  "-555555555", // too few samples to compute a margin
-  "null",
-  "",
+  -666666666, // not applicable
+  -999999999, // not available
+  -888888888, // not available
+  -222222222, // controlled / suppressed
+  -555555555, // too few samples to compute a margin
 ]);
 
 const STATE_CODES: Record<string, string> = {
@@ -88,10 +102,23 @@ function parseTable(payload: unknown): Row[] {
   });
 }
 
-function num(value: string | undefined): number | null {
-  if (value === undefined || SENTINELS.has(value)) return null;
-  const n = Number(value);
-  return Number.isFinite(n) ? n : null;
+function num(value: string | null | undefined): number | null {
+  if (value === null || value === undefined) return null;
+  const text = value.trim();
+  if (text === "" || text === "null") return null;
+  const n = Number(text);
+  if (!Number.isFinite(n)) return null;
+  return SENTINELS.has(n) ? null : n;
+}
+
+/**
+ * A margin of error is a distance from the estimate. Census writes
+ * -333333333 when the median falls outside the published brackets, which is
+ * an absent margin rather than a negative one.
+ */
+function margin(value: string | null | undefined): number | null {
+  const n = num(value);
+  return n !== null && n >= 0 ? n : null;
 }
 
 function geoidFor(level: Level, row: Row): string | null {
@@ -175,7 +202,12 @@ export async function loadCensus(db: DatabaseSync): Promise<{ places: number; fa
       const geoid = geoidFor(level, row);
       if (!geoid) continue;
       const population = num(row.B01003_001E);
-      if (level === "place" && (population ?? 0) < MIN_PLACE_POPULATION) { skipped += 1; continue; }
+      const underFloor =
+        level === "place" &&
+        MIN_PLACE_POPULATION > 0 &&
+        population !== null &&
+        population < MIN_PLACE_POPULATION;
+      if (underFloor) { skipped += 1; continue; }
 
       const { name, short } = splitName(row.NAME ?? "", level);
       const stateFips = level === "state" ? geoid : (row.state ?? null);
@@ -193,6 +225,12 @@ export async function loadCensus(db: DatabaseSync): Promise<{ places: number; fa
     }
   }
   insertPlaces(db, places);
+  // What the agency returned, so the gate can prove the file holds every row
+  // instead of trusting the loader that dropped one.
+  setBuildMeta(db, {
+    "census.place_rows": String(detail["place"].length),
+    "census.place_rows_skipped": String(skipped),
+  });
 
   // ---- metrics dimension --------------------------------------------------
   const insertMetric = db.prepare(
@@ -223,7 +261,7 @@ export async function loadCensus(db: DatabaseSync): Promise<{ places: number; fa
           table_id: v.table,
           vintage: YEAR,
           retrieved_at: retrieved,
-          moe: MOE_FOR.has(v.table) ? num(row[`${v.code.slice(0, -1)}M`]) : null,
+          moe: MOE_FOR.has(v.table) ? margin(row[`${v.code.slice(0, -1)}M`]) : null,
           revision: "annual",
           note: v.note ?? null,
         };
