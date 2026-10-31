@@ -19,10 +19,28 @@ Three bands, computed from `retrieved_at` at render:
 | aging | 35–120 days | the date in the panel receipt, in `--receipt` |
 | stale | > 120 days | an amber strip above the panel naming the source and the age |
 
-The header block carries the newest and oldest fact dates, once, in mono.
+The header block carries the newest and oldest fact dates, once, in mono:
+`pulled 2026-05-01 to 2026-10-30`, or `pulled 2026-10-31` when the file was
+refreshed in one pass.
 
 The thresholds are constants in one module, imported by the page and by
 `/healthz` (#24), so the page and the monitor cannot disagree.
+
+### What changed while building it
+
+Three things, recorded because the spec said otherwise.
+
+1. **Aging prints the age.** The spec said the aging band shows "the date in the
+   panel receipt". The receipt already prints the date for a fresh panel, so the
+   aging band was invisible and the three bands collapsed to two. An aging
+   receipt now ends `· 77 days old`. The fresh receipt is unchanged.
+2. **The header line lives in `views/report.ts`.** `views/header.ts` does not exist
+   yet; #10 creates it and will move this line into it. Building a second header
+   module here would have given #10 two places to reconcile.
+3. **`/healthz` gained five fields**, not a new endpoint: `oldest`, `newest`,
+   `ageDays`, `band`, `staleAfterDays`. A monitor needs the thresholds it is being
+   measured against, and putting them in the module is what stops the page and the
+   monitor drifting.
 
 ## Acceptance criteria
 
@@ -43,4 +61,4 @@ Per-fact ages, revision history, a public changelog of revisions.
 
 ## Files
 
-new `server/lib/freshness.ts` · `server/views/panel.ts` · `server/views/header.ts` · new `tests/freshness.test.ts`
+new `server/lib/freshness.ts` · `server/views/panel.ts` · `server/views/report.ts` · `server/views/css.ts` · `server/routes/place.ts` · `server/routes/ask.ts` · `server/routes/status.ts` · new `tests/freshness.test.ts`

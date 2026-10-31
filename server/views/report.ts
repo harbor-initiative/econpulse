@@ -9,8 +9,12 @@
 import type { Place } from "../store.ts";
 import { esc, shell } from "./layout.ts";
 import { renderPanel, type Panel } from "./panel.ts";
-export function report(place: Place, panels: Panel[], meta: Record<string, string>, notice?: string): string {
+import type { DateSpan } from "../lib/freshness.ts";
+export function report(place: Place, panels: Panel[], meta: Record<string, string>, notice?: string, span?: DateSpan): string {
   const cards = panels.map((panel) => renderPanel(panel)).join("");
+  const pulled = span?.oldest && span.newest
+    ? (span.oldest === span.newest ? `pulled ${span.oldest}` : `pulled ${span.oldest} to ${span.newest}`)
+    : null;
   const placeSub = [
     place.state_code,
     place.population ? `population ${place.population.toLocaleString("en-US")}` : null,
@@ -24,6 +28,7 @@ export function report(place: Place, panels: Panel[], meta: Record<string, strin
      <h1 class="place">${esc(place.name)}</h1>
      <p class="sub">${esc(placeSub)}</p>
      <div class="tools"><span class="tv">data ${esc(meta["data.version"] ?? "?")} · built ${esc((meta["build.finished_at"] ?? "").slice(0, 10))}</span>
+       ${pulled ? `<span class="tv">${esc(pulled)}</span>` : ""}
        <span class="tv">${esc(meta["build.source_count"] ?? String((meta["build.sources"] ?? "").split(/[·,]/).map((x) => x.trim()).filter(Boolean).length || "?"))} agencies</span></div>
      <div class="grid">${cards}</div>`,
     "Numbers are illustrative of the source.",
