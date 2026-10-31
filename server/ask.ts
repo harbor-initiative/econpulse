@@ -14,7 +14,7 @@
 import type { DatabaseSync } from "node:sqlite";
 import { searchPlaces, type Place } from "./store.ts";
 import { findMetric, splitMetricAndPlace } from "./lib/rules.ts";
-import { askModel } from "./lib/model.ts";
+import { askModel, type ModelOutcome } from "./lib/model.ts";
 
 /**
  * The question layer.
@@ -40,6 +40,8 @@ export interface Parsed {
   metric: string | null;
   via: "index" | "model" | "none";
   cleaned: string;
+  /** What the model did, when it was asked. Undefined on the local path. */
+  model?: ModelOutcome;
 }
 
 export function resolveName(db: DatabaseSync, name: string): Place | null {
@@ -73,16 +75,21 @@ export async function parseQuestion(
   db: DatabaseSync,
   text: string,
   metrics: Array<{ id: string; label: string }>,
+  dataVersion: string,
 ): Promise<Parsed> {
-  const answer = await askModel(text, metrics);
+  const outcome = await askModel(text, metrics, { dataVersion });
+  const answer = outcome.answer;
   if (answer) {
     const place = answer.placeName ? resolveName(db, answer.placeName) : null;
     const metric = answer.metric && metrics.some((m) => m.id === answer.metric) ? answer.metric : null;
-    if (place || metric) return { place, metric, via: place ? "model" : "none", cleaned: answer.placeName ?? text };
+    if (place || metric) {
+      return { place, metric, via: place ? "model" : "none", cleaned: answer.placeName ?? text, model: outcome };
+    }
   }
 
   // No key, or the model failed. Do not fall back to the word parser here: it
   // answered "the Liberty Bell" with Bell County, Texas. Asking which place is
-  // honest; guessing is not.
-  return { place: null, metric: findMetric(text), via: "none", cleaned: text };
+  // honest; guessing is not. The outcome travels so the route can tell a busy
+  // network from a question it did not read.
+  return { place: null, metric: findMetric(text), via: "none", cleaned: text, model: outcome };
 }
