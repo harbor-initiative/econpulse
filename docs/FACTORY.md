@@ -57,8 +57,30 @@ time, always.
 | **L6 Infra** | #20 → #24 → #28 → #27 → #25 → #26 | `lib/ratelimit.ts`, `routes/*`, `deploy/`, `.github/` |
 | **L7 Location** | #16 → #9 | `pipeline/sources/boundaries.ts`, `public/map.js` |
 
-Wave 0 is two steps: #37 (the measurement gate) lands first, then #35 (the
-server split). Neither lane starts until both are on `main`.
+Wave 0 is two steps: #37 (the measurement gate) landed first, then #35 (the
+server split). Both are on `main` and deployed.
+
+## What actually shipped, 2026-10-30
+
+Twenty-two issues closed in one evening. The lanes ran with four agents at once
+and the operator merged everything.
+
+| Lane | Landed |
+|---|---|
+| Search | #5 aliases · #6 fuzzy index · #7 autocomplete |
+| Report | #13 freshness · #14 benchmarks · #15 quick facts · #18 chart tables · #10 header block · #12 summary |
+| Design | #33 typefaces · #29 panel substance · #30 legends · #31 docked search · #32 better/worse |
+| Box | #19 model reliability · #21 six states · #22 progressive loading · #20 rate limit · #23 comparison |
+| Trust | #24 health and status · #25 method · #26 discoverability · #27 refresh · #28 staleness job |
+| Floor | #35 server split · #37 design gate · #49 cache safety · #58 gate readiness · #69 city search |
+
+**The design gate went 54 → 0** across those merges. That number is the one to
+watch: it is the only measure in this repository that has ever gone down without
+someone arguing about it.
+
+**What is not done:** the gates run as commands, not in CI. `.github/` has one
+workflow (#28) and no test job. Until one exists, `main` is kept honest by a
+person running three commands before a merge, and #37 records it.
 
 **L3 and L4 are the long poles** at eight and five issues. If either becomes the
 constraint, the answer is a second split — `panel.ts` into a shell plus `views/visuals/*`. Adding agents makes the collision worse. Four agents against one file is four people
