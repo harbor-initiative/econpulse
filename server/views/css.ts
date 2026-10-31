@@ -43,6 +43,8 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 .years{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.55rem;color:#6B7578;margin:.1rem 0 0}
 .rec{margin:.6rem 0 0;padding-left:.55rem;border-left:2px solid #BFDBD7;font-family:var(--mono);font-size:.58rem;line-height:1.5;color:var(--rec)}
 .rec b{font-weight:400;text-transform:uppercase;letter-spacing:.09em;color:var(--teal-ink)}
+.bench-share{font-family:var(--mono);font-size:.62rem;line-height:1.5;color:var(--muted);margin:.55rem 0 0}
+.bench-note{font-family:var(--mono);font-size:.6rem;letter-spacing:.03em;color:var(--rec);margin:.55rem 0 0}
 .stale{margin:0 0 .7rem;padding:.45rem .6rem;background:var(--stale-bg);border:1px solid var(--stale);color:var(--stale);font-size:.74rem;line-height:1.45}
 .stale b{font-weight:600;text-transform:uppercase;letter-spacing:.09em}
 .notice{background:#F2F7F6;border-left:3px solid var(--teal);padding:.6rem .8rem;margin:0 0 1rem;font-size:.82rem;color:var(--teal-ink)}
