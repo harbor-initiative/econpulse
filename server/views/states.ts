@@ -14,6 +14,7 @@
 
 import type { Place } from "../store.ts";
 import { esc, shell } from "./layout.ts";
+import { CLIENT_LIMIT } from "../lib/ratelimit.ts";
 
 interface StatePage {
   /** The page title, without the site suffix. */
@@ -93,6 +94,28 @@ export function askUnreadable(question: string, examples: string[]): string {
 }
 
 /** Neither the index nor a model produced a place. */
+/**
+ * The ceiling, explained.
+ *
+ * A 429 with a retry hint is a fact about the server and not about the reader's
+ * question, so the sentence says which limit was reached and when it lifts.
+ */
+export function askRateLimited(question: string, retryAfterSeconds: number, limit: "client" | "global"): string {
+  const minutes = Math.max(1, Math.ceil(retryAfterSeconds / 60));
+  const sentence = limit === "global"
+    ? `The box is answering as many questions as it can right now. Try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`
+    : `That is ${CLIENT_LIMIT.capacity} questions in an hour from one address. The next one is available in ${minutes} minute${minutes === 1 ? "" : "s"}.`;
+  return statePage({
+    title: "Too many questions",
+    question,
+    sentence,
+    action: retryAndExamples(question, "Try again", [
+      "Is rent going up in Austin",
+      "Population of Cook County",
+    ]),
+  });
+}
+
 export function askNoMatch(question: string, examples: string[]): string {
   return statePage({
     title: "We do not know that place",

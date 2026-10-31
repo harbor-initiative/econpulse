@@ -12,7 +12,7 @@
  */
 
 
-import type { ServerResponse } from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { lookupZip, searchPlaces } from "../store.ts";
 import { db, meta } from "../lib/runtime.ts";
 import { redirect, send } from "../lib/http.ts";
@@ -25,9 +25,10 @@ import { isModelUnavailable, type ModelOutcome } from "../lib/model.ts";
 import { report } from "../views/report.ts";
 import { searchResults } from "../views/search.ts";
 import { askCard } from "../views/ask.ts";
-import { askModelBusy, askNeedMetric, askNeedPlace, askNoMatch, askUnreadable } from "../views/states.ts";
+import { allow, clientKey } from "../lib/ratelimit.ts";
+import { askModelBusy, askNeedMetric, askNeedPlace, askNoMatch, askRateLimited, askUnreadable } from "../views/states.ts";
 
-export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> {
+export async function routeAsk(url: URL, res: ServerResponse, req?: IncomingMessage): Promise<boolean> {
   if (url.pathname !== "/ask") return false;
 
   const question = (url.searchParams.get("q") ?? "").trim();
@@ -48,6 +49,15 @@ export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> 
     }
     // A ZIP that resolves to no county is a place the file does not carry.
     send(res, 404, askNoMatch(question, examples));
+    return true;
+  }
+
+  // The ceiling sits here: after the redirects that cost nothing, before
+  // anything that can reach the model.
+  const decision = allow(clientKey(req?.headers ?? {}, req?.socket.remoteAddress));
+  if (!decision.allowed) {
+    res.setHeader("retry-after", String(decision.retryAfter));
+    send(res, 429, askRateLimited(question, decision.retryAfter, decision.limit ?? "client"));
     return true;
   }
 
