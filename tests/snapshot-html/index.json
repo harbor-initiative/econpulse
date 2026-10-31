@@ -2,42 +2,42 @@
   "home": {
     "status": 200,
     "type": "text/html; charset=utf-8",
-    "bytes": 8178
+    "bytes": 8498
   },
   "place-county": {
     "status": 200,
     "type": "text/html; charset=utf-8",
-    "bytes": 16989
+    "bytes": 16829
   },
   "place-city": {
     "status": 200,
     "type": "text/html; charset=utf-8",
-    "bytes": 17162
+    "bytes": 17002
   },
   "ask-local": {
     "status": 200,
     "type": "text/html; charset=utf-8",
-    "bytes": 8358
+    "bytes": 8750
   },
   "ask-question": {
     "status": 404,
     "type": "text/html; charset=utf-8",
-    "bytes": 8027
+    "bytes": 8347
   },
   "search": {
     "status": 200,
     "type": "text/html; charset=utf-8",
-    "bytes": 7940
+    "bytes": 8260
   },
   "status": {
     "status": 200,
     "type": "text/html; charset=utf-8",
-    "bytes": 7807
+    "bytes": 8127
   },
   "not-found": {
     "status": 404,
     "type": "text/html; charset=utf-8",
-    "bytes": 7370
+    "bytes": 7690
   },
   "healthz": {
     "status": 200,

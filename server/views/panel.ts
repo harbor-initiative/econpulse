@@ -9,7 +9,7 @@
 import type { Fact } from "../store.ts";
 import { esc } from "./layout.ts";
 import { formatValue } from "./format.ts";
-import { lineChart, barChart, compareBars } from "./charts.ts";
+import { lineChart, barChart, compareBars, shareBar } from "./charts.ts";
 import { ageInDays, bandOf } from "../lib/freshness.ts";
 /**
  * Units where three values belong on one axis.
@@ -142,10 +142,25 @@ export function renderPanel(panel: Panel): string {
   const rows = panel.benchmarks ?? [];
   const absent = panel.missingBenchmarks ?? [];
   const comparable = COMPARABLE_UNITS.has(fact.unit);
-  const bench = rows.length > 1 && comparable
-    ? compareBars(rows.map((row) => ({ label: row.label, value: row.value })), fact.unit)
-    : "";
-  const share = rows.length > 1 && !comparable ? shareLine(rows, fact.unit) : "";
+  const parent = rows.find((row) => row.role === "state") ?? rows.find((row) => row.role === "nation") ?? null;
+  const placeRow = rows.find((row) => row.role === "place") ?? null;
+  const sharePercent = parent && placeRow && parent.value > 0 ? (placeRow.value / parent.value) * 100 : null;
+
+  // One of three visuals, or the cell is a number and a receipt. The order is
+  // the order the data supports: a series if there is one, three comparable
+  // values if the units agree, and a proportion when the only fact is "how much
+  // of its parent is this".
+  const visual = chart
+    ? chart
+    : comparable && rows.length > 1
+      ? compareBars(rows.map((row) => ({ label: row.label, value: row.value })), fact.unit)
+      : sharePercent !== null && parent && placeRow
+        ? shareBar(sharePercent, parent.label, placeRow.value, parent.value, fact.unit)
+        : "";
+  // Totals keep their parents' absolute values in words when a chart already
+  // carries the shape, so the digits are never only in a tooltip that does not
+  // exist.
+  const share = chart && rows.length > 1 && !comparable ? shareLine(rows, fact.unit) : "";
   const benchNote = absent.length
     ? `<p class="bench-note">${absent.length > 1
         ? "This measure has no state or national series."
@@ -157,9 +172,9 @@ export function renderPanel(panel: Panel): string {
     <p class="label">${esc(panel.label)}</p>
     <p class="value">${esc(formatValue(fact.value, fact.unit))}</p>
     ${deltaText ? `<p class="delta">${deltaText}</p>` : ""}
-    ${chart}
+    ${visual}
     ${chartTable(panel)}
-    ${bench}${share ? `<p class="bench-share">${esc(share)}</p>` : ""}${benchNote}
+    ${share ? `<p class="bench-share">${esc(share)}</p>` : ""}${benchNote}
     <p class="rec"><b>Receipt</b> ${esc(fact.agency)} · ${esc(fact.dataset)}${fact.table_id ? ` · ${esc(fact.table_id)}` : ""} · ${esc(fact.period)}${fact.moe !== null ? ` · ±${Math.round(fact.moe).toLocaleString("en-US")}` : ""} · pulled ${esc(fact.retrieved_at)}${band === "aging" ? ` · ${ageInDays(fact.retrieved_at)} days old` : ""}</p>
   </div>`;
 }
