@@ -35,9 +35,15 @@ Interview on 2026-10-30, recorded here because they bound every spec.
 | [02 — The report](specs/02-the-report.md) | #2 | #10 header block and score · #11 percentiles · #12 AI summary · #13 freshness · #14 benchmarks · #15 quick facts · #16 map · #17 print · #18 chart tables · #29 panel substance · #30 legends · #31 docked search · #32 meaning without colour · #33 typefaces |
 | [03 — The question box](specs/03-the-question-box.md) | #3 | #19 model reliability · #20 rate limit · #21 six states · #22 progressive loading · #23 comparison |
 | [04 — Trust and reach](specs/04-trust-and-reach.md) | #4 | #24 health and status · #25 method · #26 discoverability · #27 refresh · #28 staleness |
+| [05 — Design system](specs/05-design-system.md) | #34 | #29 panel substance · #30 legends · #31 docked search · #32 meaning without colour · #33 typefaces · #10 header block |
 
-Twenty-four feature issues, one per deliverable, each linking its parent epic and
-its spec section. The three P0 clusters are #1, #2 and #3.
+Twenty-four feature issues and one design epic, each linking its parent and its
+spec section. The three P0 clusters are #1, #2 and #3; the design system is #5
+and it owns #29 to #33 plus the header block in #10.
+
+Spec 5 is the only one with a **measurement gate**. Nine assertions run in a real
+browser against the fixture database on every push, because a design rule checked
+by reading CSS is a hope.
 
 ## The design pass
 
