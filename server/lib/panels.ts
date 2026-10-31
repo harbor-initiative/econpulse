@@ -7,10 +7,10 @@
  */
 
 
-import { series, metricsFor, countyForPlace, getPlace, type Place, type Fact } from "../store.ts";
+import { series, metricsFor, countyForPlace, getPlace, directionOf, type Place, type Fact } from "../store.ts";
 import { db } from "./runtime.ts";
 import { METRICS, REPORT_ORDER, type MetricSpec } from "./metrics.ts";
-import type { BenchRow, Panel } from "../views/panel.ts";
+import type { BenchRow, Panel, PanelMark } from "../views/panel.ts";
 
 /**
  * The state a place sits in, when that is a different place.
@@ -23,6 +23,20 @@ function stateFor(place: Place): Place | null {
   const digits = place.geoid.replace(/\D/g, "");
   if (digits.length < 3) return null;
   return getPlace(db, digits.slice(0, 2));
+}
+
+/**
+ * Whether the gap against the nation is big enough to have a direction.
+ *
+ * A county at 4.32% unemployment against a nation at 4.30% is not doing worse
+ * than the country; it is the country. A tenth of a point for a rate and half a
+ * percent for a quantity are the smallest gaps this page will call a difference.
+ */
+function meaningfulGap(place: number, nation: number, unit: string): boolean {
+  const gap = Math.abs(place - nation);
+  if (unit === "percent" || unit === "years") return gap >= 0.1;
+  if (nation === 0) return gap > 0;
+  return gap / Math.abs(nation) >= 0.005;
 }
 
 export function panelFor(
@@ -73,6 +87,15 @@ export function panelFor(
   if (!stateFact && place.kind !== "us" && place.kind !== "state") missingBenchmarks.push("state series");
   if (!nationFact && place.geoid !== "0100000US") missingBenchmarks.push("national series");
 
+  // A word, in ink. Colour would say up or down and be read as good or bad.
+  let mark: PanelMark | null = null;
+  const direction = directionOf(db, metric);
+  if (fact && nationFact && place.geoid !== "0100000US" && direction !== "neutral" && meaningfulGap(fact.value, nationFact.value, fact.unit)) {
+    const higher = fact.value > nationFact.value;
+    const better = direction === "higher_is_better" ? higher : !higher;
+    mark = better ? "better" : "worse";
+  }
+
   return {
     metric,
     label,
@@ -83,6 +106,7 @@ export function panelFor(
     note,
     benchmarks,
     missingBenchmarks,
+    mark,
   };
 }
 

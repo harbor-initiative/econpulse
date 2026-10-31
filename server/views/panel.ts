@@ -28,6 +28,9 @@ export interface BenchRow {
   role: "place" | "state" | "nation";
 }
 
+/** Direction, in a word. A hue would carry the same meaning and fail in print. */
+export type PanelMark = "better" | "worse";
+
 export interface Panel {
   metric: string;
   label: string;
@@ -38,6 +41,7 @@ export interface Panel {
   note?: string;
   benchmarks?: BenchRow[];
   missingBenchmarks?: string[];
+  mark?: PanelMark | null;
 }
 
 function delta(latest: Fact, previous: Fact | null): string {
@@ -167,7 +171,11 @@ export function renderPanel(panel: Panel): string {
     ${stale}
     <p class="label">${esc(panel.label)}</p>
     <p class="value">${esc(formatValue(fact.value, fact.unit))}</p>
-    ${deltaText ? `<p class="delta">${deltaText}</p>` : ""}
+    ${deltaText || panel.mark
+      ? `<p class="delta">${deltaText}${panel.mark
+          ? `<span class="mark" data-mark="${panel.mark}">${panel.mark}</span>${deltaText ? "" : " than the United States"}`
+          : ""}</p>`
+      : ""}
     ${visual}
     ${chartTable(panel)}
     ${share ? `<p class="bench-share">${esc(share)}</p>` : ""}${benchNote}
