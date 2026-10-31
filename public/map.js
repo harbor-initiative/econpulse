@@ -63,17 +63,13 @@
 
   map.on("load", function () {
     map.addSource("outline", { type: "geojson", data: "/boundaries/" + geoid + ".json" });
-    map.addLayer({
-      id: "outline-fill",
-      type: "fill",
-      source: "outline",
-      paint: { "fill-color": "#009689", "fill-opacity": 0.08 },
-    });
+    // A line, not a filled shape. A filled county on a phone is a quarter of the
+    // viewport's worth of colour, and the budget is five percent.
     map.addLayer({
       id: "outline-line",
       type: "line",
       source: "outline",
-      paint: { "line-color": "#009689", "line-width": 1.4 },
+      paint: { "line-color": "#009689", "line-width": 1.6 },
     });
   });
 

@@ -53,7 +53,12 @@ export async function launchChrome(chrome) {
       "--disable-extensions",
       "--disable-background-networking",
       "--disable-sync",
-      "--disable-gpu",
+      // Software WebGL, so the map renders in the gate exactly as it renders in
+      // CI. Without it the gate measured a page with no map on one machine and a
+      // page with one on another, and the colour budget disagreed with itself.
+      "--enable-unsafe-swiftshader",
+      "--use-gl=angle",
+      "--use-angle=swiftshader",
       "--hide-scrollbars",
       "--force-device-scale-factor=1",
       "--window-size=1440,900",
@@ -178,6 +183,20 @@ export async function openPage(browserWs, timeoutMs = 15_000) {
     await send("Page.addScriptToEvaluateOnNewDocument", { source: expression });
   }
 
+  /**
+   * Block every request to a third party.
+   *
+   * The design gate must measure the same page on every machine. Tiles are a
+   * network dependency: with them the map draws a basemap, without them it draws
+   * the outline alone, and the colour budget measures two different pages. The
+   * gate takes the blocked case because it is the one the page is designed to
+   * survive.
+   */
+  async function blockThirdParty() {
+    await send("Network.enable");
+    await send("Network.setBlockedURLs", { urls: ["*openfreemap*", "*openstreetmap*"] });
+  }
+
   async function setViewport(width, height) {
     await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: width <= 430 });
   }
@@ -206,6 +225,7 @@ export async function openPage(browserWs, timeoutMs = 15_000) {
     goto,
     evaluate,
     evaluateOnNewDocument,
+    blockThirdParty,
     setViewport,
     setMedia,
     pdf,
