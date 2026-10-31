@@ -31,12 +31,12 @@ run offline, with the provenance built into the schema instead of a footnote.
 
 | | |
 |---|---|
-| Sources | Census ACS 5-Year 2024 · BLS LAUS · BEA Regional · USAspending |
+| Sources | Census ACS 5-Year 2024 · BLS LAUS · BEA Regional · USAspending · FRED |
 | Places | 19,142 — every state, every county, every place above 1,000 people, and the US |
-| Metrics | 12 |
-| Facts | 320,858 |
+| Metrics | 14 |
+| Facts | 321,295 |
 | File | 108 MB uncompressed, 9.4 MB gzipped |
-| Rebuild | about three minutes, four agencies, six API calls plus 66 BLS batches |
+| Rebuild | about three minutes, five agencies |
 
 [Download the current file](https://github.com/harbor-initiative/econpulse/releases/latest).
 The web app is in `server/`. Not built yet: the MCP server. See [the roadmap](#roadmap).

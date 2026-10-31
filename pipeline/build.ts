@@ -6,6 +6,7 @@ import { loadCensus } from "./sources/census.ts";
 import { loadBls } from "./sources/bls.ts";
 import { loadBea } from "./sources/bea.ts";
 import { loadUsaSpending } from "./sources/usaspending.ts";
+import { loadFred } from "./sources/fred.ts";
 
 /**
  * The build CLI.
@@ -35,6 +36,7 @@ const SOURCES = {
   bls: { run: loadBls, needs: ["BLS_API_KEY"] },
   bea: { run: loadBea, needs: ["BEA_API_KEY"] },
   usaspending: { run: loadUsaSpending, needs: [] },
+  fred: { run: loadFred, needs: ["FRED_API_KEY"] },
 } as const;
 
 type SourceName = keyof typeof SOURCES;
