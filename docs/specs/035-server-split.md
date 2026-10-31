@@ -90,9 +90,27 @@ Four sections, no more:
 - [ ] Every route renders byte-identical HTML to the pre-split capture
 - [ ] `tsc --noEmit` clean, no new `any`
 - [ ] No file in `server/` exceeds 200 lines
-- [ ] The browser gate (#34) passes before and after
+- [ ] The design gate's record is unchanged before and after (it reports 54 failures that belong to #34; a refactor must not move the number)
 - [ ] The split lands as one commit with no behaviour change in the message
 - [ ] `AGENTS.md` exists, names the real file map, and lists the six traps
+
+## What changed from the plan
+
+Three things, all recorded here rather than quietly absorbed.
+
+1. **`/ask?q=Is rent going up in Austin` cannot be captured byte for byte.** That
+   URL reaches a model, and a model answer is non-deterministic. The snapshot
+   captures it with the key absent, which exercises the "which place" state, and
+   a locally parsed question covers the answered-card path. The model path is
+   covered by tests, not by a byte comparison.
+2. **The gate cannot pass before the split.** It reports 54 failing assertions
+   that #34 exists to fix. The proof a refactor is honest is that the record does
+   not move, so that is the criterion, and `tests/design-gate-baseline.json` is
+   the record.
+3. **`server/ask.ts` also needed splitting.** It was 230 lines and the rule is
+   200. The model call moved to `lib/model.ts` (where lane L5 expects it), the
+   vocabulary to `lib/rules.ts`, and the orchestration stayed in `ask.ts` at 88
+   lines.
 
 ## Risks
 
@@ -106,4 +124,4 @@ A framework, a router library, dependency injection, a component system.
 ## Files
 
 every file in `server/` · new `server/routes/*` · new `server/views/*` ·
-new `scripts/snapshot-html.mjs`
+new `scripts/snapshot-html.mjs` · `AGENTS.md`
