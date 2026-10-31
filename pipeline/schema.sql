@@ -82,6 +82,18 @@ CREATE INDEX IF NOT EXISTS fact_geoid_idx  ON fact(geoid);
 -- Build metadata
 -- ---------------------------------------------------------------------------
 
+-- One place carries two readings for the same measure: how it compares with
+-- other counties and how it compares with other cities. A column on `fact`
+-- cannot hold both, so the pair is the key.
+CREATE TABLE IF NOT EXISTS percentile (
+  geoid      TEXT NOT NULL,
+  metric     TEXT NOT NULL,
+  peer_kind  TEXT NOT NULL,   -- county | place
+  pct        REAL NOT NULL,
+  peers      INTEGER NOT NULL,
+  PRIMARY KEY (geoid, metric, peer_kind)
+);
+
 CREATE TABLE IF NOT EXISTS build (
   key   TEXT PRIMARY KEY,
   value TEXT NOT NULL
