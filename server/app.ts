@@ -26,7 +26,7 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
     if (await routeAssets(url, res)) return;
     if (await routeHome(url, res)) return;
     if (await routePlace(url, res)) return;
-    if (await routeAsk(url, res)) return;
+    if (await routeAsk(url, res, req)) return;
 
     send(res, 404, shell("Not found", `<h1 class="place">Not found</h1><p class="sub">That page does not exist. <a href="/">Start again</a>.</p>`));
   } catch (error) {

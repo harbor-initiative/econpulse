@@ -32,6 +32,19 @@ unlimited, because those are the product.
 - [ ] Place pages are unaffected at any volume
 - [ ] The limits are environment variables
 
+### What changed while building it
+
+A fixed window would let a caller spend the whole allowance at 11:59 and the
+whole allowance again at 12:00, so it is a token bucket: capacity, refill, and a
+`retry-after` computed from the missing fraction of a token.
+
+Elapsed time clamps at zero. A clock that jumps backwards, which happens on a VM
+after a migration, would otherwise drain every bucket and tell the next reader to
+wait an hour for a question they had never asked.
+
+The check sits after the redirects that cost nothing and before anything that can
+reach the model, so a ZIP lookup or an empty query is not a question.
+
 ## Risks
 
 A shared NAT punishes an office. 20 an hour is generous for a person; the value is
