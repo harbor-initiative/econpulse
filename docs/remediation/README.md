@@ -29,12 +29,15 @@ Interview on 2026-10-30, recorded here because they bound every spec.
 
 ## The specs
 
-| Spec | Covers | Issue |
+| Spec | Epic | Feature issues |
 |---|---|---|
-| [01 — Finding a place](specs/01-finding-a-place.md) | Alias table, fuzzy index, autocomplete, full place coverage, use-my-location | #1 |
-| [02 — The report](specs/02-the-report.md) | Score and weights, AI summary, freshness, benchmarks, quick facts, map, print, tables | #2 |
-| [03 — The question box](specs/03-the-question-box.md) | Model contract, fallbacks, rate limit, six states, comparison | #3 |
-| [04 — Trust and reach](specs/04-trust-and-reach.md) | `/healthz`, `/status`, `/method`, JSON-LD, sitemap, refresh without rebuild | #4 |
+| [01 — Finding a place](specs/01-finding-a-place.md) | #1 | #5 aliases · #6 fuzzy index · #7 autocomplete · #8 full coverage · #9 location |
+| [02 — The report](specs/02-the-report.md) | #2 | #10 score and weights · #11 percentiles · #12 AI summary · #13 freshness · #14 benchmarks · #15 quick facts · #16 map · #17 print · #18 chart tables |
+| [03 — The question box](specs/03-the-question-box.md) | #3 | #19 model reliability · #20 rate limit · #21 six states · #22 progressive loading · #23 comparison |
+| [04 — Trust and reach](specs/04-trust-and-reach.md) | #4 | #24 health and status · #25 method · #26 discoverability · #27 refresh · #28 staleness |
+
+Twenty-four feature issues, one per deliverable, each linking its parent epic and
+its spec section. The three P0 clusters are #1, #2 and #3.
 
 ## What is deliberately not here
 
