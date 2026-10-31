@@ -17,6 +17,9 @@ permissions:
 jobs:
   gates:
     runs-on: ubuntu-latest
+    # Six gates, and the outlines take four minutes. A run that exceeds this is
+    # hung, and a hung gate is worse than a red one.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
