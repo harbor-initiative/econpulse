@@ -10,6 +10,8 @@ import type { Place } from "../store.ts";
 import { esc, shell } from "./layout.ts";
 import { reportHeader } from "./header.ts";
 import { scoreFor } from "../lib/score.ts";
+import { mapCentre } from "../lib/boundaries.ts";
+import { mapBlock } from "./map.ts";
 import { db } from "../lib/runtime.ts";
 import { appVersion } from "../lib/runtime.ts";
 import { placeJsonLd } from "../lib/structured.ts";
@@ -43,6 +45,7 @@ export function report(place: Place, panels: Panel[], meta: Record<string, strin
        summary,
      })}
      ${notice ? `<p class="notice">${esc(notice)}</p>` : ""}
+     ${mapBlock({ geoid: place.geoid, ...(mapCentre(place.geoid) ?? { center: null, zoom: 8 }) })}
      <div class="grid">${cards}</div>
      ${quickFactsGrid(quick ?? [])}`,
     {

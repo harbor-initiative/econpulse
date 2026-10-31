@@ -22,6 +22,10 @@ COPY data/econpulse.db ./data/econpulse.db
 # listens, which is the right failure and a bad deploy.
 COPY data/aliases ./data/aliases
 
+# County outlines, fetched by scripts/fetch-boundaries.mjs. Served from our own
+# origin so the map draws when the tiles do not.
+COPY data/boundaries ./data/boundaries
+
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
   CMD node -e "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"

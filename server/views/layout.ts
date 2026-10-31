@@ -58,6 +58,7 @@ export function shell(title: string, body: string, options: ShellOptions = {}): 
 <meta name="description" content="${esc(description)}">
 ${head}
 <style>${CSS}</style>
+<link rel="stylesheet" href="/maplibre-gl.css">
 </head><body><div class="wrap">
 <div class="topbar">
 ${docked
@@ -67,5 +68,7 @@ ${docked
 <nav class="nav"><a href="/status">Status</a><a href="https://github.com/harbor-initiative/econpulse">GitHub</a></nav></div>
 ${body}
 <footer><span>${esc(footerNote)}</span><span>A Harbor Initiative project · Public data · Not financial advice</span></footer>
-</div><script src="/ask.js" defer></script><script src="/combobox.js" defer></script></body></html>`;
+</div><script src="/ask.js" defer></script>
+<script src="/maplibre-gl.js" defer></script>
+<script src="/map.js" defer></script><script src="/combobox.js" defer></script></body></html>`;
 }
