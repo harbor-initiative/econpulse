@@ -14,11 +14,14 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.ts",
     "serve": "tsx server/index.ts",
-    "dev": "tsx server/index.ts"
+    "dev": "tsx server/index.ts",
+    "start": "tsx server/index.ts"
   },
   "devDependencies": {
     "@types/node": "^22",
-    "tsx": "^4.21.0",
     "typescript": "^5"
+  },
+  "dependencies": {
+    "tsx": "^4.21.0"
   }
 }

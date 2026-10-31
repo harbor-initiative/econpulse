@@ -1,0 +1,10 @@
+services:
+  econpulse:
+    image: econpulse:latest
+    container_name: econpulse-web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3014:3000"
+    environment:
+      PORT: "3000"
+      HOST: "0.0.0.0"
