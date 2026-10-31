@@ -32,7 +32,7 @@ run offline, with the provenance built into the schema instead of a footnote.
 | Sources | Census ACS 5-Year 2024 · BLS LAUS · BEA Regional · USAspending · FRED |
 | Places | 19,142 — every state, every county, every place above 1,000 people, and the US |
 | Metrics | 14 |
-| Facts | 321,295 |
+| Facts | 321,141 |
 | File | 108 MB uncompressed, 9.4 MB gzipped |
 | Rebuild | about three minutes, five agencies |
 
