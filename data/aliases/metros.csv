@@ -1,0 +1,101 @@
+term,geoid,kind
+manhattan nyc,36061,metro
+los angeles,06037,metro
+chicago,17031,metro
+houston,48201,metro
+phoenix,04013,metro
+miami,12086,metro
+philadelphia,42101,metro
+dallas,48113,metro
+san jose silicon valley,06085,metro
+san diego,06073,metro
+seattle,53033,metro
+columbus,39049,metro
+boston,25025,metro
+washington dc suburb,24031,metro
+denver,08031,metro
+memphis,47157,metro
+oklahoma city,40109,metro
+san antonio,48029,metro
+fort worth,48439,metro
+northern virginia,51059,metro
+detroit,26163,metro
+las vegas,32003,metro
+portland,4159000,metro
+kansas city,29095,metro
+milwaukee,55079,metro
+oakland east bay,06001,metro
+sacramento,06067,metro
+orange county,06059,metro
+atlanta,13121,metro
+charlotte,37119,metro
+salt lake city,49035,metro
+indianapolis,18097,metro
+the bronx,36005,metro
+queens,36081,metro
+honolulu,15003,metro
+westchester,36119,metro
+wilmington delaware valley,10003,metro
+cincinnati,39061,metro
+duluth,27137,metro
+st louis,29510,metro
+tacoma,53053,metro
+bergen county nyc metro,34003,metro
+raleigh,37183,metro
+boston suburbs,25017,metro
+hartford,0937000,metro
+pittsburgh,42003,metro
+nashville,47037,metro
+baltimore county,24005,metro
+baltimore city,24510,metro
+jacksonville,12031,metro
+cleveland,39035,metro
+minneapolis,27053,metro
+st paul,27123,metro
+tampa,12057,metro
+st petersburg,12103,metro
+austin,48453,metro
+fort lauderdale,12011,metro
+west palm beach,12099,metro
+orlando,12095,metro
+san francisco,06075,metro
+san mateo county,06081,metro
+contra costa,06013,metro
+riverside inland empire,06065,metro
+san bernardino inland empire,06071,metro
+ventura county,06111,metro
+washington dc,11,metro
+arlington dc,51013,metro
+alexandria dc,51510,metro
+norristown philly,42091,metro
+doylestown philly,42017,metro
+west chester philly,42029,metro
+media philly,42045,metro
+newark,34013,metro
+elizabeth,34039,metro
+jersey city,34017,metro
+new brunswick,34023,metro
+freehold,34025,metro
+toms river,34029,metro
+wheaton chicago,17043,metro
+waukegan chicago,17097,metro
+joliet chicago,17197,metro
+aurora chicago,17089,metro
+plano dallas,48085,metro
+denton dallas,48121,metro
+georgetown austin,48491,metro
+tucson,04019,metro
+toledo,39095,metro
+st louis county,29189,metro
+louisville,21111,metro
+des moines,19153,metro
+new haven,0952000,metro
+stamford fairfield county,0973000,metro
+columbia,45079,metro
+savannah,13051,metro
+wichita,20173,metro
+greenville,45045,metro
+winston salem,37067,metro
+durham,37063,metro
+asheville,37021,metro
+fort collins,08069,metro

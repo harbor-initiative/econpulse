@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { openDb, getBuildMeta, DB_PATH } from "./db.ts";
 import { readFileSync } from "node:fs";
+import { buildAliasMap, readAliasRows } from "../server/lib/aliases.ts";
 
 /**
  * The gate.
@@ -113,6 +114,26 @@ function main(): void {
       detail: row ? `${row.value} (expected ${expected})` : "missing",
     });
   }
+
+  // 10. Aliases are unambiguous. A term with two GEOIDs has no correct answer,
+  // so this fails and names both. The CSVs are the whole table.
+  const aliasProblems: string[] = [];
+  let aliasCount = 0;
+  try {
+    const rows = readAliasRows();
+    aliasCount = rows.length;
+    for (const [term, geoid] of buildAliasMap(rows)) {
+      const target = one<{ n: number }>("SELECT COUNT(*) n FROM place WHERE geoid = ?", geoid);
+      if (target.n === 0) aliasProblems.push(`"${term}" points at missing place ${geoid}`);
+    }
+  } catch (error) {
+    aliasProblems.push((error as Error).message);
+  }
+  checks.push({
+    name: "aliases resolve to one real place",
+    ok: aliasProblems.length === 0,
+    detail: aliasProblems.length ? aliasProblems.join("; ") : `${aliasCount} terms`,
+  });
 
   // ---- report -------------------------------------------------------------
   const failed = checks.filter((c) => !c.ok);
