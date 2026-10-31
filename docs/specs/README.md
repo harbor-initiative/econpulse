@@ -26,6 +26,7 @@ file.
 | #16 | Map | P1 | [016-map.md](016-map.md) |
 | #17 | Print | P1 | [017-print.md](017-print.md) |
 | #18 | Chart tables | P1 | [018-chart-tables.md](018-chart-tables.md) |
+| **#35** | **Server split** | **P0** | [035-server-split.md](035-server-split.md) |
 | **#34** | **Design clean-up** | **P1** | [epic](../remediation/specs/05-design-system.md) |
 | #29 | Panel substance | P1 | [029-panel-substance.md](029-panel-substance.md) |
 | #30 | Legends | P1 | [030-legends.md](030-legends.md) |
