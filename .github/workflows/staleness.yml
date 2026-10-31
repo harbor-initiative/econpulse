@@ -1,0 +1,72 @@
+name: Data age
+
+# A product about provenance that quietly serves a two-month-old file is the
+# failure it claims to prevent. Nothing failed when the data aged, so this does.
+#
+# One comment a week on one issue is the loudest this gets. A noisy job is a
+# muted job.
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Monday 09:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  age:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Fetch the released database
+        run: |
+          curl -sSL -o /tmp/econpulse.db.gz \
+            https://github.com/harbor-initiative/econpulse/releases/download/v0.1.0-data/econpulse-2026.10.db.gz
+          mkdir -p data
+          gunzip -c /tmp/econpulse.db.gz > data/econpulse.db
+
+      - name: Measure the age
+        id: age
+        run: |
+          node scripts/data-age.mjs --json | tee /tmp/age.json
+          node -e "const a=require('/tmp/age.json'); console.log('stale='+a.stale); console.log('days='+a.age_days); console.log('built='+a.built_at)" >> "$GITHUB_OUTPUT"
+
+      - name: Say something, once
+        if: steps.age.outputs.stale == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DAYS: ${{ steps.age.outputs.days }}
+          BUILT: ${{ steps.age.outputs.built }}
+        run: |
+          set -euo pipefail
+          title="Data is $DAYS days old"
+          existing=$(gh issue list --state open --search "in:title Data is" --json number --jq '.[0].number // empty')
+          body="The released database was built on $BUILT, which is $DAYS days ago.
+
+          Refresh it:
+
+          \`\`\`bash
+          ssh wala-srv '
+            curl -sSL -o /tmp/econpulse.db.gz https://github.com/harbor-initiative/econpulse/releases/latest/download/econpulse-2026.10.db.gz
+            gunzip -c /tmp/econpulse.db.gz > /srv/econpulse/econpulse.db.new
+            mv /srv/econpulse/econpulse.db.new /srv/econpulse/econpulse.db
+            docker restart econpulse
+          '
+          \`\`\`
+
+          Runbook: \`deploy/README.md\`."
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body" --label P0
+          fi
+
+      - name: Say nothing when the file is current
+        if: steps.age.outputs.stale != 'true'
+        run: echo "the file is ${{ steps.age.outputs.days }} days old, under the alert threshold"

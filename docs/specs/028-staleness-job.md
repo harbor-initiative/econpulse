@@ -25,6 +25,21 @@ The workflow needs only `contents: read` and `issues: write`.
 - [ ] A second week comments on the existing issue rather than duplicating
 - [ ] Closing the issue and running again re-opens it
 
+### What changed while building it
+
+**Two thresholds, answering different questions.** The job speaks up at 45 days;
+a page warns a reader at 120, from `lib/freshness.ts`. A monitor should be
+noisier than the page, because the person who reads the job can still fix the
+file. `scripts/data-age.mjs` reports both numbers so the difference is visible
+rather than surprising.
+
+**The script never fails on old data.** It exits non-zero only when the file
+cannot be read. A job that goes red because the data is old reports a broken job
+instead of an old file, and gets muted.
+
+**The issue body carries the fix**, not just the complaint: the three commands
+that swap the file and restart the container, which #27 made possible.
+
 ## Risks
 
 A noisy job gets muted. One comment a week on one issue is the loudest this
