@@ -8,3 +8,9 @@ services:
     environment:
       PORT: "3000"
       HOST: "0.0.0.0"
+      # The baked file inside the image. To swap data without rebuilding, mount a
+      # release and point at it instead:
+      #
+      #   ECONPULSE_DB: "/data/econpulse.db"
+      #   volumes:
+      #     - /srv/econpulse:/data:ro
