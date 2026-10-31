@@ -35,8 +35,18 @@ import { askModel, type ModelOutcome } from "./lib/model.ts";
  * page.
  */
 
+/** A comparison has to be asked for; a model that volunteers one is ignored. */
+export const COMPARISON_TRIGGER = /\b(vs\.?|versus|compared? (?:to|with)|compare)\b/i;
+
+export function wantsComparison(text: string): boolean {
+  return COMPARISON_TRIGGER.test(text);
+}
+
 export interface Parsed {
   place: Place | null;
+  comparePlace?: Place | null;
+  /** A second name the question asked about that the file does not carry. */
+  dropped?: string;
   metric: string | null;
   via: "index" | "model" | "none";
   cleaned: string;
@@ -56,9 +66,39 @@ export function resolveName(db: DatabaseSync, name: string): Place | null {
   return starts ?? places[0] ?? null;
 }
 
+/**
+ * The no-model comparison: "Austin vs Nashville".
+ *
+ * The most obvious comparison shape does not need a model to read it, and going
+ * to the index first means the feature works with no key, no network and no
+ * quota. The model still handles "how does Austin compare with Nashville on
+ * rent", which the grammar does not attempt.
+ */
+export function parseComparison(db: DatabaseSync, text: string): Parsed | null {
+  const match = text.match(/^(.{2,}?)\s+(?:vs\.?|versus)\s+(.{2,})$/i);
+  if (!match?.[1] || !match[2]) return null;
+  const leftName = match[1].trim();
+  const rightName = match[2].trim();
+  const left = resolveName(db, leftName);
+  const right = resolveName(db, rightName);
+
+  if (left && right) {
+    return { place: left, comparePlace: right, metric: null, via: "index", cleaned: text };
+  }
+  // One of the two is in the file. Answering about it and naming the one that is
+  // not is better than refusing the whole question: the reader still gets the
+  // half that exists.
+  if (left) return { place: left, comparePlace: null, dropped: rightName, metric: null, via: "index", cleaned: text };
+  if (right) return { place: right, comparePlace: null, dropped: leftName, metric: null, via: "index", cleaned: text };
+  return null;
+}
+
 /** The no-model path: a name, or "measure in name". */
 export function parseLocally(db: DatabaseSync, text: string): Parsed {
   const trimmed = text.trim();
+
+  const comparison = wantsComparison(trimmed) ? parseComparison(db, trimmed) : null;
+  if (comparison) return comparison;
 
   if (/^\d{2,11}$/.test(trimmed)) {
     const place = searchPlaces(db, trimmed, 1)[0] ?? null;
@@ -83,7 +123,11 @@ export async function parseQuestion(
     const place = answer.placeName ? resolveName(db, answer.placeName) : null;
     const metric = answer.metric && metrics.some((m) => m.id === answer.metric) ? answer.metric : null;
     if (place || metric) {
-      return { place, metric, via: place ? "model" : "none", cleaned: answer.placeName ?? text, model: outcome };
+      // The second name is only trusted when the question asked for a
+      // comparison. A model that volunteers one for "Austin" would turn a
+      // single-place question into a two-place page nobody asked for.
+      const comparePlace = wantsComparison(text) && answer.compareTo ? resolveName(db, answer.compareTo) : null;
+      return { place, metric, comparePlace, via: place ? "model" : "none", cleaned: answer.placeName ?? text, model: outcome };
     }
   }
 

@@ -33,6 +33,26 @@ says which one it dropped.
 - [ ] Two places with no metrics in common renders a clear empty state
 - [ ] The query cost is bounded: two place lookups, no extra model call
 
+### What changed while building it
+
+**The obvious comparison does not need a model.** `Austin vs Nashville` is two
+names around a keyword, so `parseComparison` splits it, resolves both through the
+index, and answers with no key, no network and no quota. The model still handles
+"how does Austin compare with Nashville on rent"; the grammar handles the shape
+everybody types.
+
+**A single period each is two bars, not a line.** Population, rent, home value,
+income and poverty have one period in this file. A line through one point is not
+a chart, so those measures render as two scaled bars with both values printed.
+
+**The delta had to be formatted per unit.** The first render said
+`+8577461000.0 above Davidson County, Tennessee` next to `+$85.8B` in the same
+panel. A gap in dollars is not a gap in points.
+
+**One name resolving is better than none.** If one of the two places is not in
+the file, the page answers about the one that is and says which name it dropped.
+The first version refused the whole question.
+
 ## Risks
 
 The model may return a second place for a question that was not a comparison.

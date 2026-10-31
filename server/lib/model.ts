@@ -4,7 +4,7 @@
  * list, one retry, a breaker and an hour-long cache sit in front of it. Every
  * outcome logs one line, so the failure rate is visible in `docker logs`.
  */
-export interface ModelAnswer { placeName: string | null; metric: string | null }
+export interface ModelAnswer { placeName: string | null; metric: string | null; compareTo: string | null }
 /** What became of one question. The route turns this into a page state. */
 export type ModelStatus = "ok" | "cached" | "unreadable" | "unavailable" | "failed" | "off";
 export interface ModelOutcome { answer: ModelAnswer | null; status: ModelStatus }
@@ -99,11 +99,11 @@ function retryable(status: number): boolean {
 }
 /** Null when the content holds no JSON object. An empty object is an answer. */
 function parseAnswer(content: string): ModelAnswer | null {
-  const parsed = extractJson(content) as { place?: unknown; metric?: unknown } | null;
+  const parsed = extractJson(content) as { place?: unknown; metric?: unknown; compareTo?: unknown } | null;
   if (!parsed) return null;
   const text = (value: unknown): string | null =>
     typeof value === "string" && value.trim() ? value.trim() : null;
-  return { placeName: text(parsed.place), metric: text(parsed.metric) };
+  return { placeName: text(parsed.place), metric: text(parsed.metric), compareTo: text(parsed.compareTo) };
 }
 
 /** One attempt, one retry on a rate limit, a 5xx or a timeout; then give up. */
