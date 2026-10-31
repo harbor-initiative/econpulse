@@ -12,6 +12,7 @@ import path from "node:path";
 import { send, sendBinary } from "../lib/http.ts";
 import { db } from "../lib/runtime.ts";
 import { sitemap } from "../lib/sitemap.ts";
+import { boundaryFor } from "../lib/boundaries.ts";
 
 /**
  * The only files served from disk.
@@ -74,6 +75,24 @@ export async function routeAssets(url: URL, res: ServerResponse): Promise<boolea
       return true;
     }
     send(res, 200, body, "application/xml; charset=utf-8");
+    return true;
+  }
+
+  const boundaryMatch = url.pathname.match(/^\/boundaries\/(\d{2,11})\.json$/);
+  if (boundaryMatch?.[1]) {
+    const body = boundaryFor(boundaryMatch[1]);
+    if (!body) {
+      send(res, 404, "No boundary for that geoid.\n", "text/plain");
+      return true;
+    }
+    // Immutable within a data version, and the version is in the filename by
+    // convention: a new build is a new deploy.
+    res.writeHead(200, {
+      "content-type": "application/json; charset=utf-8",
+      "content-length": String(body.length),
+      "cache-control": "public, max-age=86400",
+    });
+    res.end(body);
     return true;
   }
 

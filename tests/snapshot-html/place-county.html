@@ -87,6 +87,11 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 /* Every number the gate can find is tabular. One rule, so a new number cannot miss it. */
 [data-number]{font-variant-numeric:tabular-nums}
 .hsub{font-size:1.5rem;line-height:1.15;margin:.2rem 0 .6rem}
+.mapf{height:200px;margin:0 0 1.4rem;border:1px solid var(--rule);background:#F4F2EC;position:relative}
+.mapf.map-failed{padding:.9rem 1rem;display:flex;align-items:center}
+.mapnote{font-family:var(--mono);font-size:.6rem;color:var(--rec);padding:.8rem}
+.maplibregl-canvas{display:block}
+.maplibregl-ctrl{display:none}
 .hblock{margin:0 0 1.6rem}
 .scope{font-size:.82rem;color:var(--muted);margin:.45rem 0 0}
 .hrule{height:1px;background:var(--ink);margin:1rem 0 .8rem}
@@ -164,6 +169,7 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
   footer{position:static;margin-top:1rem;border-top:1px solid var(--rule);font-size:8pt}
 }
 </style>
+<link rel="stylesheet" href="/maplibre-gl.css">
 </head><body><div class="wrap">
 <div class="topbar">
 <form class="dock" action="/ask" method="get" role="search"><input type="search" name="q" placeholder="Place or question" aria-label="Place or question"></form>
@@ -175,12 +181,15 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
     <p class="scope">PA · population 1,579,706 · GEOID 42101</p>
     <div class="hrule"></div>
     <p class="hpending">No score yet. It is computed when the file is built.</p>
-    <p class="hsummary">unemployment is worse than the national figure. median gross rent is better than the national figure.</p>
+    <p class="hsummary">Unemployment is worse than the national figure. Median gross rent is better than the national figure.</p>
     <div class="hrule light"></div>
     <p class="hreceipt"><b>U.S. Census Bureau</b> · American Community Survey 5-Year · B01003 · 2020-2024 · pulled 2026-10-31</p>
     <p class="htv">data 2026.10 · built 2026-10-31 · pulled 2026-10-31</p>
   </header>
      
+     <figure class="mapf" data-map data-geoid="42101" data-center="[-75.1180,40.0027]" data-zoom="8">
+    <noscript><p class="mapnote">The outline needs JavaScript. The GEOID is in the scope line above.</p></noscript>
+  </figure>
      <div class="grid"><div class="metric" data-freshness="fresh">
     
     <p class="label">Population</p>
@@ -300,5 +309,7 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
       <span class="factv" data-number>12.13%</span>
       <span class="factr">U.S. Census Bureau · 2020-2024</span>
     </div></div></section>
-<footer><span>data 2026.10 · app 0.12.0 · econpulse.harborgovcon.com · Numbers are illustrative of the source.</span><span>A Harbor Initiative project · Public data · Not financial advice</span></footer>
-</div><script src="/ask.js" defer></script><script src="/combobox.js" defer></script></body></html>
+<footer><span>data 2026.10 · app 0.13.0 · econpulse.harborgovcon.com · Numbers are illustrative of the source.</span><span>A Harbor Initiative project · Public data · Not financial advice</span></footer>
+</div><script src="/ask.js" defer></script>
+<script src="/maplibre-gl.js" defer></script>
+<script src="/map.js" defer></script><script src="/combobox.js" defer></script></body></html>
