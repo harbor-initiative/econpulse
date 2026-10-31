@@ -47,7 +47,7 @@ Running the app needs no API key. The released database is the whole product:
 | Command | What it does |
 |---|---|
 | `npm run serve` | The web server on `127.0.0.1:3100`. `PORT` and `HOST` override. |
-| `npm run verify` | The data gate. 16 checks over the open database. |
+| `npm run verify` | The data gate. 17 checks over the open database and the alias CSVs. |
 | `npx tsc --noEmit` | The type gate. Clean is the only passing state. |
 | `npm run mcp` | The same database over MCP, on stdio. Seven tools. |
 | `node scripts/snapshot-html.mjs` | Write the rendered HTML of ten routes to `tests/snapshot-html/`. |
@@ -93,11 +93,13 @@ server/
 │   ├── metrics.ts    which measures exist, and the report order
 │   ├── panels.ts     place + measure -> panel, including the county fallback
 │   ├── http.ts       send() and redirect(); nothing else touches res
+│   ├── aliases.ts    nicknames, state codes and metros, read from CSV at boot
 │   ├── rules.ts      the local vocabulary a name is matched against
 │   └── model.ts      the one call to a model
 ├── ask.ts            the question layer: parse a name, or ask the model
 ├── store.ts          every SQL query in the product
 └── mcp.ts            the MCP server
+data/aliases/         the three CSVs the alias map is built from
 pipeline/             the loaders, the build, and the data gate
 scripts/              the snapshot comparator and the design gate
 docs/specs/           one specification per issue
