@@ -19,6 +19,7 @@ import { routeHome } from "./routes/home.ts";
 import { routePlace } from "./routes/place.ts";
 import { routeAsk } from "./routes/ask.ts";
 import { routeMethod } from "./routes/method.ts";
+import { routeWhere } from "./routes/where.ts";
 
 async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
@@ -31,6 +32,7 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
     if (await routePlace(url, res)) return;
     if (await routeAsk(url, res, req)) return;
     if (await routeMethod(url, res)) return;
+    if (await routeWhere(url, res)) return;
 
     send(res, 404, shell("Not found", `<h1 class="place">Not found</h1><p class="sub">That page does not exist. <a href="/">Start again</a>.</p>`));
   } catch (error) {

@@ -88,6 +88,9 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 .hsub{font-size:1.5rem;line-height:1.15;margin:.2rem 0 .6rem}
 .mapf{height:200px;margin:0 0 1.4rem;border:1px solid var(--rule);background:#F4F2EC;position:relative}
 .mapf.map-failed{padding:.9rem 1rem;display:flex;align-items:center}
+.locate{position:absolute;left:.6rem;bottom:.6rem;z-index:2;font:inherit;font-size:.68rem;padding:.3rem .55rem;border:1px solid var(--rule2);border-radius:6px;background:#fff;color:var(--ink);cursor:pointer}
+.locate:hover{border-color:var(--ink)}
+.locate:disabled{color:var(--rec);cursor:default}
 .mapnote{font-family:var(--mono);font-size:.6rem;color:var(--rec);padding:.8rem}
 .maplibregl-canvas{display:block}
 .maplibregl-ctrl{display:none}
