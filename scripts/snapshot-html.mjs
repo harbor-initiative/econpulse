@@ -54,6 +54,17 @@ function fail(message) {
   process.exit(1);
 }
 
+/**
+ * The release number is metadata, not content.
+ *
+ * Every page footer prints the app version, so bumping package.json moved ten
+ * baselines and failed the gate three times in one evening. The gate is here to
+ * catch a page that changed, and a release is not a page change.
+ */
+function withoutVersion(html) {
+  return html.replace(/app \d+\.\d+\.\d+/g, "app <version>");
+}
+
 /** First byte that differs, with a little context, so a failure is readable. */
 function describeDifference(expected, actual) {
   let i = 0;
@@ -91,7 +102,7 @@ async function main() {
         const expectedFile = path.join(OUT, `${route.slug}.html`);
         if (!existsSync(expectedFile)) fail(`no snapshot for ${route.slug}. Run without --check first.`);
         const expected = await readFile(expectedFile, "utf8");
-        if (expected !== body) {
+        if (withoutVersion(expected) !== withoutVersion(body)) {
           failures.push(`  ${route.slug.padEnd(14)} ${route.path}\n${describeDifference(expected, body)}`);
           continue;
         }
