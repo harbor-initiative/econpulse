@@ -138,6 +138,7 @@ export function probe() {
   contrast.sort((a, b) => a.ratio - b.ratio);
 
   const topbar = document.querySelector(".topbar,[data-topbar]");
+  const anySearch = Boolean(document.querySelector("input[type=search][name=q]"));
   const smallest = contrast.reduce((min, row) => Math.min(min, row.size), 99);
 
   return {
@@ -149,6 +150,7 @@ export function probe() {
     contrast: contrast.slice(0, 8),
     contrastCount: contrast.length,
     topbarSearch: Boolean(topbar && topbar.querySelector("input[type=search]")),
+    anySearch,
     overflow: Math.max(0, document.documentElement.scrollWidth - window.innerWidth),
     smallestText: smallest,
     chartCount: charts.length,
