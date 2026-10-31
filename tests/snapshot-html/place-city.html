@@ -48,6 +48,10 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 .chart-table th,.chart-table td{text-align:right;font-weight:400;padding:.22rem .4rem;border-bottom:1px solid var(--rule);font-variant-numeric:tabular-nums}
 .chart-table th:first-child,.chart-table td:first-child{text-align:left}
 .chart-table thead th{color:var(--rec);font-family:var(--mono);font-size:.54rem;letter-spacing:.06em;text-transform:uppercase}
+.sharebar{margin:.75rem 0 .1rem}
+.sbtrack{display:block;height:10px;background:#F0EEE6;border-radius:2px;overflow:hidden}
+.sbtrack i{display:block;height:10px;background:var(--teal)}
+.sblabel{display:block;font-family:var(--mono);font-size:.58rem;line-height:1.5;color:var(--rec);margin-top:.32rem;letter-spacing:.03em}
 .bench-share{font-family:var(--mono);font-size:.62rem;line-height:1.5;color:var(--muted);margin:.55rem 0 0}
 .bench-note{font-family:var(--mono);font-size:.6rem;letter-spacing:.03em;color:var(--rec);margin:.55rem 0 0}
 .stale{margin:0 0 .7rem;padding:.45rem .6rem;background:var(--stale-bg);border:1px solid var(--stale);color:var(--stale);font-size:.74rem;line-height:1.45}
@@ -90,9 +94,12 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
     <p class="label">Population</p>
     <p class="value">1,579,706</p>
     
+    <div class="sharebar" data-visual>
+    <span class="sbtrack"><i style="width:12.1%"></i></span>
+    <span class="sblabel">12.13% of Pennsylvania · 1,579,706 of 13,018,639</span>
+  </div>
     
     
-    <p class="bench-share">Pennsylvania 13,018,639 · United States 334,922,499 · this place is 12.13% of the state</p>
     <p class="rec"><b>Receipt</b> U.S. Census Bureau · American Community Survey 5-Year · B01003 · 2020-2024 · pulled 2026-10-31</p>
   </div><div class="metric" data-freshness="fresh">
     
@@ -107,26 +114,12 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
       <table><caption>Unemployment (Philadelphia County), against United States</caption>
         <thead><tr><th scope="col">Period</th><th scope="col">This place</th><th scope="col">United States</th><th scope="col">Margin</th></tr></thead><tbody><tr><th scope="row">2024-01</th><td>4.6%</td><td>4.1%</td><td>—</td></tr><tr><th scope="row">2024-02</th><td>4.8%</td><td>4.2%</td><td>—</td></tr><tr><th scope="row">2024-03</th><td>4.4%</td><td>3.9%</td><td>—</td></tr><tr><th scope="row">2024-04</th><td>4.0%</td><td>3.5%</td><td>—</td></tr><tr><th scope="row">2024-05</th><td>4.4%</td><td>3.7%</td><td>—</td></tr><tr><th scope="row">2024-06</th><td>4.9%</td><td>4.3%</td><td>—</td></tr><tr><th scope="row">2024-07</th><td>5.5%</td><td>4.5%</td><td>—</td></tr><tr><th scope="row">2024-08</th><td>5.7%</td><td>4.4%</td><td>—</td></tr><tr><th scope="row">2024-09</th><td>4.6%</td><td>3.9%</td><td>—</td></tr><tr><th scope="row">2024-10</th><td>4.7%</td><td>3.9%</td><td>—</td></tr><tr><th scope="row">2024-11</th><td>4.6%</td><td>4.0%</td><td>—</td></tr><tr><th scope="row">2024-12</th><td>4.5%</td><td>3.8%</td><td>—</td></tr><tr><th scope="row">2025-01</th><td>5.2%</td><td>4.4%</td><td>—</td></tr><tr><th scope="row">2025-02</th><td>5.2%</td><td>4.5%</td><td>—</td></tr><tr><th scope="row">2025-03</th><td>5.0%</td><td>4.2%</td><td>—</td></tr><tr><th scope="row">2025-04</th><td>4.7%</td><td>3.9%</td><td>—</td></tr><tr><th scope="row">2025-05</th><td>5.1%</td><td>4.0%</td><td>—</td></tr><tr><th scope="row">2025-06</th><td>5.6%</td><td>4.4%</td><td>—</td></tr><tr><th scope="row">2025-07</th><td>6.0%</td><td>4.6%</td><td>—</td></tr><tr><th scope="row">2025-08</th><td>6.4%</td><td>4.5%</td><td>—</td></tr><tr><th scope="row">2025-09</th><td>5.6%</td><td>4.3%</td><td>—</td></tr><tr><th scope="row">2025-11</th><td>5.0%</td><td>4.3%</td><td>—</td></tr><tr><th scope="row">2025-12</th><td>4.6%</td><td>4.1%</td><td>—</td></tr><tr><th scope="row">2026-01</th><td>5.3%</td><td>4.7%</td><td>—</td></tr><tr><th scope="row">2026-02</th><td>5.5%</td><td>4.7%</td><td>—</td></tr><tr><th scope="row">2026-03</th><td>5.0%</td><td>4.3%</td><td>—</td></tr><tr><th scope="row">2026-04</th><td>4.7%</td><td>4.0%</td><td>—</td></tr><tr><th scope="row">2026-05</th><td>5.0%</td><td>4.1%</td><td>—</td></tr><tr><th scope="row">2026-06</th><td>4.9%</td><td>4.4%</td><td>—</td></tr><tr><th scope="row">2026-07</th><td>4.9%</td><td>4.4%</td><td>—</td></tr><tr><th scope="row">2026-08</th><td>5.2%</td><td>4.3%</td><td>—</td></tr><tr><th scope="row">2026-09</th><td>4.3%</td><td>4.0%</td><td>—</td></tr></tbody></table>
     </details>
-    <div class="compare"><div class="crow">
-        <span class="cl">This place</span>
-        <span class="cbar"><i style="width:100.0%"></i></span>
-        <span class="cv">4.3%</span>
-      </div><div class="crow">
-        <span class="cl">Pennsylvania</span>
-        <span class="cbar"><i style="width:83.7%"></i></span>
-        <span class="cv">3.6%</span>
-      </div><div class="crow">
-        <span class="cl">United States</span>
-        <span class="cbar"><i style="width:93.0%"></i></span>
-        <span class="cv">4.0%</span>
-      </div></div>
+    
     <p class="rec"><b>Receipt</b> U.S. Bureau of Labor Statistics · Local Area Unemployment Statistics · LAUCN421010000000003 · 2026-09 · pulled 2026-10-31</p>
   </div><div class="metric" data-freshness="fresh">
     
     <p class="label">Median gross rent</p>
     <p class="value">$1,397</p>
-    
-    
     
     <div class="compare"><div class="crow">
         <span class="cl">This place</span>
@@ -141,6 +134,8 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
         <span class="cbar"><i style="width:100.0%"></i></span>
         <span class="cv">$1,413</span>
       </div></div>
+    
+    
     <p class="rec"><b>Receipt</b> U.S. Census Bureau · American Community Survey 5-Year · B25064 · 2020-2024 · pulled 2026-10-31</p>
   </div><div class="metric" data-freshness="fresh">
     

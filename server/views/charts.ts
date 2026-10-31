@@ -56,6 +56,21 @@ export function barChart(values: number[], labels: string[]): string {
     <line x1="0" y1="${h - 1}" x2="${w}" y2="${h - 1}" stroke="${RULE}" stroke-width="1"/></svg>${ticks}`;
 }
 
+/**
+ * One proportion, drawn as a bar.
+ *
+ * The third of the three allowed visuals, and the one a single-period total
+ * needs: a county's population has no series to plot and no honest axis to share
+ * with a country, so the only meaningful visual is how much of its parent it is.
+ */
+export function shareBar(percent: number, label: string, placeValue: number, parentValue: number, unit: string): string {
+  const width = Math.max(1.5, Math.min(100, percent));
+  return `<div class="sharebar" data-visual>
+    <span class="sbtrack"><i style="width:${width.toFixed(1)}%"></i></span>
+    <span class="sblabel">${esc(percent.toFixed(2))}% of ${esc(label)} · ${esc(formatValue(placeValue, unit))} of ${esc(formatValue(parentValue, unit))}</span>
+  </div>`;
+}
+
 export function compareBars(rows: Array<{ label: string; value: number }>, unit: string): string {
   const max = Math.max(...rows.map((r) => r.value), 1);
   return `<div class="compare">${rows
