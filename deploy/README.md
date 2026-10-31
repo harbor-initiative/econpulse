@@ -100,6 +100,19 @@ ssh wala-srv '
 `mv` rather than a write in place, so the container never opens a half-written
 file. The restart is what picks the new one up.
 
+## County outlines
+
+`data/boundaries/` is build output and is not in the repository. The image copies
+it, so the host must have it before `docker build`:
+
+```bash
+ssh wala-srv 'cd ~/econpulse && node scripts/fetch-boundaries.mjs'
+```
+
+Fifty-two states, about 16 MB, four minutes. No key, and the geometry only changes
+when the Census republishes. A build without it succeeds and every map draws its
+"No WebGL" fallback, which is the wrong kind of quiet.
+
 ## Checks after a deploy
 
 ```bash
