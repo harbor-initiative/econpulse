@@ -5,12 +5,16 @@
   "type": "module",
   "description": "Open, offline, citable data on how American places are doing.",
   "license": "MIT",
-  "engines": { "node": ">=22.5" },
+  "engines": {
+    "node": ">=22.5"
+  },
   "scripts": {
     "load": "tsx pipeline/build.ts",
     "verify": "tsx pipeline/verify.ts",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/*.test.ts"
+    "test": "node --test tests/*.test.ts",
+    "serve": "tsx server/index.ts",
+    "dev": "tsx server/index.ts"
   },
   "devDependencies": {
     "@types/node": "^22",

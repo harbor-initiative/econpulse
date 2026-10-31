@@ -3,8 +3,8 @@
 **Every number about a place, with its receipt.**
 
 EconPulse answers one question: how is this place doing? Give it a city, county,
-or ZIP and it returns population, income, rent, home value, jobs, education, and
-poverty for that place, next to its state and the country.
+or ZIP and it returns population, income, rent, home value, jobs, output, and
+federal money for that place, next to its state and the country.
 
 The difference is not the chart. It is that every value carries the agency that
 published it, the table it came from, the period it describes, the vintage of
@@ -31,52 +31,77 @@ run offline, with the provenance built into the schema instead of a footnote.
 
 | | |
 |---|---|
-| Sources | Census ACS 5-Year 2024 |
+| Sources | Census ACS 5-Year 2024 · BLS LAUS · BEA Regional · USAspending |
 | Places | 19,142 — every state, every county, every place above 1,000 people, and the US |
-| Metrics | 9 — population, income, rent, home value, median age, unemployment, labor force participation, bachelor's degree, poverty |
-| Facts | 170,740 |
-| File | 52 MB |
-| Rebuild | about ten seconds |
+| Metrics | 12 |
+| Facts | 320,858 |
+| File | 108 MB uncompressed, 9.4 MB gzipped |
+| Rebuild | about three minutes, four agencies, six API calls plus 66 BLS batches |
 
-Not built yet: BLS, BEA, USAspending, the web app, the MCP server. See
-[the roadmap](#roadmap).
+[Download the current file](https://github.com/harbor-initiative/econpulse/releases/latest).
+The web app is in `server/`. Not built yet: the MCP server. See [the roadmap](#roadmap).
 
-## Quick start
+## Use the data
 
-Requires Node 22.5 or newer, for `node:sqlite`. No native modules, no build step.
+No clone, no install, no key.
+
+```bash
+curl -LO https://github.com/harbor-initiative/econpulse/releases/latest/download/econpulse-2026.10.db.gz
+curl -LO https://github.com/harbor-initiative/econpulse/releases/latest/download/econpulse-2026.10.db.gz.sha256
+shasum -a 256 -c econpulse-2026.10.db.gz.sha256
+gunzip econpulse-2026.10.db.gz
+sqlite3 econpulse.db "select metric, value, agency, vintage from fact where geoid='42101'"
+```
+
+Anything that reads SQLite works: `sqlite3`, DuckDB, Python, R, a notebook, an
+agent.
+
+```sql
+-- Every fact about one place, with its receipt.
+SELECT metric, value, moe, agency, dataset, vintage, retrieved_at
+FROM fact WHERE geoid = '42101' ORDER BY metric;
+
+-- The joined view, ready to chart.
+SELECT place_name, metric_label, value, unit, agency, vintage
+FROM fact_view WHERE geoid = '42101';
+```
+
+Geographies use the Census GEOID: a county is `42101`, a state is `42`, a place
+is `4210100000`, and the country is `0100000US`.
+
+## Rebuild it
+
+Maintainers only. Requires Node 22.5 or newer, for `node:sqlite`. No native
+modules, no build step.
 
 ```bash
 git clone https://github.com/harbor-initiative/econpulse.git
 cd econpulse
 npm install
 
-cp .env.example .env      # add a Census key, free, takes two minutes
+cp .env.example .env      # Census and BEA keys, both free
 npm run load              # writes data/econpulse.db
-npm run verify            # checks the receipts and pins five numbers
+npm run verify            # the gate
 ```
 
-`npm run load` rebuilds from zero. `npm run load --keep` adds to the existing
-file. `npm run load --only=census` runs one source.
+`npm run load` rebuilds from zero. `npm run load --only=bls` adds one source
+without touching the rest. `npm run load --keep` adds without clearing.
 
-## Read the file
+## Run the site
 
-The database is the product. Any SQLite client works.
+The web app is a plain Node server: no framework, no bundler, no build step.
 
-```sql
--- Every fact about one place, with its receipt.
-SELECT metric, value, moe, agency, dataset, vintage, retrieved_at
-FROM fact
-WHERE geoid = '42101'
-ORDER BY metric;
-
--- The joined view, ready to chart.
-SELECT place_name, metric_label, value, unit, agency, vintage
-FROM fact_view
-WHERE geoid = '42101';
+```bash
+npm run serve              # http://127.0.0.1:3100
+PORT=8080 npm run serve
 ```
 
-Geographies use the Census GEOID, so a county is `42101`, a state is `42`, a
-place is `4210100000`, and the country is `0100000US`.
+`/` is the search box, `/p/:geoid` is the report, `/status` says what is in the
+file, and `/healthz` is for a monitor. The whole server is three files and about
+600 lines, which is the point: a self-hoster should be able to read it.
+
+The charts are built as SVG strings from a small spec, so the same numbers can
+be rendered again by an MCP client without touching the query layer.
 
 ## The data model
 
@@ -93,42 +118,54 @@ time should be able to run `SELECT * FROM fact LIMIT 5` and understand every
 number without joining anything.
 
 A fact is never written without all five receipt fields. `npm run verify` fails
-the build if one is missing, if a margin duplicates its estimate, or if a pinned
-number moves.
+the build if one is missing, if a margin duplicates its estimate, if two
+agencies publish the same metric name, or if a pinned number moves.
 
 ## Keys
 
-**Running the app needs no keys. Rebuilding needs two.**
+**Using the data needs no keys. Rebuilding needs two.**
 
 | Source | Key | Why |
 |---|---|---|
-| Census | Required | API returns `302 → missing_key.html` without one, as of 2026 |
-| BEA | Required | Regional output |
-| BLS | Optional | Raises the daily limit from 25 series |
-| FRED | Optional | Raises macro context |
+| Census | Required | The API returns `302 → missing_key.html` without one, as of 2026 |
+| BEA | Required | County and state output |
+| BLS | Required | The bulk flat file returns 403 to every client, so the API is the only route |
+| FRED | Optional | Not yet used |
 | USAspending | Not needed | Open |
 
 That asymmetry is the design. Getting a key takes minutes, but nobody should
-have to spend them to look up their own town. Whoever runs the app reads the
-prebuilt file; whoever maintains it holds the keys.
+have to spend them to look up their own town. Whoever uses the data reads the
+published file; whoever maintains it holds the keys.
+
+## Known limits
+
+- **No ZCTAs yet.** ZIP codes are the most natural way people ask this question
+  and they are not in the file. Next.
+- **Places are city boundaries, not metro areas.** A suburb's number is its own,
+  not the region's.
+- **BLS county figures are model-based estimates**, not a count. The note on
+  every row says so.
+- **ACS five-year figures are averages over five years.** They are not a
+  current-year reading and they will disagree with BLS by design. Both are
+  labelled.
+- **Federal obligations are not outlays**, and they sit at the place of
+  performance, not the contractor's address.
 
 ## Roadmap
 
 - [x] Schema with a receipt on every value
-- [x] Census loader
-- [ ] BLS loader — county unemployment, monthly
-- [ ] BEA loader — county GDP, annual
-- [ ] USAspending loader — federal obligations by place
-- [ ] Person and ZCTA coverage
-- [ ] Publish `econpulse.db` as a release asset with a checksum
-- [ ] Web app — the one-page report
+- [x] Census, BLS, BEA, USAspending loaders
+- [x] Publish the file as a release asset with a checksum
+- [ ] ZIP code coverage
+- [x] Web app — the one-page report
 - [ ] MCP server
+- [ ] Automated staleness check
 
 ## Contributing
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md). The short version: a new source is one
-file in `pipeline/sources/`, one entry in the CLI, and a fixture test. The
-provenance rule is not negotiable.
+Read [CONTRIBUTING.md](CONTRIBUTING.md). A new source is one file in
+`pipeline/sources/`, one entry in the CLI, and a fixture. The provenance rule is
+not negotiable.
 
 ## Licence
 

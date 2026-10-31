@@ -90,10 +90,15 @@ async function main(): Promise<void> {
     console.log(`  ${result.places.toLocaleString()} places, ${result.facts.toLocaleString()} facts`);
   }
 
+  // Derived from the file, not from the flags. A single-source run must not
+  // claim the file only contains that source.
+  const loaded = (db.prepare("SELECT DISTINCT agency FROM fact ORDER BY agency").all() as unknown as Array<{ agency: string }>)
+    .map((r) => r.agency);
   setBuildMeta(db, {
     "data.version": new Date().toISOString().slice(0, 7).replace("-", "."),
     "build.finished_at": new Date().toISOString(),
-    "build.sources": names.join(","),
+    "build.sources": loaded.join(" · "),
+    "build.source_count": String(loaded.length),
   });
 
   db.exec("ANALYZE");

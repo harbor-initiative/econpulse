@@ -88,8 +88,10 @@ export async function loadUsaSpending(db: DatabaseSync): Promise<{ places: numbe
         vintage: `FY${fy}`,
         retrieved_at: retrieved,
         moe: null,
-        revision: "final",
-        note: "Obligations, not outlays. Place of performance, not recipient address.",
+        revision: fy === LAST_FY ? "provisional" : "final",
+        note: fy === LAST_FY
+          ? "Obligations, not outlays. Place of performance, not recipient address. Current fiscal year, still being reported."
+          : "Obligations, not outlays. Place of performance, not recipient address.",
       };
       writer.write(fact);
       facts += 1;

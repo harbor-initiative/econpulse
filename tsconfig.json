@@ -13,5 +13,5 @@
     "forceConsistentCasingInFileNames": true,
     "types": ["node"]
   },
-  "include": ["pipeline/**/*.ts", "tests/**/*.ts"]
+  "include": ["pipeline/**/*.ts", "server/**/*.ts", "tests/**/*.ts"]
 }
