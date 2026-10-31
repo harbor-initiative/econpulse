@@ -104,7 +104,13 @@ const RULES = [
   {
     id: "G9",
     name: "search on every page",
-    run: (m) => (m.page.topbarSearch ? [] : ["the top bar carries no search input"]),
+    // The top bar carries it everywhere except the home page, where the hero
+    // field is the same job done larger. What the rule is for is that a reader
+    // can search from any page without going back to the front door.
+    run: (m) => {
+      if (m.page.topbarSearch || m.page.anySearch) return [];
+      return ["no search input on the page, in the top bar or in the body"];
+    },
   },
 ];
 

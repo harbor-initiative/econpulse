@@ -21,5 +21,7 @@ export function home(): string {
         <a class="chip" href="/ask?q=Federal%20money%20in%20Philadelphia">Federal money in Philadelphia</a>
       </div>
     </div>`,
+    "",
+    false,
   );
 }
