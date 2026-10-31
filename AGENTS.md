@@ -64,8 +64,9 @@ dataset rather than an error.
 `node scripts/snapshot-html.mjs --check`. A change that touches a page also runs
 `node scripts/design-check.mjs`, and its failing count must not grow.
 
-The design gate currently reports 54 failing assertions. That number is the
-design debt in #34, measured. It is not a permission to add more.
+The design gate reports failing assertions, and the count is the design debt
+#34 exists to pay. Run it before a merge: the number must not grow. It is not
+written down here because it falls, and a number in this file went stale twice.
 
 ## 3. The file map
 
