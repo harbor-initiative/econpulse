@@ -14,6 +14,7 @@ import { send } from "./lib/http.ts";
 import { shell } from "./views/layout.ts";
 import { routeAssets } from "./routes/assets.ts";
 import { routeStatus } from "./routes/status.ts";
+import { routeSuggest } from "./routes/suggest.ts";
 import { routeHome } from "./routes/home.ts";
 import { routePlace } from "./routes/place.ts";
 import { routeAsk } from "./routes/ask.ts";
@@ -24,6 +25,7 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
 
   try {
     if (await routeStatus(url, res)) return;
+    if (await routeSuggest(url, res)) return;
     if (await routeAssets(url, res)) return;
     if (await routeHome(url, res)) return;
     if (await routePlace(url, res)) return;
