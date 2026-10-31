@@ -56,6 +56,35 @@ Rules the split enforces:
 identical after, modulo whitespace. A refactor that changes an answer is not a
 refactor.
 
+### AGENTS.md lands with the split
+
+The split is also when the repository gets its `AGENTS.md`, because that file
+carries a map of `server/` and the map is only true after the split moves the
+files. Written before, it describes a repository that no longer exists.
+
+Four sections, no more:
+
+1. **The house rules that do not bend.** No antithesis constructions. No red or
+   green on a number. Hairlines. Every value carries its receipt. The file names
+   its own version.
+2. **How to run it.** `npm install`, where the database comes from, `npm run
+   serve`, `npm run verify`, what the gate checks.
+3. **The file map.** Route owns route, view owns view, `css.ts` is the only
+   stylesheet, `lib/` holds shared behaviour. An agent should not need to look
+   twice.
+4. **The traps already paid for.** Each of these cost a deploy:
+   - `_E$` never matches `B01003_001E`, because the string ends in `1E`. Slice
+     the last character.
+   - ZCTA codes are five digits and collide with county FIPS. ZIPs live in their
+     own table.
+   - Census encodes "no margin" as `-555555555`, and four other sentinels.
+   - `openrouter/free` spends the token budget thinking. Under 400 `max_tokens`
+     it returns an empty answer with `finish_reason: length`.
+   - `PRAGMA wal_checkpoint(TRUNCATE)` before shipping the database, or the
+     artifact is two files.
+   - The design gate measures coloured pixels in a real browser. Reading the CSS
+     proves nothing.
+
 ## Acceptance criteria
 
 - [ ] Every route renders byte-identical HTML to the pre-split capture
@@ -63,6 +92,7 @@ refactor.
 - [ ] No file in `server/` exceeds 200 lines
 - [ ] The browser gate (#34) passes before and after
 - [ ] The split lands as one commit with no behaviour change in the message
+- [ ] `AGENTS.md` exists, names the real file map, and lists the six traps
 
 ## Risks
 
