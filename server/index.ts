@@ -6,7 +6,7 @@ import {
   countyForPlace, lookupZip, counts, buildMeta, type Place, type Fact,
 } from "./store.ts";
 import { home, searchResults, report, status, shell, askCard, askNeedPlace, askNeedMetric, type Panel } from "./view.ts";
-import { parseQuestion, askModel } from "./ask.ts";
+import { isQuestion, parseLocally, parseQuestion } from "./ask.ts";
 
 /**
  * The web server.
@@ -135,18 +135,22 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
         ]));
       }
 
-      const parsed = parseQuestion(db, question);
+      const menu = Object.entries(METRICS).map(([id, spec]) => ({ id, label: spec.label }));
+
+      // A question goes to the model. A name goes to the index. Mixing the two
+      // is how "the Liberty Bell" became Bell County, Texas.
+      let parsed = isQuestion(question)
+        ? await parseQuestion(db, question, menu)
+        : parseLocally(db, question);
+
+      // A name the index could not place may still be a nickname. Ask the model
+      // only after the index has failed.
+      if (!parsed.place && !isQuestion(question) && process.env.OPENROUTER_API_KEY) {
+        parsed = await parseQuestion(db, question, menu);
+      }
+
       let place = parsed.place;
       let metric = parsed.metric;
-
-      // The model is a fallback for the questions the local parse could not
-      // place. It chooses from a menu and never sees a value.
-      if ((!place || !metric) && process.env.OPENROUTER_API_KEY) {
-        const menu = Object.entries(METRICS).map(([id, s]) => ({ id, label: s.label }));
-        const choice = await askModel(db, question, menu);
-        if (!place && choice?.geoid) place = getPlace(db, choice.geoid);
-        if (!metric && choice?.metric && METRICS[choice.metric]) metric = choice.metric;
-      }
 
       if (!place) {
         const candidates = searchPlaces(db, question);
@@ -160,7 +164,7 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
       const ctx = contextFor(place);
 
       if (!metric) {
-        if (parsed.via === "exact" && ctx.available.size > 1) {
+        if (ctx.available.size > 1) {
           return send(res, 200, report(place, buildPanels(place), meta));
         }
         const offered = REPORT_ORDER
