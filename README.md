@@ -37,7 +37,8 @@ run offline, with the provenance built into the schema instead of a footnote.
 | Rebuild | about three minutes, five agencies |
 
 [Download the current file](https://github.com/harbor-initiative/econpulse/releases/latest).
-The web app is in `server/`. Not built yet: the MCP server. See [the roadmap](#roadmap).
+The web app is in `server/`. The MCP server is in the same tree and speaks stdio
+— see [Use it from an agent](#use-it-from-an-agent).
 
 ## Use the data
 
@@ -115,9 +116,14 @@ npm run serve              # http://127.0.0.1:3100
 PORT=8080 npm run serve
 ```
 
-`/` is the search box, `/p/:geoid` is the report, `/status` says what is in the
-file, and `/healthz` is for a monitor. The whole server is three files and about
-600 lines, which is the point: a self-hoster should be able to read it.
+`/` is the search box, `/p/:geoid` is the report, `/ask?q=` answers a question,
+`/method` says where the numbers come from, `/status` says what is in the file,
+and `/healthz` answers a monitor about the data rather than the process.
+
+The server is 22 files with nothing above 200 lines: routes in `server/routes/`,
+views in `server/views/`, shared behaviour in `server/lib/`. That limit is what
+lets two people change two things at once, and it is the reason a self-hoster can
+read the whole thing in an afternoon.
 
 The charts are built as SVG strings from a small spec, so the same numbers can
 be rendered again by an MCP client without touching the query layer.
@@ -158,8 +164,12 @@ published file; whoever maintains it holds the keys.
 
 ## Known limits
 
-- **No ZCTAs yet.** ZIP codes are the most natural way people ask this question
-  and they are not in the file. Next.
+- **A ZIP resolves to a county, not an address.** 33,486 ZIPs map to the county
+  holding most of their land, and the page says so. A postal route is not a civic
+  boundary and the file does not pretend otherwise.
+- **A city borrows its county's figures by name, and the name is often wrong.**
+  Austin city borrows Austin County, which it is not in. Tracked as #71; the fix
+  is a place-to-county table and a rebuild.
 - **Places are city boundaries.** A suburb's number describes the suburb itself; metro figures measure something else.
 - **BLS county figures are model-based estimates.** Nobody counts every unemployed person. The note on
   every row says so.
@@ -173,11 +183,14 @@ published file; whoever maintains it holds the keys.
 - [x] Schema with a receipt on every value
 - [x] Census, BLS, BEA, USAspending loaders
 - [x] Publish the file as a release asset with a checksum
-- [ ] ZIP code coverage
+- [x] ZIP code coverage
 - [x] Web app — the one-page report
 - [x] `econpulse.harborgovcon.com` behind Caddy
 - [x] MCP server
-- [ ] Automated staleness check
+- [x] Automated staleness check
+- [x] The design gate, at zero failing assertions
+- [ ] Continuous integration — the gates run as commands (#37)
+- [ ] A map, and use-my-location (#16, #9)
 
 ## Contributing
 
