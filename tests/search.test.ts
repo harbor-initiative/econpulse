@@ -83,7 +83,7 @@ describe("the open database", { skip }, () => {
     assert.ok(mean < 5, `${mean.toFixed(2)} ms per query, budget 5 ms`);
   });
 
-  test("the index covers every place, in under 150 ms, under 8 MB", () => {
+  test("the index covers every place, in under 150 ms, under 500 bytes each", () => {
     const count = db!.prepare("SELECT COUNT(*) AS c FROM place").get() as unknown as { c: number };
     const started = performance.now();
     const stats = buildSearchIndex(allPlaces(db!));
@@ -92,7 +92,13 @@ describe("the open database", { skip }, () => {
     assert.equal(stats.places, count.c);
     assert.ok(stats.buildMs < 150, `build took ${stats.buildMs.toFixed(1)} ms, budget 150 ms`);
     assert.ok(elapsed < 150, `boot read and build took ${elapsed.toFixed(1)} ms, budget 150 ms`);
-    assert.ok(stats.bytes < 8 * 1024 * 1024, `index footprint ${(stats.bytes / 1048576).toFixed(2)} MB, budget 8 MB`);
+    // Per place, not per file. The budget was 8 MB when the file had 19,142
+    // places; #8 loads every place in the Census file, which takes it to 13 MB.
+    // The index growing because the product covers more places is the feature
+    // working, and a fixed byte budget would fail for the change it protects.
+    const perPlace = stats.bytes / stats.places;
+    assert.ok(perPlace < 500, `${perPlace.toFixed(0)} bytes per place, budget 500`);
+    assert.ok(stats.bytes < 24 * 1024 * 1024, `index footprint ${(stats.bytes / 1048576).toFixed(2)} MB, ceiling 24 MB`);
     assert.equal(indexStats()?.buildMs, stats.buildMs);
   });
 });
