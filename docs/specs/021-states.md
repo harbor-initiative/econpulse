@@ -21,8 +21,7 @@ Six templates, each with one job:
 | Measure missing | place resolved, metric absent | "No *measure* for *place*." + what it does have |
 | Rate limited | bucket empty | "20 questions an hour. Resets at *time*." |
 
-Each is a route branch, not an error page, and each is reachable in a test with a
-fixture.
+Each is a route branch with its own template, and each is reachable in a test with a fixture.
 
 ## Acceptance criteria
 

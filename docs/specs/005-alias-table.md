@@ -10,7 +10,7 @@ app had no aliases either, so this is new ground rather than a regression.
 
 ## Approach
 
-A table, not code:
+A table:
 
 ```sql
 CREATE TABLE alias (
@@ -32,7 +32,7 @@ Build step loads them into `alias`. Query order in the resolver: **alias first,
 exact name second, fuzzy third.** An alias is an exact answer and must beat a
 substring match.
 
-A term that resolves to more than one GEOID is a build error, not a coin flip.
+A term that resolves to more than one GEOID is a build error.
 The old app's peer suggester had the same problem and resolved it arbitrarily.
 
 ## Acceptance criteria
@@ -46,8 +46,7 @@ The old app's peer suggester had the same problem and resolved it arbitrarily.
 
 ## Risks
 
-Ambiguity is real — "Springfield" is not an alias, it is five places, and the
-resolver must show the picker rather than choose. Aliases age; the CSV is data,
+Ambiguity is real: "Springfield" names five places, so the resolver shows the picker. Aliases age; the CSV is data,
 so correcting one is a one-line diff.
 
 ## Out of scope

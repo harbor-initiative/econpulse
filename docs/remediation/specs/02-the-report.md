@@ -46,8 +46,7 @@ Maryland · population 959,754 · GEOID 24033
 - **Weights printed** under the score in 11px mono:
   `jobs 30 · housing 25 · output 20 · population 15 · federal 10`.
 - **Method link** to `/method`, one page, plain English.
-- **Summary** is two sentences maximum, generated, and may not contain a number
-  that is not in the pillars. It is cached per `(geoid, data_version)`.
+- **Summary** is two sentences maximum, generated, and may not contain a number absent from the pillars. The result is cached per `(geoid, data_version)`.
 
 ### 2. How the score is computed
 
@@ -129,7 +128,7 @@ Each carries its receipt in the same format. No new data.
 - Style from **OpenFreeMap**, keyless, no registration, no tracking.
 - Overlay: the county or place boundary, from Census cartographic boundary
   GeoJSON, downloaded at build time and served from our own origin.
-- Size: 200px tall, placed beside the header block, not above the panels.
+- Size: 200px tall, placed beside the header block.
 - Offline: if tiles fail, the outline still renders from our GeoJSON. No error
   message; the map simply becomes an outline.
 
@@ -140,7 +139,7 @@ A print stylesheet, because print is now the only export.
 - One column, panels unbroken across pages.
 - Receipts included.
 - Footer prints URL, app version, data version, and the retrieval dates.
-- Tested by generating a PDF, not by reading the CSS.
+- Tested by generating a PDF.
 
 ### 9. Accessibility
 

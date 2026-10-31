@@ -35,7 +35,7 @@ not a screenshot on social.
 ## Risks
 
 51,158 URLs invite crawler load on a small box. Crawl delay plus a state split
-keeps it polite; the sitemap is generated once per build, not per request.
+keeps it polite; the sitemap is generated once per build.
 
 ## Out of scope
 

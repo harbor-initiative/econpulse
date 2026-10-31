@@ -78,7 +78,7 @@ Hard rules:
   Chart strokes are graphical objects and pass at 3:1; type does not.
 - **No red, no green, ever.** Direction is not the same as good. Meaning is
   carried by a mono `better` / `worse` word in ink against the national figure.
-- **Colour budget: ≤5% of the viewport, target ≤3%.** Measured, not estimated.
+- **Colour budget: ≤5% of the viewport, target ≤3%.** Measured.
 - **Colour never appears on chrome** — no tinted nav, no filled primary button,
   no coloured card. The page has no primary button at all.
 
@@ -94,7 +94,7 @@ A 4px scale: 4 · 8 · 12 · 16 · 24 · 32 · 48. Nothing between steps.
 
 ### 1.4 Surfaces and shape
 
-- **Hairlines, not shadows.** `box-shadow: none` on every element except the
+- **Hairlines only.** `box-shadow: none` on every element except the
   search input, which keeps one for focus affordance only.
 - **Radius 6px for interactive controls.** Data surfaces are square. A rounded
   card holding a number is a tile, and this is not a tile interface.
@@ -106,7 +106,7 @@ not draw. `prefers-reduced-motion` removes the count-up and leaves the number.
 
 ## Part 2 — Components
 
-Each is specified as anatomy, not prose. The names are the ones the code should
+Each is specified as anatomy. The names are the ones the code should
 carry.
 
 ### 2.1 `TopBar`
@@ -142,7 +142,7 @@ receipt      10px mono, --receipt, teal left rule 2px
 ```
 
 **A panel must justify its cell.** One of the three visuals is mandatory. A panel
-that is a value and a receipt is a defect, not a layout.
+that is a value and a receipt is a defect.
 
 ### 2.4 `CompareRows`
 
@@ -228,7 +228,7 @@ every push, next to `verify`.
 - **A gate that measures colours can be gamed** by a page with no colour. G8 and
   the panel-visual rule exist to stop restraint becoming emptiness.
 - **Two faces add a download.** Subsetting and `swap` keep it under 60 KB; a
-  failure to subset is visible in the gate as a render delay, not a failure.
+  failure to subset is visible in the gate as a render delay.
 - **The gate needs Chrome.** CI images include it; a contributor without it gets
   a skip with a warning, never a silent pass.
 

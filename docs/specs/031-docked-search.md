@@ -22,7 +22,7 @@ the docked one is a compact 420px version in the same visual language.
 
 - [ ] A search field is present in the top bar on every route
 - [ ] It is the first focusable element
-- [ ] It submits to `/ask` and answers questions, not just names
+- [ ] It submits to `/ask` and answers questions as well as names
 - [ ] The home page still has its hero field
 - [ ] The gate asserts presence (#5 G9)
 

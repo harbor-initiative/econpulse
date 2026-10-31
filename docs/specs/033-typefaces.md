@@ -6,9 +6,7 @@ Audit: [DESIGN-AUDIT](../../DESIGN-AUDIT.md) D6 · Status: draft
 ## Problem
 
 Georgia for the place name is a choice. The system sans everywhere else is a
-default, and a page built from defaults reads as a kit. `taste-skill` puts it
-plainly: stock Geist or Inter on a stock ground is "a well-applied kit, not a
-product with its own identity".
+default, and a page built from defaults reads as a kit. `taste-skill` calls a stock face on a stock ground "a well-applied kit".
 
 ## Approach
 
@@ -21,7 +19,7 @@ Both subset to Latin-1 plus the punctuation the page actually uses. Budget 60 KB
 total across all weights.
 
 Pick by setting the same header block in both candidates and looking at it. That
-comparison is recorded in this file before the choice is made, not after.
+comparison is recorded in this file before the choice is made.
 
 ## Acceptance criteria
 

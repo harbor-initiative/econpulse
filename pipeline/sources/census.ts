@@ -10,9 +10,9 @@ import { insertPlaces, makeFactWriter, type FactRow } from "../db.ts";
  * this pipeline rebuilds the whole file in under a minute rather than overnight.
  *
  * ACS margins of error are pulled where they matter and carried onto the fact
- * row. A number without its margin is a claim, not a measurement.
+ * row. A number without its margin cannot be checked against anything.
  *
- * Suffixes are sliced, not regex-replaced. `_E$` never matches `B01003_001E`,
+ * Suffixes are sliced. `_E$` never matches `B01003_001E`,
  * because the string ends in `1E`. That mistake put the estimate in the margin
  * column on the first run.
  */
@@ -120,7 +120,7 @@ async function getLevel(level: Level, dataset: "acs5" | "acs5/profile", variable
 }
 
 /**
- * ZIP codes are postal, not civic, so a ZCTA does not get its own facts. It
+ * ZIP codes follow postal routes, so a ZCTA does not get its own facts. It
  * gets a parent: the county that holds most of its land. The report for a ZIP
  * is then the county report, labelled with the ZIP, which is both honest and
  * what the person typing their ZIP actually wanted.

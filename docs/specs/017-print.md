@@ -19,8 +19,7 @@ colour.
 - the map prints as its outline, or not at all if it would break the flow
 - links print their href only where the href is the citation
 
-Verified by generating a PDF with Chrome headless and inspecting the page count
-and the last page's footer, not by reading the CSS.
+Verified by generating a PDF with Chrome headless and inspecting the page count and the last page's footer.
 
 ## Acceptance criteria
 

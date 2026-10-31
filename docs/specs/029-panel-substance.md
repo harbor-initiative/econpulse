@@ -17,7 +17,7 @@ A panel renders one of three visuals, or it does not render:
 2. **Scaled comparison** — this place, the state, the nation, one scale.
 3. **Share bar** — this place as a proportion of its state.
 
-The choice is data-driven, not per-metric hardcoded: `series.length > 1` →
+The choice is data-driven: `series.length > 1` →
 time series; else a comparison exists → comparison rows; else a share exists →
 share bar.
 
@@ -30,13 +30,13 @@ chart, and an early draft of the design did exactly that.
 - [ ] No panel renders without one of the three visuals
 - [ ] Comparison bars are scaled to their values and print their numbers
 - [ ] Population compares growth rates, never totals
-- [ ] A metric with a single period gets a comparison, not an empty cell
+- [ ] A metric with a single period gets a comparison, so no cell sits empty
 - [ ] The gate asserts the rule (#5 G8)
 
 ## Risks
 
 Filling a panel for the sake of it produces chartjunk. The three allowed forms are
-all meaningful; a fourth is a design review, not an improvisation.
+all meaningful; a fourth needs a design review.
 
 ## Out of scope
 

@@ -49,7 +49,7 @@ reload fails.
 
 ## Rollback
 
-The previous container is kept, renamed and stopped, not removed.
+The previous container is kept, renamed and stopped.
 
 ```bash
 ssh wala-srv '

@@ -15,7 +15,7 @@ The old app answered "how is my town doing" from a city name. The new one takes
 a name, a county, or a ZIP, and until yesterday a ZIP produced an error. A
 resident does not know their county FIPS and often does not know whether they
 live in a city or an unincorporated area.
-*Fix: the search index must cover settlement names, not administrative names.
+*Fix: the search index must cover the names people use for where they live.
 Aliases are the cheapest win in the whole remediation.*
 
 **2. Removing the score removed the only sentence a non-analyst could repeat.**
@@ -35,8 +35,7 @@ worth existing.
 decimal place of the number. One receipt, promoted, teaches the whole idea.*
 
 **4. "Runs offline" is a promise the hosted page does not keep.**
-The map needs tiles. The question box needs a model. The claim is true of the
-*data artifact*, not of the site, and the site says it in the hero.
+The map needs tiles. The question box needs a model. The claim is true of the *data artifact*; the site needs a network for tiles and the model.
 *Fix: say "the data runs offline" and link the file. Stop claiming the page does.*
 
 **5. Print-only export is defensible and incomplete.**
@@ -61,7 +60,7 @@ the network was busy.
 say which. Add a model fallback list and a short retry.*
 
 **Verdict:** the rebuild is a better record and a worse product than the thing it
-replaced. The remediation is not cosmetic. It restores the four things that made
+replaced. The remediation is structural. It restores the four things that made
 the old app legible — a verdict, a score, a map, and a search that forgives — and
 it should do so without giving up the receipt.
 
@@ -69,7 +68,7 @@ it should do so without giving up the receipt.
 
 ## Chief Technology Officer
 
-**The top risk is not a feature. It is that the numbers are frozen.**
+**The top risk is that the numbers are frozen.**
 
 **1. The old app was live; the new one is a snapshot.**
 `build-dashboard.ts` called five federal APIs per request with a six-hour cache.
@@ -113,7 +112,7 @@ answer type-ahead locally. The server sees only the final GEOID.*
 
 **7. Removing the 1,000-person filter doubles the file.**
 19,142 places becomes 35,605, roughly 110 MB to 160 MB, and the build from about
-150 seconds to about 240. That is affordable; it should be measured, not assumed.
+150 seconds to about 240. That is affordable; measure it.
 *Fix: measure before and after in the same session and record both numbers in the
 spec.*
 
@@ -128,8 +127,7 @@ baking as the default for anyone who wants one artifact.*
 oldest, and let the monitor alert on the second.*
 
 **Verdict:** the pipeline is stronger than the old one and the serving layer is
-weaker. The remediation should spend its first week on freshness, tests and rate
-limiting, not on the map.
+weaker. The remediation should spend its first week on freshness, tests and rate limiting, before the map.
 
 ---
 
@@ -151,7 +149,7 @@ panels below as evidence. The page reads top-down as claim then proof.*
 **3. The map will fight the charts.**
 A full-width map above five panels steals the first screen from the numbers and
 duplicates the breadcrumb.
-*Fix: a 200px locator beside the header, not a hero. It answers "where", then
+*Fix: a 200px locator beside the header. A full-width hero map takes the first screen from the numbers. It answers "where", then
 gets out of the way.*
 
 **4. A three-to-five second model call has no loading state.**
@@ -168,7 +166,7 @@ The picker appears, indistinguishable from "I did not understand you".
 **6. The print stylesheet does not exist.**
 Print is now the only export and it is unbuilt.
 *Fix: one column, panels unbroken, receipts included, URL and data version in the
-footer. Test by printing to PDF, not by reading the CSS.*
+footer. Test by printing to PDF.*
 
 **7. Charts have no accessible alternative.**
 The SVGs are `aria-hidden` with no table. The design doc promised a table toggle
@@ -197,7 +195,7 @@ difference between a demo and a product.
 
 1. **The score needs a header block**, and the summary must be grounded.
 2. **The receipt must be promoted** from fine print to a feature.
-3. **Freshness is a trust feature**, not a nice-to-have, and it is missing.
+3. **Freshness is a trust feature** and it is missing.
 4. **The question box needs loading, error and rate-limit states** before it can
    be depended on.
 5. **Search forgiveness** — aliases, typo tolerance, local autocomplete — matters

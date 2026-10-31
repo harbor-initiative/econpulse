@@ -42,8 +42,7 @@ across the specs:
 | `server/lib/search-index.ts` | 2 — #5, #6 |
 | `server/views/layout.ts` | 2 — #26, #31 |
 
-So the unit of parallelism is not a wave. It is a **lane**: a strictly ordered
-chain of issues that share files. Lanes run in parallel; inside a lane, one at a
+So the unit of parallelism is the **lane**: a strictly ordered chain of issues that share files. Lanes run in parallel; inside a lane, one at a
 time, always.
 
 ## The lanes
@@ -61,8 +60,7 @@ time, always.
 Wave 0 (#35) lands before any lane starts.
 
 **L3 and L4 are the long poles** at eight and five issues. If either becomes the
-constraint, the answer is a second split — `panel.ts` into a shell plus
-`views/visuals/*` — not more agents. Four agents against one file is four people
+constraint, the answer is a second split — `panel.ts` into a shell plus `views/visuals/*`. Adding agents makes the collision worse. Four agents against one file is four people
 editing the same paragraph.
 
 ## The rules an agent works under
@@ -75,7 +73,7 @@ Every agent gets one issue and this contract.
 3. **Read the spec first**, then the files it names. The spec is the authority;
    the issue is a pointer.
 4. **Stay inside the files the spec lists.** A change outside them is a scope
-   breach and belongs in a comment on the issue, not in the diff.
+   breach and belongs in a comment on the issue.
 5. **Rebase on `main`** before opening the PR. A PR that does not apply is not
    a PR.
 6. **Never merge. Never push to `main`. Never touch another worktree.**
@@ -142,8 +140,7 @@ four PRs a day is the actual constraint, and a fifth only adds unread diffs.
 ## What this document is not
 
 Not a workflow engine. There is no queue, no daemon, no scheduler. The operator
-reads a wave, dispatches four agents, reviews four PRs, merges, repeats. The
-value here is the graph and the contract, not automation for its own sake.
+reads a wave, dispatches four agents, reviews four PRs, merges, repeats. The value here is the graph and the contract.
 
 ## Acceptance
 

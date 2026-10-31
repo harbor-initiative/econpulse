@@ -31,7 +31,7 @@ Ranking, first match wins:
 4. trigram overlap ≥ 0.6, tie-broken by population
 5. substring
 
-Trigrams are computed at boot, not stored. 52,000 × ~20 trigrams is a few MB and
+Trigrams are computed at boot. 52,000 × ~20 trigrams is a few MB and
 one pass; storing them in SQLite costs a schema migration for no gain.
 
 Ties are broken by population, and that is a stated editorial choice: a search

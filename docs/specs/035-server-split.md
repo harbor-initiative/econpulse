@@ -13,9 +13,7 @@ Measured across the 29 per-issue specs, two files own almost everything:
 | `server/store.ts` | 3 |
 | `pipeline/verify.ts` | 3 |
 
-The operator's chosen model is one branch and one pull request per issue. Under
-that model, 21 branches editing one file is not parallelism, it is a merge queue
-with extra steps. Every PR will conflict with every other PR and the factory
+The operator's chosen model is one branch and one pull request per issue. Under that model, twenty-one branches editing one file become a merge queue with extra steps. Every PR will conflict with every other PR and the factory
 stalls on the first wave.
 
 This is the single largest constraint on the plan and it is cheap to remove:

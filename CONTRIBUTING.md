@@ -6,8 +6,7 @@ Two rules matter more than the rest.
 `dataset`, `vintage`, `retrieved_at`, and `period`. If a source cannot supply
 those, it does not go in the file.
 
-**The build must fail loudly.** `npm run verify` is the gate. A number that
-moves without anyone meaning it to is a bug, not a refresh.
+**The build must fail loudly.** `npm run verify` is the gate. A number that moves without anyone meaning it to is a bug. A refresh is deliberate and recorded.
 
 ## Adding a source
 

@@ -136,8 +136,8 @@ server.tool(
       sources: meta["build.sources"],
       limits: [
         "No ZIP code (ZCTA) coverage.",
-        "Places are city boundaries, not metro areas.",
-        "BLS county figures are model-based estimates, not a count.",
+        "Places are city boundaries; metro figures measure something else.",
+        "BLS county figures are model-based estimates.",
         "ACS five-year figures are averages over five years and will disagree with BLS by design.",
         "Federal obligations are not outlays, and sit at the place of performance.",
       ],

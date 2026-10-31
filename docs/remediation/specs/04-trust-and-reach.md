@@ -21,8 +21,7 @@ snapshot is any good.
 
 ## Decision
 
-- No analytics by decision. Reach comes from structured data and a sitemap, not
-  from tracking.
+- No analytics by decision. Reach comes from structured data and a sitemap.
 - No accounts, so no per-user freshness. Freshness is a property of the file.
 - The data artifact is the primary product; the site is its demonstration.
 
@@ -59,8 +58,7 @@ One page, plain English, linked from the score and the footer. It covers:
 - Why the ACS five-year average differs from the monthly BLS rate, and why both
   appear.
 - How the score is built, with the weights and the percentile method.
-- What the score is not: not a prediction, not financial advice, not a ranking of
-  places by worth.
+- What the score does not do: it predicts nothing, offers no financial advice, and does not rank places by worth.
 - How to cite the page: app version, data version, retrieval date.
 
 This page is the answer to "why should I trust this", and there is currently no

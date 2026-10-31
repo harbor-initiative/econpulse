@@ -8,10 +8,10 @@ import { insertMetrics, makeFactWriter, type FactRow } from "../db.ts";
  * No key required. One request per fiscal year returns every county at once,
  * which is the whole reason this source is cheap to include.
  *
- * Two things this number is not: it is not outlays, and it is not where the
- * contractor is headquartered. It is obligated money attributed to the place of
- * performance. Both caveats are written onto every row, because a reader who
- * assumes either one will draw the wrong conclusion about their town.
+ * This number records money obligated at the place of performance. Outlays come
+ * later, and the contractor may be headquartered elsewhere. Both caveats are
+ * written onto every row, because a reader who assumes either one will draw the
+ * wrong conclusion about their town.
  */
 
 const API = "https://api.usaspending.gov/api/v2/search/spending_by_geography/";

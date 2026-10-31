@@ -1,6 +1,6 @@
 # Research: what the old EconPulse did, and what this rebuild does not
 
-Written 2026-10-31. Every claim here is from reading the code, not from memory.
+Written 2026-10-31. Every claim here comes from reading the code.
 
 - Old app: `aporb/EconPulse`, now archived. Cloned at `_repo/`, last commit `c465fd8` on 2026-09-05.
 - New app: `harbor-initiative/econpulse`, live at `econpulse.harborgovcon.com`.
@@ -12,16 +12,16 @@ From the scoping interview on 2026-10-30. These bound every specification that f
 
 | # | Decision | Consequence |
 |---|---|---|
-| 1 | **Reading experience only.** No accounts, no billing, no Redis, no admin cache. | Sixteen old capabilities are out of scope by decision, not by omission. |
+| 1 | **Reading experience only.** No accounts, no billing, no Redis, no admin cache. | Sixteen old capabilities are out of scope by decision. |
 | 2 | **Every place is findable.** All 32,330 incorporated places, 3,222 counties, 33,486 ZIPs, 52 states. | The 1,000-person filter comes off. File grows to roughly 160 MB. |
-| 3 | **The model leads on questions.** Grammar is the fallback, not the path. | A question needs a key. Without one the box degrades to the picker. |
+| 3 | **The model leads on questions.** Grammar is the fallback. | A question needs a key. Without one the box degrades to the picker. |
 | 4 | **Score returns, with weights shown**, plus an AI-written summary grounded in the pillars. | Reverses the no-verdict rule in the design doc. The weights must be visible on the page. |
 | 5 | **Map is MapLibre with OpenFreeMap tiles**, keyless, degrading to an outline offline. | No tile server to run. External network for the map only. |
 | 6 | **Print is the only export.** | No CSV, no JSON, no share image. The print stylesheet carries the citation. |
 
 ## What the rebuild already has
 
-The old app never had these. They are not at risk and the remediation must not break them.
+The old app never had these. The remediation must keep all of it working.
 
 | Capability | Where |
 |---|---|

@@ -22,7 +22,7 @@ placeholder unchanged, no dialog and no explanation.
 
 - [ ] A coordinate resolves to the containing county
 - [ ] Denial silently falls back to search
-- [ ] A coordinate outside the US returns the not-found state, not a wrong county
+- [ ] A coordinate outside the US returns the not-found state
 - [ ] No coordinate is logged or stored
 
 ## Risks

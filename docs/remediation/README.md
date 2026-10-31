@@ -11,8 +11,7 @@ Order of work, and it is deliberate:
    acceptance criteria.
 4. **Issues** — filed from these specs, never before them.
 
-A specification is committed and pushed before its issue exists. An issue is a
-pointer to a spec, not a replacement for one.
+A specification is committed and pushed before its issue exists. An issue points at a spec. The spec holds the detail.
 
 ## Decisions taken
 
@@ -53,7 +52,7 @@ eight findings. The measurable ones:
 
 | Rule | Measured on the live report | Verdict |
 |---|---|---|
-| Colour on data, not chrome (median 3%, ceiling 5%) | 2.2% of the viewport | pass |
+| Colour stays on the data (median 3%, ceiling 5%) | 2.2% of the viewport | pass |
 | No icon tiles on a KPI | none | pass |
 | Flat surfaces, no card shadows | none | pass |
 | No heading over 24px on an app screen | place name at 35px | fail |

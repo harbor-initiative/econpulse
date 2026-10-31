@@ -22,7 +22,7 @@ computed against the national value and the metric's direction.
 - `gdp` up → better
 - `population` → no mark; growth is not good or bad
 
-The word is a `<span>` with a border-bottom, not colour. It survives greyscale, a
+The word is a `<span>` with a border-bottom. It survives greyscale, a
 printed page, and colour blindness. It is read by a screen reader as text.
 
 ## Acceptance criteria
@@ -30,7 +30,7 @@ printed page, and colour blindness. It is read by a screen reader as text.
 - [ ] Every delta with a national value carries better, worse, or nothing
 - [ ] Neutral metrics carry no mark
 - [ ] No hue signals good or bad anywhere on the site
-- [ ] The mark is text, not a background or an icon
+- [ ] The mark is text
 - [ ] The mark survives a greyscale screenshot
 
 ## Risks

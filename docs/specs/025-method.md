@@ -18,8 +18,7 @@ which is fatal for a product whose only claim is provenance.
    estimate. They disagree by design and the page says why.
 3. **How the score is built.** The percentile method from #11, the weights, the
    renormalisation when a pillar is missing.
-4. **What the score is not.** Not a prediction, not advice, not a judgement of a
-   place or the people in it.
+4. **What the score is not.** It predicts nothing, offers no advice, and judges nobody who lives there.
 5. **How to cite it.** App version, data version, retrieval date, the exact string.
 
 ## Acceptance criteria

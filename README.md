@@ -6,9 +6,7 @@ EconPulse answers one question: how is this place doing? Give it a city, county,
 or ZIP and it returns population, income, rent, home value, jobs, output, and
 federal money for that place, next to its state and the country.
 
-The difference is not the chart. It is that every value carries the agency that
-published it, the table it came from, the period it describes, the vintage of
-the release, the date it was pulled, and the margin of error where one exists.
+Every value carries the agency that published it, the table it came from, the period it describes, the vintage of the release, the date it was pulled, and the margin of error where one exists.
 
 Nothing here is a number without a source.
 
@@ -16,7 +14,7 @@ Nothing here is a number without a source.
 
 ## Why this exists
 
-Public data is free. The join is not.
+The five agencies publish everything for free. Bringing them into one record of a place, with the vintage and the margin attached, is the part that keeps getting abandoned.
 
 The free civic layer of this space keeps disappearing. DataUSA archived its
 public API in January 2022 and now runs as a commercial funnel. An open
@@ -106,7 +104,7 @@ Most questions are answered **without a model**. The parser finds the measure
 from a keyword table and the place from the local index, then runs a query. A
 model is consulted only when that fails, only when `OPENROUTER_API_KEY` is set,
 and it may only choose an id from a menu. It never sees a value and never
-produces one, so a wrong choice yields the wrong question, not a wrong number.
+produces one, so a bad choice produces a badly framed question while every number stays sourced.
 
 ## Run the site
 
@@ -162,15 +160,13 @@ published file; whoever maintains it holds the keys.
 
 - **No ZCTAs yet.** ZIP codes are the most natural way people ask this question
   and they are not in the file. Next.
-- **Places are city boundaries, not metro areas.** A suburb's number is its own,
-  not the region's.
-- **BLS county figures are model-based estimates**, not a count. The note on
+- **Places are city boundaries.** A suburb's number describes the suburb itself; metro figures measure something else.
+- **BLS county figures are model-based estimates.** Nobody counts every unemployed person. The note on
   every row says so.
 - **ACS five-year figures are averages over five years.** They are not a
   current-year reading and they will disagree with BLS by design. Both are
   labelled.
-- **Federal obligations are not outlays**, and they sit at the place of
-  performance, not the contractor's address.
+- **Federal obligations record money committed at the place of performance.** Outlays and the contractor's address give different figures.
 
 ## Roadmap
 

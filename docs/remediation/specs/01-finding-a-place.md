@@ -30,7 +30,7 @@ above.
 
 - Every incorporated place, county, ZIP and state is findable. The 1,000-person
   filter comes off the **facts**; the index covers everything regardless.
-- Search is served from an in-process index, not from SQL, so ranking and fuzzy
+- Search is served from an in-process index, so ranking and fuzzy
   matching are ours to control.
 
 ## Design
@@ -125,7 +125,7 @@ distinguish them clearly.
 containing county using a point-in-polygon test against the county boundaries
 already downloaded for the map work.
 
-If the map work is not done, this waits. It is the lowest-priority item in this
+This waits on the map work. It is the lowest-priority item in this
 spec because a ZIP is a better answer nine times in ten.
 
 ### 8. Nearby places

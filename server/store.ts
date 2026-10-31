@@ -60,7 +60,7 @@ export function searchPlaces(db: DatabaseSync, query: string, limit = 12): Place
   const q = query.trim();
   if (!q) return [];
 
-  // A GEOID or a ZIP is an exact lookup, not a name match.
+  // A GEOID or a ZIP is an exact lookup.
   if (/^\d{2,11}$/.test(q)) {
     const exact = db
       .prepare("SELECT geoid, kind, name, short_name, state_code, parent_geoid, population FROM place WHERE geoid = ?")

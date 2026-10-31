@@ -90,7 +90,7 @@ function main(): void {
   });
 
   // 9. Golden numbers. Pinned to the 2024 ACS 5-year release. These guard the
-  // parsing and the joins, not the agencies: if Census revises, this test moves.
+  // parsing and the joins. If Census revises, this test moves.
   const golden: Array<[string, string, string, number]> = [
     ["42101", "population", "2020-2024", 1579706],
     ["42101", "median_household_income", "2020-2024", 61953],

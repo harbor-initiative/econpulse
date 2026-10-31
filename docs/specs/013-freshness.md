@@ -34,7 +34,7 @@ The thresholds are constants in one module, imported by the page and by
 
 ## Risks
 
-Staleness is a property of the file, not of the request. A page with one stale
+Staleness describes the file. A page with one stale
 source should not look entirely stale, which is why the strip is per panel.
 
 ## Out of scope

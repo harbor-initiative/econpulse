@@ -16,8 +16,7 @@ happens. The old app had `/api/suggest` and a 101-entry metro index.
                     "kind": "county", "stateCode": "PA", "population": 1579706 }] }
 ```
 
-Client: a combobox, not a `<datalist>` — the native element cannot show kind or
-population, and both matter because "Philadelphia city" and "Philadelphia County"
+Client: a combobox. The native `<datalist>` cannot show kind or population, and both matter because "Philadelphia city" and "Philadelphia County"
 are different answers.
 
 The combobox carries `role="combobox"`, `aria-expanded`, `aria-activedescendant`,
@@ -34,7 +33,7 @@ arrow keys, Enter, Escape and a 120 ms debounce.
 ## Risks
 
 A request per keystroke on one small host. Debounce plus a 60-second HTTP cache
-keeps it cheap; the client-side index is the later optimisation, not this issue.
+keeps it cheap; the client-side index is a later optimisation.
 
 ## Out of scope
 

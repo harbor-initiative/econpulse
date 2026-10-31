@@ -145,7 +145,7 @@ export async function askModel(
   const key = process.env.OPENROUTER_API_KEY;
   if (!key) return null;
 
-  // openrouter/free is a router, not a model: it picks whichever free model is
+  // openrouter/free is a router: it picks whichever free model is
   // available, so one provider going down does not break the box.
   const model = process.env.ECONPULSE_MODEL ?? process.env.OPENROUTER_MODEL ?? "openrouter/free";
   const metricMenu = metrics.map((m) => `${m.id} (${m.label})`).join(", ");

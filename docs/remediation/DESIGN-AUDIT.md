@@ -13,13 +13,12 @@ them, and records where it fails.
 
 ## 1. The rules worth holding ourselves to
 
-From `app-screens.md`, distilled from a study of 23 real product screens. The
-numbers are theirs, not invented here.
+From `app-screens.md`, distilled from a study of 23 real product screens. The numbers are theirs.
 
 | # | Rule | The number |
 |---|---|---|
-| R1 | Colour goes on data, not chrome | median 3% coloured pixels; 17 of 23 at ≤5% |
-| R2 | KPIs are type, not tiles | no icon in a tinted circle, no sparkline on a KPI |
+| R1 | Colour stays on the data | median 3% coloured pixels; 17 of 23 at ≤5% |
+| R2 | KPIs are set as type | no icon in a tinted circle, no sparkline on a KPI |
 | R3 | Surfaces are flat | 17 of 23 give cards no shadow; separation is a 1px line |
 | R4 | No hero header on an app screen | 9 screens have no heading over 16px; where present the median is 24px |
 | R5 | Charts carry almost no chrome | a single series has no legend; 3–7 faint gridlines or none |
@@ -30,7 +29,7 @@ numbers are theirs, not invented here.
 | R10 | The shell names the product and the scope | — |
 | R11 | Colour on a change says good or bad, not up or down | — |
 | R12 | The most frequent job is one click from the first screen | — |
-| R13 | The screen has a face of its own | not stock type, not a stock ground, not a stock card |
+| R13 | The screen has a face of its own | a chosen typeface and a ground tinted from the subject |
 
 From `better-layout`: space groups first, lines last; the gap between groups is
 at least 2× the gap within one; controls must look like controls; align to a
@@ -116,8 +115,7 @@ national value, in ink. Colour stays off the delta; meaning does not.*
 page built from defaults reads as a kit.
 *Fix: choose a sans with character and ship it as a self-hosted woff2 — one file,
 subset, no CDN. Candidates to try: Söhne (paid, no), IBM Plex Sans (OFL), Inter
-Tight (OFL), Source Serif 4 for the display face to pair with it. Decision belongs
-in Spec 2, not here.*
+Tight (OFL), Source Serif 4 for the display face to pair with it. That decision belongs in Spec 2.*
 
 **D7 — Dead space above the crumb.** 90px of nothing.
 *Fix: the topbar owns the top 56px and the crumb starts 16px under it.*
@@ -150,7 +148,7 @@ The rest are new issues with the `design` label.
 ## 5. The rule this audit will not break
 
 The project's own rule survives: **no red, no green, no colour that says a number
-is good or bad.** R11 asks for meaning, not hue. A caret and a word carry the
+is good or bad.** R11 asks for meaning. Hue is one way to carry it and not the only one. A caret and a word carry the
 same information and survive colour blindness, greyscale printing and a
 screenshot in a document.
 

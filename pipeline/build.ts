@@ -92,7 +92,7 @@ async function main(): Promise<void> {
     console.log(`  ${result.places.toLocaleString()} places, ${result.facts.toLocaleString()} facts`);
   }
 
-  // Derived from the file, not from the flags. A single-source run must not
+  // Derived from the file. A single-source run must not
   // claim the file only contains that source.
   const loaded = (db.prepare("SELECT DISTINCT agency FROM fact ORDER BY agency").all() as unknown as Array<{ agency: string }>)
     .map((r) => r.agency);

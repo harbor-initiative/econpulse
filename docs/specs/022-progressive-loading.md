@@ -10,7 +10,7 @@ silence reads as a broken box.
 
 ## Approach
 
-Progressive enhancement, not a framework.
+Progressive enhancement with no framework.
 
 - The form posts normally. With JavaScript, submit is intercepted, `/ask` is
   fetched, the shell renders immediately with the question echoed, and the
@@ -25,7 +25,7 @@ Progressive enhancement, not a framework.
 
 - [ ] The shell appears within 100 ms of submit
 - [ ] The progress line names a step at all times and never completes early
-- [ ] The response replaces the document, not a fragment
+- [ ] The response replaces the document
 - [ ] JavaScript disabled still answers
 - [ ] A failure replaces the shell with the right state from #21
 

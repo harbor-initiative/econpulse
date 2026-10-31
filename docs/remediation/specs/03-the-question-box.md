@@ -46,7 +46,7 @@ Request: the question plus the metric menu. Response: `{place, metric}` where
 
 Validation, in order:
 
-1. Extract the first balanced JSON object, not a greedy regex.
+1. Extract the first balanced JSON object. A greedy regex spans two of them.
 2. `metric` must exist in the menu, or it is dropped.
 3. `place` is resolved through the index. An unresolvable name means no place.
 4. If both are null, the state is **not understood**, not **unavailable**.
@@ -88,11 +88,11 @@ Each is a distinct template. None of them is an error page.
 
 ### 6. Loading without blocking
 
-Progressive enhancement, not a framework:
+Progressive enhancement with no framework:
 
 - The form posts normally. With JavaScript, it is intercepted: `fetch` the same
   URL, show the shell immediately, then replace the document with the response.
-- The progress line advances on a timer, not on real progress, and the last step
+- The progress line advances on a timer and the last step
   waits for the response. It never claims to be finished early.
 - With JavaScript off, the original blocking request still works.
 
@@ -109,7 +109,7 @@ and it is deferred to v2 of this spec if the first pass runs long.
 
 ## Acceptance criteria
 
-1. A question with no key shows the model-unavailable state, not the picker.
+1. A question with no key shows the model-unavailable state.
 2. A question the model cannot place shows the not-understood state.
 3. Killing the model mid-flight produces the unavailable state within 6 s.
 4. The 21st question from one IP in an hour returns 429 with a reset time.

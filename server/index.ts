@@ -202,7 +202,7 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
       }
       const zip = url.searchParams.get("zip");
       const notice = zip && /^\d{5}$/.test(zip)
-        ? `ZIP ${zip}. ZIP codes are postal, not civic, so these figures are for ${place.name}.`
+        ? `ZIP ${zip}. ZIP codes follow postal routes, so these figures are for ${place.name}.`
         : undefined;
       return send(res, 200, report(place, buildPanels(place), meta, notice));
     }

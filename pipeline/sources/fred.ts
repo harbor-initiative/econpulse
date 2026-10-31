@@ -9,7 +9,7 @@ import { insertMetrics, makeFactWriter, type FactRow } from "../db.ts";
  * so a reader can put a local dollar figure next to inflation: "rent is up 6.2%"
  * means something different when prices are up 3% than when they are up 8%.
  *
- * FRED is a distributor, not a producer. The receipt names the agency that
+ * FRED distributes these series; someone else produces them. The receipt names the agency that
  * actually measured it, with FRED in the dataset, because "Federal Reserve
  * Economic Data" is not who counted the price of eggs.
  */

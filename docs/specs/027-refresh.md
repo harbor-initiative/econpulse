@@ -32,7 +32,7 @@ acceptable. Watching the inode is a later optimisation.
 - [ ] The mounted path is documented in `deploy/README.md`
 - [ ] A swap and restart serves the new data version, verified by `/healthz`
 - [ ] The baked path still works unchanged
-- [ ] A missing database fails fast with a clear message, not a 500 per request
+- [ ] A missing database fails fast with a clear message at boot
 
 ## Risks
 
