@@ -31,7 +31,7 @@ function statePage({ title, question, sentence, action }: StatePage): string {
   return shell(
     `${title} — EconPulse`,
     `<p class="crumb">You asked</p>
-     <h1 class="place" style="font-size:1.6rem">${esc(question)}</h1>
+     <h1 class="place hsub">${esc(question)}</h1>
      <p class="sub">${sentence}</p>
      ${action}`,
   );

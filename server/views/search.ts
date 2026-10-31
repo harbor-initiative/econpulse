@@ -9,7 +9,7 @@ export function searchResults(query: string, places: Place[]): string {
   if (!places.length) {
     return shell(
       `No match for ${query}`,
-      `<p class="crumb">Search</p><h1 style="font-size:1.6rem">We do not know that place.</h1>
+      `<p class="crumb">Search</p><h1 class="place hsub">We do not know that place.</h1>
        <p class="sub">Check the spelling, add a state, or try a ZIP code. Coverage is every county and every place above 1,000 people.</p>
        <form class="search" action="/s" method="get"><input type="search" name="q" value="${esc(query)}" aria-label="Place"></form>`,
     );
