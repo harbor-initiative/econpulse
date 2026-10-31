@@ -33,6 +33,13 @@ label names the measure for anyone who reaches it first.
 - [ ] Values match the chart exactly, asserted in a test
 - [ ] Absent values appear as an em dash, never a zero
 
+### What changed while building it
+
+The table lives in `views/panel.ts`, not `views/charts.ts`. `charts.ts` returns
+SVG strings and nothing else, and a `<table>` there would make it the file that
+draws every visual *and* the alternative to every visual. The panel owns both,
+which keeps the two side by side in the file where a reviewer can compare them.
+
 ## Risks
 
 A table under every chart doubles the page height when opened. Collapsed by

@@ -68,6 +68,44 @@ function shareLine(rows: BenchRow[], unit: string): string {
   return parts.join(" · ");
 }
 
+/**
+ * The series as a table, under the chart that draws it.
+ *
+ * The chart is `aria-hidden`, so this is the accessible path to the same
+ * numbers. Collapsed by default: open, it is three times the height of the chart
+ * above it, and a reader who wants the shape should not have to scroll past the
+ * digits to reach the next panel.
+ *
+ * A value that is absent prints an em dash. A zero in a table of rates is a
+ * reading, and this panel has no reading to give.
+ */
+function chartTable(panel: Panel): string {
+  const { history, comparison, comparisonLabel, fact } = panel;
+  if (!fact || history.length < 2) return "";
+
+  const twoSeries = comparison.length === history.length && comparisonLabel;
+  const head = twoSeries
+    ? `<tr><th scope="col">Period</th><th scope="col">This place</th><th scope="col">${esc(comparisonLabel)}</th><th scope="col">Margin</th></tr>`
+    : `<tr><th scope="col">Period</th><th scope="col">${esc(panel.label)}</th><th scope="col">Margin</th></tr>`;
+  const dash = "—";
+
+  const rows = history
+    .map((row, index) => {
+      const margin = row.moe === null ? dash : `±${Math.round(row.moe).toLocaleString("en-US")}`;
+      const cells = twoSeries
+        ? `<td>${esc(formatValue(row.value, row.unit))}</td><td>${esc(formatValue(comparison[index]?.value ?? 0, row.unit))}</td><td>${esc(margin)}</td>`
+        : `<td>${esc(formatValue(row.value, row.unit))}</td><td>${esc(margin)}</td>`;
+      return `<tr><th scope="row">${esc(row.period)}</th>${cells}</tr>`;
+    })
+    .join("");
+
+  return `<details class="chart-table" data-chart-table>
+      <summary>Table, ${history.length} periods</summary>
+      <table><caption>${esc(panel.label)}${twoSeries ? `, against ${esc(comparisonLabel)}` : ""}</caption>
+        <thead>${head}</thead><tbody>${rows}</tbody></table>
+    </details>`;
+}
+
 export function renderPanel(panel: Panel): string {
   if (!panel.fact) {
     return `<div class="metric"><p class="label">${esc(panel.label)}</p>
@@ -120,6 +158,7 @@ export function renderPanel(panel: Panel): string {
     <p class="value">${esc(formatValue(fact.value, fact.unit))}</p>
     ${deltaText ? `<p class="delta">${deltaText}</p>` : ""}
     ${chart}
+    ${chartTable(panel)}
     ${bench}${share ? `<p class="bench-share">${esc(share)}</p>` : ""}${benchNote}
     <p class="rec"><b>Receipt</b> ${esc(fact.agency)} · ${esc(fact.dataset)}${fact.table_id ? ` · ${esc(fact.table_id)}` : ""} · ${esc(fact.period)}${fact.moe !== null ? ` · ±${Math.round(fact.moe).toLocaleString("en-US")}` : ""} · pulled ${esc(fact.retrieved_at)}${band === "aging" ? ` · ${ageInDays(fact.retrieved_at)} days old` : ""}</p>
   </div>`;
