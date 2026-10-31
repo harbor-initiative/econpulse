@@ -33,6 +33,7 @@ file.
 | #49 | Cache only a success | P0 | [049-cache-safety.md](049-cache-safety.md) |
 | #58 | The gates wait on a port, not a mood | P1 | [058-gate-readiness.md](058-gate-readiness.md) |
 | #69 | Typing a city name returns its county | P0 | [069-city-before-county.md](069-city-before-county.md) |
+| #71 | A city borrows the wrong county | P0 | [071-place-county.md](071-place-county.md) |
 | #29 | Panel substance | P1 | [029-panel-substance.md](029-panel-substance.md) |
 | #30 | Legends | P1 | [030-legends.md](030-legends.md) |
 | #31 | Docked search | P1 | [031-docked-search.md](031-docked-search.md) |
