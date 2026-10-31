@@ -75,7 +75,21 @@ function main(): void {
     detail: multiAgency === 0 ? "none" : `${multiAgency} ambiguous`,
   });
 
-  // 8. Golden numbers. Pinned to the 2024 ACS 5-year release. These guard the
+  // 8. ZIP coverage. A missing zcta table means nobody can type a ZIP, which is
+  // how most people name where they live.
+  let zctaCount = 0;
+  try {
+    zctaCount = one<{ n: number }>("SELECT COUNT(*) n FROM zcta").n;
+  } catch {
+    zctaCount = -1;
+  }
+  checks.push({
+    name: "ZIP codes resolve to counties",
+    ok: zctaCount > 30_000,
+    detail: zctaCount < 0 ? "no zcta table" : `${zctaCount.toLocaleString()} mapped`,
+  });
+
+  // 9. Golden numbers. Pinned to the 2024 ACS 5-year release. These guard the
   // parsing and the joins, not the agencies: if Census revises, this test moves.
   const golden: Array<[string, string, string, number]> = [
     ["42101", "population", "2020-2024", 1579706],
