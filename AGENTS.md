@@ -47,12 +47,12 @@ map draws its fallback, and the HTML snapshot gate fails on three routes because
 the committed baseline has the map in it. Fetch them before you capture or check.
 
 Running the app needs no API key. The released database is the whole product:
-19,142 places, 321,295 facts, 14 metrics, 109.8 MB, data version 2026.10.
+35,605 places, 449,542 facts, 14 metrics, 152 MB, data version 2026.10.
 
 | Command | What it does |
 |---|---|
 | `npm run serve` | The web server on `127.0.0.1:3100`. `PORT` and `HOST` override. |
-| `npm run verify` | The data gate. 17 checks over the open database and the alias CSVs. |
+| `npm run verify` | The data gate. 20 checks over the open database and the alias CSVs. |
 | `npx tsc --noEmit` | The type gate. Clean is the only passing state. |
 | `npm run mcp` | The same database over MCP, on stdio. Seven tools. |
 | `node scripts/snapshot-html.mjs` | Write the rendered HTML of ten routes to `tests/snapshot-html/`. |

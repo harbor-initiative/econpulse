@@ -30,11 +30,11 @@ run offline, with the provenance built into the schema instead of a footnote.
 | | |
 |---|---|
 | Sources | Census ACS 5-Year 2024 · BLS LAUS · BEA Regional · USAspending · FRED |
-| Places | 19,142 — every state, every county, every place above 1,000 people, and the US |
+| Places | 35,605 — every state, every county, every place the Census file lists, and the US |
 | Metrics | 14 |
-| Facts | 321,295 |
-| File | 108 MB uncompressed, 9.4 MB gzipped |
-| Rebuild | about three minutes, five agencies |
+| Facts | 449,542 |
+| File | about 152 MB uncompressed |
+| Rebuild | about two minutes, five agencies |
 
 [Download the current file](https://github.com/harbor-initiative/econpulse/releases/latest).
 The web app is in `server/`. The MCP server is in the same tree and speaks stdio
@@ -143,8 +143,10 @@ time should be able to run `SELECT * FROM fact LIMIT 5` and understand every
 number without joining anything.
 
 A fact is never written without all five receipt fields. `npm run verify` fails
-the build if one is missing, if a margin duplicates its estimate, if two
-agencies publish the same metric name, or if a pinned number moves.
+the build if one is missing, if a whole geography level of a table repeats its
+margin as its estimate, if a Census sentinel ships as a value, if a place above
+1,000 people has no fact, if two agencies publish the same metric name, or if a
+pinned number moves.
 
 ## Keys
 
