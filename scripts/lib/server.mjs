@@ -44,12 +44,18 @@ export async function startServer({ port, env = {}, timeoutMs = 30_000 } = {}) {
   });
 
   const started = Date.now();
+  let lastStatus = null;
   while (Date.now() - started < timeoutMs) {
     try {
       const response = await fetch(`${base}/healthz`, { redirect: "manual" });
-      if (response.ok) {
+      // Readiness is the port answering, not the file being healthy. `/healthz`
+      // returns 503 when the data is stale, and a gate that refused to measure a
+      // stale file would break at the moment somebody needs it most.
+      lastStatus = response.status;
+      if (response.status < 500 || response.status === 503) {
         return {
           base,
+          health: response.status,
           stop() {
             child.kill("SIGTERM");
           },
@@ -62,5 +68,5 @@ export async function startServer({ port, env = {}, timeoutMs = 30_000 } = {}) {
   }
 
   child.kill("SIGKILL");
-  throw new Error(`the server did not answer ${base}/healthz within ${timeoutMs}ms\n${stderr}`);
+  throw new Error(`the server did not answer ${base}/healthz within ${timeoutMs}ms (last status ${lastStatus ?? "none"})\n${stderr}`);
 }
