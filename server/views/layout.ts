@@ -65,5 +65,5 @@ ${docked ? `<form class="dock" action="/ask" method="get" role="search"><input t
 <nav class="nav"><a href="/status">Status</a><a href="https://github.com/harbor-initiative/econpulse">GitHub</a></nav></div>
 ${body}
 <footer><span>${esc(footerNote)}</span><span>A Harbor Initiative project · Public data · Not financial advice</span></footer>
-</div></body></html>`;
+</div><script src="/ask.js" defer></script></body></html>`;
 }
