@@ -173,6 +173,11 @@ export async function openPage(browserWs, timeoutMs = 15_000) {
     return result.result.value;
   }
 
+  /** Run a script before any document script, on every navigation. */
+  async function evaluateOnNewDocument(expression) {
+    await send("Page.addScriptToEvaluateOnNewDocument", { source: expression });
+  }
+
   async function setViewport(width, height) {
     await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: width <= 430 });
   }
@@ -185,6 +190,7 @@ export async function openPage(browserWs, timeoutMs = 15_000) {
   return {
     goto,
     evaluate,
+    evaluateOnNewDocument,
     setViewport,
     screenshot,
     close() {
