@@ -29,43 +29,41 @@ costume. **Wave 0 is [spec 035](specs/035-server-split.md): split the server, no
 behaviour change.** Nothing else starts until it merges. It is one day and it is
 the difference between a factory and a traffic jam.
 
-## The dependency graph
+## Hotspots, measured
 
-`—` means no dependency. Wave = the earliest wave it can run in, after #35.
+The split removes the two megafiles. It does not remove every hotspot. Measured
+across the specs:
 
-| Issue | Depends on | Wave |
+| File after the split | Issues touching it |
+|---|---|
+| `server/views/panel.ts` | 8 — #13, #14, #15, #18, #23, #29, #30, #32 |
+| `server/views/css.ts` | 5 — #10, #17, #29, #31, #33 |
+| `server/views/header.ts` | 3 — #10, #12, #16 |
+| `server/lib/search-index.ts` | 2 — #5, #6 |
+| `server/views/layout.ts` | 2 — #26, #31 |
+
+So the unit of parallelism is not a wave. It is a **lane**: a strictly ordered
+chain of issues that share files. Lanes run in parallel; inside a lane, one at a
+time, always.
+
+## The lanes
+
+| Lane | Issues, in order | Files it owns |
 |---|---|---|
-| #35 split | — | 0 |
-| #5 aliases | — | 1 |
-| #8 coverage | — | 1 |
-| #13 freshness | — | 1 |
-| #14 benchmarks | — | 1 |
-| #15 quick facts | — | 1 |
-| #18 chart tables | #35 | 1 |
-| #19 model reliability | — | 1 |
-| #20 rate limit | — | 1 |
-| #27 refresh | — | 1 |
-| #29 panel substance | #35 | 1 |
-| #30 legends | #35 | 1 |
-| #33 typefaces | #35 | 1 |
-| #6 fuzzy index | #5 | 2 |
-| #11 percentiles | #8 | 2 |
-| #21 six states | #19, #20 | 2 |
-| #24 health and status | #13 | 2 |
-| #32 meaning without colour | #14 | 2 |
-| #7 autocomplete | #6 | 3 |
-| #12 AI summary | #11 | 3 |
-| #16 map | #35 | 3 |
-| #22 progressive loading | #21 | 3 |
-| #23 comparison | #6, #19 | 3 |
-| #28 staleness job | #24 | 3 |
-| #10 header block | #11, #12 | 4 |
-| #25 method page | #11, #12 | 4 |
-| #31 docked search | #7 | 4 |
-| #9 use my location | #16 | 4 |
-| #17 print | #10 | 5 |
-| #26 discoverability | #10 | 5 |
-| #34 design epic | its children | — |
+| **L1 Search** | #5 → #6 → #7 | `lib/search-index.ts`, `routes/suggest.ts` |
+| **L2 Data** | #8 → #11 | `pipeline/*` only |
+| **L3 Panels** | #13 → #14 → #18 → #29 → #30 → #32 → #15 → #23 | `views/panel.ts` |
+| **L4 Header** | #33 → #12 → #10 → #17 → #31 | `views/header.ts`, `css.ts`, `public/fonts` |
+| **L5 Box** | #19 → #21 → #22 | `lib/model.ts`, `views/states.ts`, `public/ask.js` |
+| **L6 Infra** | #20 → #24 → #28 → #27 → #25 → #26 | `lib/ratelimit.ts`, `routes/*`, `deploy/`, `.github/` |
+| **L7 Location** | #16 → #9 | `pipeline/sources/boundaries.ts`, `public/map.js` |
+
+Wave 0 (#35) lands before any lane starts.
+
+**L3 and L4 are the long poles** at eight and five issues. If either becomes the
+constraint, the answer is a second split — `panel.ts` into a shell plus
+`views/visuals/*` — not more agents. Four agents against one file is four people
+editing the same paragraph.
 
 ## The rules an agent works under
 
@@ -131,9 +129,9 @@ waits a wave. `css.ts` is the known serialisation point: #33 lands before #29,
 
 The operator merges. Agents do not.
 
-Order inside a wave: smallest diff first, so a stuck PR blocks the least.
+Merge one lane at a time, in the order the lane lists. Within an issue, smallest diff first.
 
-Before merging a wave, `npm run verify` and the design gate both run on `main`.
+Before merging a lane step, `npm run verify` and the design gate both run on `main`.
 A wave that breaks either is not merged, whatever the individual PRs said.
 
 ## Concurrency
@@ -150,7 +148,7 @@ value here is the graph and the contract, not automation for its own sake.
 ## Acceptance
 
 - [ ] #35 merges before any other issue is dispatched
-- [ ] No two issues in one wave share a file
+- [ ] No two lanes touch the same file; inside a lane, one issue at a time
 - [ ] Every PR links its spec and ticks its acceptance list
 - [ ] `main` passes `verify` and the design gate after every wave
 - [ ] No agent merges
