@@ -93,6 +93,27 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
   h1{font-size:2rem}
   .place{font-size:1.6rem}
 }
+@media print{
+  :root{--paper:#fff;--ink:#000;--muted:#333;--rec:#444;--rule:#bbb;--rule2:#999}
+  @page{margin:14mm}
+  body{font-size:10pt;line-height:1.4}
+  .wrap{max-width:none;padding:0}
+  .topbar,.dock,.chart-table,.chips,form.search,.legend .sw{display:none}
+  a{text-decoration:none;color:inherit}
+  .grid{display:block}
+  .metric,.metric:nth-child(odd),.metric:nth-child(even){display:block;border:0;border-bottom:1px solid var(--rule);padding:.5rem 0 .6rem;break-inside:avoid;page-break-inside:avoid}
+  .metric.full{display:block}
+  .place{font-size:19pt}
+  h1{font-size:14pt}
+  .value{font-size:14pt}
+  .label,.crumb,.tv,.rec,.sblabel,.bench-note,.bench-share{color:var(--rec)}
+  .rec{font-size:9pt}
+  .sbtrack,.cbar{background:#e8e8e8}
+  .sbtrack i,.cbar i{background:#555}
+  .stale{background:#fff;border:1px solid #000;color:#000}
+  .mark{color:#000;border-bottom:1px solid #000}
+  footer{position:static;margin-top:1rem;border-top:1px solid var(--rule);font-size:8pt}
+}
 </style>
 </head><body><div class="wrap">
 <div class="topbar">

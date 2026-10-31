@@ -8,6 +8,7 @@
 
 import type { Place } from "../store.ts";
 import { esc, shell } from "./layout.ts";
+import { appVersion } from "../lib/runtime.ts";
 import { renderPanel, type Panel } from "./panel.ts";
 import type { DateSpan } from "../lib/freshness.ts";
 export function report(place: Place, panels: Panel[], meta: Record<string, string>, notice?: string, span?: DateSpan): string {
@@ -31,6 +32,9 @@ export function report(place: Place, panels: Panel[], meta: Record<string, strin
        ${pulled ? `<span class="tv">${esc(pulled)}</span>` : ""}
        <span class="tv">${esc(meta["build.source_count"] ?? String((meta["build.sources"] ?? "").split(/[·,]/).map((x) => x.trim()).filter(Boolean).length || "?"))} agencies</span></div>
      <div class="grid">${cards}</div>`,
-    "Numbers are illustrative of the source.",
+    // Print is the only export, and a printed page loses every affordance the
+    // screen has. The footer is the line that survives on paper, so it carries
+    // where this came from and which file it is.
+    `data ${meta["data.version"] ?? "?"} · app ${appVersion} · econpulse.harborgovcon.com · Numbers are illustrative of the source.`,
   );
 }

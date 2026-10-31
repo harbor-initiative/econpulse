@@ -29,6 +29,18 @@ Verified by generating a PDF with Chrome headless and inspecting the page count 
 - [ ] Grayscale output remains legible
 - [ ] The PDF is generated in CI and its page count asserted
 
+### What changed while building it
+
+The footer carries the data version, the app version and the address, because a
+printed page has no address bar and no hover. `appVersion` is read once from
+`package.json` at boot; the Docker tag and that number are now kept equal, and
+the first thing this check caught was that they were not (app 0.1.0 in a 0.9.0
+image).
+
+The gate is `scripts/pdf-check.mjs`. It measures the print rules in the live DOM
+and the page count in a real PDF, because those catch different failures: a rule
+that did not apply, and rules that applied and still produced six pages.
+
 ## Risks
 
 Print fidelity drifts silently because nobody looks at it. The CI PDF check is
@@ -40,4 +52,4 @@ Server-side PDF rendering, branded cover pages, CSV or JSON export.
 
 ## Files
 
-`server/views/css.ts` (the `@media print` block) · new `scripts/pdf-check.mjs`
+`server/views/css.ts` (the `@media print` block) · `server/views/report.ts` · `server/lib/runtime.ts` · `scripts/lib/cdp.mjs` · `package.json` · new `scripts/pdf-check.mjs`
