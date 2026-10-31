@@ -19,6 +19,7 @@ import { redirect, send } from "../lib/http.ts";
 import { METRICS, REPORT_ORDER } from "../lib/metrics.ts";
 import { buildPanels, contextFor, panelFor, sharedMetrics } from "../lib/panels.ts";
 import { factDateSpan } from "../lib/freshness.ts";
+import { summarise } from "../lib/summary.ts";
 import { parseLocally, parseQuestion } from "../ask.ts";
 import { isQuestion } from "../lib/rules.ts";
 import { isModelUnavailable, type ModelOutcome } from "../lib/model.ts";
@@ -140,7 +141,12 @@ export async function routeAsk(url: URL, res: ServerResponse, req?: IncomingMess
       const droppedNotice = parsed.dropped
         ? `${parsed.dropped} is not in this file, so this is ${place.name} alone.`
         : undefined;
-      send(res, 200, report(place, buildPanels(place), meta, droppedNotice, factDateSpan(db)));
+      const panels = buildPanels(place);
+      const summary = await summarise(
+        { placeName: place.name, panels: panels.map((panel) => ({ label: panel.label, fact: panel.fact, mark: panel.mark })) },
+        dataVersion,
+      );
+      send(res, 200, report(place, panels, meta, droppedNotice, factDateSpan(db), undefined, summary.text));
       return true;
     }
     const offered = REPORT_ORDER

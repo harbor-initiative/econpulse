@@ -12,6 +12,7 @@ import { db, meta } from "../lib/runtime.ts";
 import { send } from "../lib/http.ts";
 import { buildPanels, quickFacts } from "../lib/panels.ts";
 import { factDateSpan } from "../lib/freshness.ts";
+import { summarise } from "../lib/summary.ts";
 import { shell } from "../views/layout.ts";
 import { report } from "../views/report.ts";
 
@@ -29,6 +30,13 @@ export async function routePlace(url: URL, res: ServerResponse): Promise<boolean
   const notice = zip && /^\d{5}$/.test(zip)
     ? `ZIP ${zip}. ZIP codes follow postal routes, so these figures are for ${place.name}.`
     : undefined;
-  send(res, 200, report(place, buildPanels(place), meta, notice, factDateSpan(db), quickFacts(place)));
+  const panels = buildPanels(place);
+  // One sentence per place per data version. The fallback is a template, so a
+  // missing key or a busy model still puts a sentence under the score.
+  const summary = await summarise(
+    { placeName: place.name, panels: panels.map((panel) => ({ label: panel.label, fact: panel.fact, mark: panel.mark })) },
+    meta["data.version"] ?? "?",
+  );
+  send(res, 200, report(place, panels, meta, notice, factDateSpan(db), quickFacts(place), summary.text));
   return true;
 }

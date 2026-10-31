@@ -26,7 +26,7 @@ function descriptionFor(place: Place, panels: Panel[]): string {
   return `${place.name}: ${parts.join(", ")}. Each figure carries its agency, dataset and retrieval date.`;
 }
 
-export function report(place: Place, panels: Panel[], meta: Record<string, string>, notice?: string, span?: DateSpan, quick?: QuickFact[]): string {
+export function report(place: Place, panels: Panel[], meta: Record<string, string>, notice?: string, span?: DateSpan, quick?: QuickFact[], summary?: string): string {
   const cards = panels.map((panel) => renderPanel(panel)).join("");
   const score = scoreFor(db, place);
   const promoted = panels.find((panel) => panel.fact)?.fact ?? null;
@@ -40,6 +40,7 @@ export function report(place: Place, panels: Panel[], meta: Record<string, strin
        promoted,
        dataVersion: meta["data.version"] ?? "?",
        built: (meta["build.finished_at"] ?? "").slice(0, 10),
+       summary,
      })}
      ${notice ? `<p class="notice">${esc(notice)}</p>` : ""}
      <div class="grid">${cards}</div>
