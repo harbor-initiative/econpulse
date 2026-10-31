@@ -58,5 +58,6 @@ export function status(
      <ul class="results">${rows}</ul>
      <p class="label">Build</p>
      <ul class="results">${buildRows}</ul>`,
+    { canonical: "/status", description: "What is in the EconPulse file: places, facts, every agency and the date it was last pulled." },
   );
 }

@@ -10,6 +10,8 @@ import type { ServerResponse } from "node:http";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { send, sendBinary } from "../lib/http.ts";
+import { db } from "../lib/runtime.ts";
+import { sitemap } from "../lib/sitemap.ts";
 
 /**
  * The only files served from disk.
@@ -36,7 +38,25 @@ function font(name: string): Buffer | null {
 
 export async function routeAssets(url: URL, res: ServerResponse): Promise<boolean> {
   if (url.pathname === "/robots.txt") {
-    send(res, 200, "User-agent: *\nAllow: /\n", "text/plain");
+    // A crawl delay because this is one small box, and the sitemap so a crawler
+    // finds 32,000 pages in a day rather than following links for a month.
+    send(res, 200, "User-agent: *\nAllow: /\nCrawl-delay: 1\nSitemap: https://econpulse.harborgovcon.com/sitemap.xml\n", "text/plain");
+    return true;
+  }
+
+  if (url.pathname === "/sitemap.xml") {
+    send(res, 200, sitemap(db).index, "application/xml; charset=utf-8");
+    return true;
+  }
+
+  const child = url.pathname.match(/^\/sitemap\/(state-(\d{2})|pages)\.xml$/);
+  if (child?.[1]) {
+    const body = sitemap(db).states.get(child[1] === "pages" ? "pages" : child[2] ?? "");
+    if (!body) {
+      send(res, 404, "No sitemap for that state.\n", "text/plain");
+      return true;
+    }
+    send(res, 200, body, "application/xml; charset=utf-8");
     return true;
   }
 

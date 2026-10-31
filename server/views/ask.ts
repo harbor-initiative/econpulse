@@ -24,5 +24,6 @@ export function askCard(
        ${followUps.map((f) => `<a class="chip" href="${esc(f.href)}">${esc(f.label)}</a>`).join("")}
        <a class="chip" href="/p/${esc(place.geoid)}">Full report</a>
      </div>`,
+    { canonical: `/p/${place.geoid}`, robots: "noindex" },
   );
 }

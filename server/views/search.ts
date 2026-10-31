@@ -24,5 +24,6 @@ export function searchResults(query: string, places: Place[]): string {
     `${query} — EconPulse`,
     `<p class="crumb">Search</p><h1 style="font-size:1.5rem">${places.length > 1 ? `${places.length} places match` : "One place matches"}</h1>
      <ul class="results">${items}</ul>`,
+    { canonical: "/s", description: `Places matching ${query}.`, robots: "noindex" },
   );
 }
