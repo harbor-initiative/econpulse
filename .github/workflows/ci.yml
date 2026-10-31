@@ -32,7 +32,7 @@ jobs:
       - name: Fetch the released database
         run: |
           curl -sSL -o /tmp/econpulse.db.gz \
-            https://github.com/harbor-initiative/econpulse/releases/download/v0.1.0-data/econpulse-2026.10.db.gz
+            https://github.com/harbor-initiative/econpulse/releases/download/v0.1.1-data/econpulse-2026.10.db.gz
           mkdir -p data
           gunzip -c /tmp/econpulse.db.gz > data/econpulse.db
 
