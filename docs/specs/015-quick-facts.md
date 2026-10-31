@@ -27,6 +27,16 @@ No new data. Every value already has a fact row.
 - [ ] The grid collapses to one column under 720px
 - [ ] Values are tabular and right-aligned
 
+### What changed while building it
+
+The tenth value is the ACS five-year unemployment rate, which sits beside the
+monthly BLS figure shown in the panels. They disagree by design (8.1% against
+4.3% for Philadelphia County) and the grid is where a reader sees it without
+opening the method page.
+
+The two national series are labelled `(United States)` because a CPI row inside
+a county report reads as the county's CPI, which does not exist.
+
 ## Risks
 
 A grid of ten numbers invites skimming past the receipts. The receipt stays
@@ -38,4 +48,4 @@ Sparklines in the grid, sorting, user selection of which facts appear.
 
 ## Files
 
-`server/views/panel.ts` · `server/lib/panels.ts`
+`server/views/panel.ts` · `server/lib/panels.ts` · `server/views/report.ts` · `server/routes/place.ts` · `server/views/css.ts`

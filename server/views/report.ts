@@ -9,9 +9,9 @@
 import type { Place } from "../store.ts";
 import { esc, shell } from "./layout.ts";
 import { appVersion } from "../lib/runtime.ts";
-import { renderPanel, type Panel } from "./panel.ts";
+import { quickFactsGrid, renderPanel, type Panel, type QuickFact } from "./panel.ts";
 import type { DateSpan } from "../lib/freshness.ts";
-export function report(place: Place, panels: Panel[], meta: Record<string, string>, notice?: string, span?: DateSpan): string {
+export function report(place: Place, panels: Panel[], meta: Record<string, string>, notice?: string, span?: DateSpan, quick?: QuickFact[]): string {
   const cards = panels.map((panel) => renderPanel(panel)).join("");
   const pulled = span?.oldest && span.newest
     ? (span.oldest === span.newest ? `pulled ${span.oldest}` : `pulled ${span.oldest} to ${span.newest}`)
@@ -31,7 +31,8 @@ export function report(place: Place, panels: Panel[], meta: Record<string, strin
      <div class="tools"><span class="tv">data ${esc(meta["data.version"] ?? "?")} · built ${esc((meta["build.finished_at"] ?? "").slice(0, 10))}</span>
        ${pulled ? `<span class="tv">${esc(pulled)}</span>` : ""}
        <span class="tv">${esc(meta["build.source_count"] ?? String((meta["build.sources"] ?? "").split(/[·,]/).map((x) => x.trim()).filter(Boolean).length || "?"))} agencies</span></div>
-     <div class="grid">${cards}</div>`,
+     <div class="grid">${cards}</div>
+     ${quickFactsGrid(quick ?? [])}`,
     // Print is the only export, and a printed page loses every affordance the
     // screen has. The footer is the line that survives on paper, so it carries
     // where this came from and which file it is.
