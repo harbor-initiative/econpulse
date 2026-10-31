@@ -50,7 +50,7 @@ export function quickFactsGrid(facts: QuickFact[]): string {
     .map(
       (fact) => `<div class="fact" data-scope="${fact.scope}">
       <span class="factl">${esc(fact.label)}</span>
-      <span class="factv">${esc(fact.value)}</span>
+      <span class="factv" data-number>${esc(fact.value)}</span>
       <span class="factr">${esc(fact.agency)} · ${esc(fact.period)}</span>
     </div>`,
     )
@@ -200,7 +200,7 @@ export function renderPanel(panel: Panel): string {
   return `<div class="metric${full}" data-freshness="${band}">
     ${stale}
     <p class="label">${esc(panel.label)}</p>
-    <p class="value">${esc(formatValue(fact.value, fact.unit))}</p>
+    <p class="value" data-number>${esc(formatValue(fact.value, fact.unit))}</p>
     ${deltaText || panel.mark
       ? `<p class="delta">${deltaText}${panel.mark
           ? `<span class="mark" data-mark="${panel.mark}">${panel.mark}</span>${deltaText ? "" : " than the United States"}`

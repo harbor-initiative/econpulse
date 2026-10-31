@@ -52,7 +52,7 @@ export function reportHeader(input: HeaderInput): string {
 
   const scoreBlock = score
     ? `<div class="hscore">
-        <span class="score">${score.value}</span>
+        <span class="score" data-number>${score.value}</span>
         <span class="hlabel">${esc(score.label)}</span>
         <span class="hpeers">${esc(peers(score))}</span>
         <span class="hweights">${esc(weightsText())} · <a href="/method">method</a></span>

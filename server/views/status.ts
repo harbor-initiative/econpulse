@@ -49,7 +49,7 @@ export function status(
 
   return shell(
     "Status — EconPulse",
-    `<p class="crumb">Status</p><h1 style="font-size:1.6rem">What is in the file</h1>
+    `<p class="crumb">Status</p><h1 class="place hsub">What is in the file</h1>
      <p class="sub">${counts.places.toLocaleString("en-US")} places · ${counts.facts.toLocaleString("en-US")} facts · ${counts.metrics} metrics · data ${esc(meta["data.version"] ?? "?")}</p>
      <p class="sub">${dated}</p>
      ${covered ? `<p class="sub">${covered}</p>` : ""}

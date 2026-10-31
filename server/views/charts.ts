@@ -145,7 +145,7 @@ export function compareBars(rows: Array<{ label: string; value: number }>, unit:
       (r) => `<div class="crow">
         <span class="cl">${esc(r.label)}</span>
         <span class="cbar"><i style="width:${Math.max(2, (r.value / max) * 100).toFixed(1)}%"></i></span>
-        <span class="cv">${esc(formatValue(r.value, unit))}</span>
+        <span class="cv" data-number>${esc(formatValue(r.value, unit))}</span>
       </div>`,
     )
     .join("")}</div>`;

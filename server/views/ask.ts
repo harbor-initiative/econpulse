@@ -20,7 +20,7 @@ export function askCard(
     `${question} — EconPulse`,
     `<p class="crumb">You asked · ${esc(place.name)}${place.state_code ? `, ${esc(place.state_code)}` : ""}</p>
      ${notice ? `<p class="notice">${esc(notice)}</p>` : ""}
-     <h1 class="place" style="font-size:1.6rem;max-width:24ch">${esc(question)}</h1>
+     <h1 class="place hsub" style="max-width:24ch">${esc(question)}</h1>
      <div class="grid" style="grid-template-columns:1fr;margin-top:1.2rem">${body}</div>
      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:1.2rem">
        ${followUps.map((f) => `<a class="chip" href="${esc(f.href)}">${esc(f.label)}</a>`).join("")}
@@ -49,7 +49,7 @@ export function compareCard(
     .map((row) => {
       const latestA = row.a[row.a.length - 1];
       const latestB = row.b[row.b.length - 1];
-      const headline = `<p class="value">${esc(formatValue(latestA?.value ?? 0, latestA?.unit ?? ""))}<span class="vs">against ${esc(formatValue(latestB?.value ?? 0, latestB?.unit ?? ""))}</span></p>`;
+      const headline = `<p class="value" data-number>${esc(formatValue(latestA?.value ?? 0, latestA?.unit ?? ""))}<span class="vs">against ${esc(formatValue(latestB?.value ?? 0, latestB?.unit ?? ""))}</span></p>`;
 
       // A single period each is a pair of numbers, and a line through one point
       // is not a chart. Two bars say the same thing and can be read.
@@ -80,7 +80,7 @@ export function compareCard(
   return shell(
     `${a.name} and ${b.name} — EconPulse`,
     `<p class="crumb">You asked · comparing two places</p>
-     <h1 class="place" style="font-size:1.6rem;max-width:32ch">${esc(question)}</h1>
+     <h1 class="place hsub" style="max-width:32ch">${esc(question)}</h1>
      ${dropped ? `<p class="notice">${esc(dropped)}</p>` : ""}
      <div class="tools"><span class="tv">${esc(a.name)}</span><span class="tv">${esc(b.name)}</span></div>
      <div class="grid">${blocks}</div>`,
@@ -93,7 +93,7 @@ export function compareEmpty(question: string, a: Place, b: Place): string {
   return shell(
     `${a.name} and ${b.name} — EconPulse`,
     `<p class="crumb">You asked</p>
-     <h1 class="place" style="font-size:1.6rem">${esc(question)}</h1>
+     <h1 class="place hsub">${esc(question)}</h1>
      <p class="sub">${esc(a.name)} and ${esc(b.name)} have no measures in common in this file, so there is nothing to put side by side.</p>
      <div class="chips" style="justify-content:flex-start;margin-top:1rem">
        <a class="chip" href="/p/${esc(a.geoid)}">${esc(a.name)}</a>

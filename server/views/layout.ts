@@ -60,7 +60,9 @@ ${head}
 <style>${CSS}</style>
 </head><body><div class="wrap">
 <div class="topbar">
-${docked ? `<form class="dock" action="/ask" method="get" role="search"><input type="search" name="q" placeholder="Place or question" aria-label="Place or question"></form>` : ""}
+${docked
+  ? `<form class="dock" action="/ask" method="get" role="search"><input type="search" name="q" placeholder="Place or question" aria-label="Place or question"></form>`
+  : `<span class="dock-gap" aria-hidden="true"></span>`}
 <a class="brand" href="/">EconPulse</a>
 <nav class="nav"><a href="/status">Status</a><a href="https://github.com/harbor-initiative/econpulse">GitHub</a></nav></div>
 ${body}
