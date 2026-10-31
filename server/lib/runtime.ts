@@ -8,7 +8,8 @@
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { openStore, storePath, buildMeta } from "../store.ts";
+import { allPlaces, openStore, storePath, buildMeta } from "../store.ts";
+import { buildSearchIndex } from "./search-index.ts";
 
 /** The version this process is running, read from package.json at boot. */
 export const appVersion: string = (() => {
@@ -22,3 +23,7 @@ export const appVersion: string = (() => {
 
 export const db = openStore(storePath());
 export const meta = buildMeta(db);
+
+// The search index reads every place once. The build is logged with its size
+// and timing, so a slow or fat index shows up in the boot log.
+buildSearchIndex(allPlaces(db));

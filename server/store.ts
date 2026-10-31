@@ -2,6 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { aliasGeoid, loadAliases } from "./lib/aliases.ts";
+import { buildSearchIndex, isIndexBuilt, searchIndex } from "./lib/search-index.ts";
 
 // Read the three alias CSVs once, before the first request. A malformed file
 // fails the process at boot instead of returning an empty search.
@@ -61,6 +62,13 @@ export function getPlace(db: DatabaseSync, geoid: string): Place | null {
   return row ?? null;
 }
 
+/** Every row the search index holds, read once at boot. */
+export function allPlaces(db: DatabaseSync): Place[] {
+  return db
+    .prepare("SELECT geoid, kind, name, short_name, state_code, parent_geoid, population FROM place")
+    .all() as unknown as Place[];
+}
+
 export function searchPlaces(db: DatabaseSync, query: string, limit = 12): Place[] {
   const q = query.trim();
   if (!q) return [];
@@ -94,19 +102,9 @@ export function searchPlaces(db: DatabaseSync, query: string, limit = 12): Place
     if (place) return limit > 0 ? [place] : [];
   }
 
-  // Fuzzy last: the LIKE scan this issue exists to get in front of.
-  const like = `%${q.replace(/[%_]/g, "")}%`;
-  return db
-    .prepare(
-      `SELECT geoid, kind, name, short_name, state_code, parent_geoid, population
-       FROM place
-       WHERE name LIKE ? COLLATE NOCASE OR short_name LIKE ? COLLATE NOCASE
-       ORDER BY
-         CASE kind WHEN 'county' THEN 0 WHEN 'place' THEN 1 WHEN 'state' THEN 2 ELSE 3 END,
-         population DESC
-       LIMIT ?`,
-    )
-    .all(like, like, limit) as unknown as Place[];
+  // Fuzzy last. The index is built once, then every search is a memory pass.
+  if (!isIndexBuilt()) buildSearchIndex(allPlaces(db));
+  return searchIndex(q, limit);
 }
 
 export function series(db: DatabaseSync, geoid: string, metric: string): Fact[] {
