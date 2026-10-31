@@ -8,6 +8,22 @@
 
 
 import { CSS } from "./css.ts";
+import { SITE } from "../lib/site.ts";
+
+/** Everything a page can say about itself in the head. */
+export interface ShellOptions {
+  /** The line that prints in the footer, and the only line that survives on paper. */
+  footerNote?: string;
+  /** The docked search field. Off on the home route, which has the hero field. */
+  docked?: boolean;
+  /** Path only; the origin is fixed. A canonical that follows a header agrees with anything. */
+  canonical?: string;
+  description?: string;
+  /** Structured data, one object per script tag. Never an aggregate rating. */
+  jsonld?: unknown[];
+  /** `noindex` for a page that should not be in a search result. */
+  robots?: string;
+}
 export function esc(value: unknown): string {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -27,12 +43,20 @@ export function esc(value: unknown): string {
  * and CSS places it between the brand and the nav. Tab order follows the
  * document; the layout follows the design.
  */
-export function shell(title: string, body: string, footerNote = "", docked = true): string {
+export function shell(title: string, body: string, options: ShellOptions = {}): string {
+  const { footerNote = "", docked = true, canonical, description = SITE.description, jsonld = [], robots } = options;
+  const head = [
+    canonical ? `<link rel="canonical" href="${esc(`${SITE.origin}${canonical}`)}">` : "",
+    robots ? `<meta name="robots" content="${esc(robots)}">` : "",
+    ...jsonld.map((block) => `<script type="application/ld+json">${JSON.stringify(block)}</script>`),
+  ].filter(Boolean).join("\n");
+
   return `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title>
-<meta name="description" content="Every number about a place, with its receipt.">
+<meta name="description" content="${esc(description)}">
+${head}
 <style>${CSS}</style>
 </head><body><div class="wrap">
 <div class="topbar">

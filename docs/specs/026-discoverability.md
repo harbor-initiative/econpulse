@@ -32,6 +32,20 @@ not a screenshot on social.
 - [ ] `robots.txt` points at the index and sets a crawl delay
 - [ ] No page claims an aggregate rating
 
+### What changed while building it
+
+- **The old host redirects.** `econpulse.porbanderwala.cloud` returned 200 on the
+  same container, which gives two addresses for every page. It now answers
+  `301 https://econpulse.harborgovcon.com{uri}` from its own Caddy block, verified
+  live before this PR opened.
+- **`/method` is not in the sitemap yet.** The page is #25. A sitemap that lists a
+  404 is worse than a sitemap that lists two pages.
+- **The sitemap is built at request time and cached**, because a sitemap written
+  at build time describes the file the build had. #8 is about to add 13,000 places
+  and the sitemap should follow without a second change.
+- **`shell()` takes an options object.** A sixth positional argument for
+  `canonical` was the point at which the signature stopped being readable.
+
 ## Risks
 
 51,158 URLs invite crawler load on a small box. Crawl delay plus a state split
@@ -43,4 +57,4 @@ Search-console verification, RSS, Open Graph images.
 
 ## Files
 
-new `server/lib/structured.ts` · new `server/lib/sitemap.ts` · `server/routes/assets.ts` · `server/views/layout.ts` · new `tests/structured.test.ts`
+new `server/lib/structured.ts` · new `server/lib/site.ts` · new `server/lib/sitemap.ts` · `server/routes/assets.ts` · `server/views/layout.ts` · `server/views/report.ts` · `server/views/home.ts` · `server/views/status.ts` · `server/views/search.ts` · `server/views/ask.ts` · new `tests/structured.test.ts`

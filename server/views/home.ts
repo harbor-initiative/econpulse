@@ -21,7 +21,6 @@ export function home(): string {
         <a class="chip" href="/ask?q=Federal%20money%20in%20Philadelphia">Federal money in Philadelphia</a>
       </div>
     </div>`,
-    "",
-    false,
+    { docked: false, canonical: "/", description: "How is your town doing? Type a place and read every number with the agency, dataset and date behind it." },
   );
 }
