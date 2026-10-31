@@ -241,7 +241,7 @@ export function report(place: Place, panels: Panel[], meta: Record<string, strin
      <h1 class="place">${esc(place.name)}</h1>
      <p class="sub">${esc(placeSub)}</p>
      <div class="tools"><span class="tv">data ${esc(meta["data.version"] ?? "?")} · built ${esc((meta["build.finished_at"] ?? "").slice(0, 10))}</span>
-       <span class="tv">${esc(meta["build.source_count"] ?? "?")} agencies</span></div>
+       <span class="tv">${esc(meta["build.source_count"] ?? String((meta["build.sources"] ?? "").split(" · ").filter(Boolean).length || "?"))} agencies</span></div>
      <div class="grid">${cards}</div>`,
     "Numbers are illustrative of the source, not of the place.",
   );
