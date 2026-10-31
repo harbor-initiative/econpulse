@@ -38,4 +38,4 @@ Sparklines in the grid, sorting, user selection of which facts appear.
 
 ## Files
 
-`server/view.ts` · `server/index.ts`
+`server/views/panel.ts` · `server/lib/panels.ts`

@@ -35,4 +35,4 @@ Interactive legends, toggling series, tooltips.
 
 ## Files
 
-`server/view.ts` · new `tests/chart.test.ts`
+`server/views/charts.ts` · `server/views/panel.ts` · `server/views/css.ts` · new `tests/chart.test.ts`

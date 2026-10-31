@@ -45,5 +45,4 @@ Three or more places, saving a comparison, sharing a comparison URL.
 
 ## Files
 
-`server/ask.ts` · `server/index.ts` · `server/view.ts` ·
-new `tests/compare.test.ts`
+`server/routes/ask.ts` · `server/ask.ts` · `server/views/ask.ts` · new `tests/compare.test.ts`

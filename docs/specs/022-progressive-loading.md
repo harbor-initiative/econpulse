@@ -40,4 +40,4 @@ Streaming model tokens, partial results, optimistic rendering.
 
 ## Files
 
-new `public/ask.js` · `server/view.ts` · `server/index.ts`
+new `public/ask.js` · `server/views/states.ts` · `server/views/ask.ts` · `server/routes/ask.ts`

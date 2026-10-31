@@ -41,5 +41,4 @@ Localisation, animated transitions between states.
 
 ## Files
 
-new `server/states.ts` · `server/index.ts` · `server/view.ts` ·
-new `tests/states.test.ts`
+`server/views/states.ts` · `server/routes/ask.ts` · new `tests/states.test.ts`

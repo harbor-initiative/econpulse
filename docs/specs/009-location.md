@@ -37,5 +37,4 @@ Street-address geocoding, routing, IP-based lookup.
 
 ## Files
 
-`server/index.ts` · new `server/geo.ts` · `public/location.js` ·
-`pipeline/sources/boundaries.ts` (shared with #16)
+new `server/routes/geo.ts` · `server/app.ts` · new `public/location.js` · new `pipeline/sources/boundaries.ts` (shared with #16)

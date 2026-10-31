@@ -40,4 +40,4 @@ A third face, variable-font animation, icon fonts.
 
 ## Files
 
-new `public/fonts/*.woff2` · `server/view.ts` · new `scripts/font-check.mjs`
+new `public/fonts/*.woff2` · `server/views/css.ts` · `server/views/layout.ts` · new `scripts/font-check.mjs`

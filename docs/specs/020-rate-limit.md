@@ -43,4 +43,4 @@ Persistent quotas, accounts, per-key limits, a dashboard.
 
 ## Files
 
-new `server/ratelimit.ts` · `server/index.ts` · new `tests/ratelimit.test.ts`
+new `server/lib/ratelimit.ts` · `server/routes/ask.ts` · new `tests/ratelimit.test.ts`

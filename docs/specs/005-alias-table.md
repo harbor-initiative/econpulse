@@ -55,5 +55,4 @@ User-defined aliases, dialect variants, non-English names.
 
 ## Files
 
-`data/aliases/*.csv` (new) · `pipeline/schema.sql` · new `pipeline/alias.ts` ·
-`pipeline/verify.ts` · `server/store.ts` · new `tests/alias.test.ts`
+`data/aliases/*.csv` (new) · `pipeline/schema.sql` · new `pipeline/alias.ts` · `pipeline/verify.ts` · `server/store.ts` · new `tests/alias.test.ts`

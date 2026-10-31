@@ -41,5 +41,4 @@ Client-side index, search history, recent places.
 
 ## Files
 
-`server/index.ts` · new `public/combobox.js` · `server/view.ts` ·
-new `tests/suggest.test.ts`
+new `server/routes/suggest.ts` · `server/app.ts` · new `public/combobox.js` · `server/views/search.ts` · new `tests/suggest.test.ts`

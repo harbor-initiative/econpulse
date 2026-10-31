@@ -44,4 +44,4 @@ Metro, peer-county, or same-size-cohort benchmarks.
 
 ## Files
 
-`server/index.ts` · `server/view.ts` · new `tests/benchmarks.test.ts`
+`server/views/panel.ts` · `server/lib/panels.ts` · new `tests/benchmarks.test.ts`

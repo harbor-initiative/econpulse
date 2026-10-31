@@ -49,4 +49,4 @@ Metrics endpoints, tracing, log shipping.
 
 ## Files
 
-`server/index.ts` · `server/view.ts` · new `tests/health.test.ts`
+`server/routes/status.ts` · `server/views/status.ts` · `server/lib/freshness.ts` · new `tests/health.test.ts`
