@@ -40,6 +40,8 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 .years{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.55rem;color:#6B7578;margin:.1rem 0 0}
 .rec{margin:.6rem 0 0;padding-left:.55rem;border-left:2px solid #BFDBD7;font-family:var(--mono);font-size:.58rem;line-height:1.5;color:var(--rec)}
 .rec b{font-weight:400;text-transform:uppercase;letter-spacing:.09em;color:var(--teal-ink)}
+.bench-share{font-family:var(--mono);font-size:.62rem;line-height:1.5;color:var(--muted);margin:.55rem 0 0}
+.bench-note{font-family:var(--mono);font-size:.6rem;letter-spacing:.03em;color:var(--rec);margin:.55rem 0 0}
 .stale{margin:0 0 .7rem;padding:.45rem .6rem;background:var(--stale-bg);border:1px solid var(--stale);color:var(--stale);font-size:.74rem;line-height:1.45}
 .stale b{font-weight:600;text-transform:uppercase;letter-spacing:.09em}
 .notice{background:#F2F7F6;border-left:3px solid var(--teal);padding:.6rem .8rem;margin:0 0 1rem;font-size:.82rem;color:var(--teal-ink)}
@@ -81,6 +83,7 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
     <p class="value">1,579,706</p>
     
     
+    <p class="bench-share">Pennsylvania 13,018,639 · United States 334,922,499 · this place is 12.13% of the state</p>
     <p class="rec"><b>Receipt</b> U.S. Census Bureau · American Community Survey 5-Year · B01003 · 2020-2024 · pulled 2026-10-31</p>
   </div><div class="metric" data-freshness="fresh">
     
@@ -90,16 +93,34 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
     <svg viewBox="0 0 320 54" preserveAspectRatio="none" aria-hidden="true">
     <polyline points="0.0,39.5 10.3,35.7 20.6,43.3 31.0,51.0 41.3,43.3 51.6,33.8 61.9,22.3 72.3,18.4 82.6,39.5 92.9,37.6 103.2,39.5 113.5,41.4 123.9,28.0 134.2,28.0 144.5,31.8 154.8,37.6 165.2,29.9 175.5,20.3 185.8,12.7 196.1,5.0 206.5,20.3 216.8,31.8 227.1,39.5 237.4,26.1 247.7,22.3 258.1,31.8 268.4,37.6 278.7,31.8 289.0,33.8 299.4,33.8 309.7,28.0 320.0,45.3" fill="none" stroke="#009689" stroke-width="1.7" stroke-linejoin="round"/>
     <polyline points="0.0,28.0 10.3,24.2 20.6,35.7 31.0,51.0 41.3,43.3 51.6,20.3 61.9,12.7 72.3,16.5 82.6,35.7 92.9,35.7 103.2,31.8 113.5,39.5 123.9,16.5 134.2,12.7 144.5,24.2 154.8,35.7 165.2,31.8 175.5,16.5 185.8,8.8 196.1,12.7 206.5,20.3 216.8,20.3 227.1,28.0 237.4,5.0 247.7,5.0 258.1,20.3 268.4,31.8 278.7,28.0 289.0,16.5 299.4,16.5 309.7,20.3 320.0,31.8" fill="none" stroke="#104E64" stroke-width="1.2" stroke-dasharray="4 3"/><line x1="0" y1="53" x2="320" y2="53" stroke="#E4E2DC" stroke-width="1"/></svg><div class="years"><span>2024-01</span><span>2026-09</span></div>
+    <div class="compare"><div class="crow">
+        <span class="cl">This place</span>
+        <span class="cbar"><i style="width:100.0%"></i></span>
+        <span class="cv">4.3%</span>
+      </div><div class="crow">
+        <span class="cl">Pennsylvania</span>
+        <span class="cbar"><i style="width:83.7%"></i></span>
+        <span class="cv">3.6%</span>
+      </div><div class="crow">
+        <span class="cl">United States</span>
+        <span class="cbar"><i style="width:93.0%"></i></span>
+        <span class="cv">4.0%</span>
+      </div></div>
     <p class="rec"><b>Receipt</b> U.S. Bureau of Labor Statistics · Local Area Unemployment Statistics · LAUCN421010000000003 · 2026-09 · pulled 2026-10-31</p>
   </div><div class="metric" data-freshness="fresh">
     
     <p class="label">Median gross rent</p>
     <p class="value">$1,397</p>
     
+    
     <div class="compare"><div class="crow">
         <span class="cl">This place</span>
         <span class="cbar"><i style="width:98.9%"></i></span>
         <span class="cv">$1,397</span>
+      </div><div class="crow">
+        <span class="cl">Pennsylvania</span>
+        <span class="cbar"><i style="width:85.6%"></i></span>
+        <span class="cv">$1,209</span>
       </div><div class="crow">
         <span class="cl">United States</span>
         <span class="cbar"><i style="width:100.0%"></i></span>
@@ -114,6 +135,7 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
     <svg viewBox="0 0 320 54" preserveAspectRatio="none" aria-hidden="true">
     <polyline points="0.0,45.7 40.0,48.6 80.0,45.2 120.0,42.7 160.0,51.0 200.0,39.8 240.0,26.6 280.0,15.5 320.0,5.0" fill="none" stroke="#009689" stroke-width="1.7" stroke-linejoin="round"/>
     <line x1="0" y1="53" x2="320" y2="53" stroke="#E4E2DC" stroke-width="1"/></svg><div class="years"><span>2016</span><span>2024</span></div>
+    <p class="bench-share">Pennsylvania $1007.9B · this place is 13.39% of the state</p><p class="bench-note">This measure has no national series.</p>
     <p class="rec"><b>Receipt</b> U.S. Bureau of Economic Analysis · BEA Regional, CAGDP2 · CAGDP2-1 · 2024 · pulled 2026-10-31</p>
   </div><div class="metric full" data-freshness="fresh">
     
@@ -122,6 +144,7 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
     <p class="delta">−19.7% vs FY2025</p>
     <svg viewBox="0 0 320 54" preserveAspectRatio="none" aria-hidden="true"><rect x="10.1" y="8.6" width="33.1" height="44.4" fill="#009689"/><rect x="63.5" y="7.0" width="33.1" height="46.0" fill="#009689"/><rect x="116.8" y="10.9" width="33.1" height="42.1" fill="#009689"/><rect x="170.1" y="13.5" width="33.1" height="39.5" fill="#009689"/><rect x="223.5" y="15.1" width="33.1" height="37.9" fill="#009689"/><rect x="276.8" y="22.5" width="33.1" height="30.5" fill="#009689"/>
     <line x1="0" y1="53" x2="320" y2="53" stroke="#E4E2DC" stroke-width="1"/></svg><div class="years"><span>FY2021</span><span>FY2026</span></div>
+    <p class="bench-note">This measure has no state or national series.</p>
     <p class="rec"><b>Receipt</b> USAspending.gov · Federal award obligations by county · spending_by_geography · FY2026 · pulled 2026-10-31</p>
   </div></div>
 <footer><span>Numbers are illustrative of the source.</span><span>A Harbor Initiative project · Public data · Not financial advice</span></footer>

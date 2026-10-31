@@ -32,6 +32,22 @@ the panel says so.
 - [ ] A missing benchmark never renders as a zero or an empty bar
 - [ ] The delta states which comparison it is against
 
+### What changed while building it
+
+Two things the spec did not decide, both of which decide whether the panel is
+readable.
+
+1. **Counts get shares, rates get bars.** Population, output and federal
+   obligations are totals. On a shared axis a county's 1.58 million against the
+   nation's 335 million renders the county as an invisible sliver, which is a
+   chart that cannot be read. Panel rows for a count print the parent values and
+   the place's share of its parent instead: `Pennsylvania 13,018,639 · United
+   States 334,922,499 · this place is 12.13% of the state`. Rates, ages and
+   monthly rents keep the three-row bar comparison.
+2. **The one-value comparison was removed.** A panel with a single value used to
+   draw a two-row comparison under it. The benchmark block is that comparison
+   with the state added, so keeping both drew the same fact twice at two scales.
+
 ## Risks
 
 Benchmarks are not like-for-like: a county's GDP against a national GDP is a
@@ -44,4 +60,4 @@ Metro, peer-county, or same-size-cohort benchmarks.
 
 ## Files
 
-`server/views/panel.ts` · `server/lib/panels.ts` · new `tests/benchmarks.test.ts`
+`server/views/panel.ts` · `server/lib/panels.ts` · `server/views/css.ts` · new `tests/benchmarks.test.ts`
