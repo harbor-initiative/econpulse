@@ -182,6 +182,21 @@ export async function openPage(browserWs, timeoutMs = 15_000) {
     await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: width <= 430 });
   }
 
+  /** Switch the media type, so the print rules can be measured without printing. */
+  async function setMedia(media) {
+    await send("Emulation.setEmulatedMedia", { media });
+  }
+
+  /** A real PDF, which is the only way to know the page count. */
+  async function pdf() {
+    const { data } = await send("Page.printToPDF", {
+      printBackground: true,
+      preferCSSPageSize: true,
+      displayHeaderFooter: false,
+    });
+    return Buffer.from(data, "base64");
+  }
+
   async function screenshot() {
     const { data } = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
     return Buffer.from(data, "base64");
@@ -192,6 +207,8 @@ export async function openPage(browserWs, timeoutMs = 15_000) {
     evaluate,
     evaluateOnNewDocument,
     setViewport,
+    setMedia,
+    pdf,
     screenshot,
     close() {
       socket.close();
