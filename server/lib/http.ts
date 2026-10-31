@@ -9,8 +9,19 @@
 
 import type { ServerResponse } from "node:http";
 
+/**
+ * Cache a success. Store nothing else.
+ *
+ * A 503 means the model is busy and a 404 means the place is not in this
+ * release. Both can be false a minute later, and a browser that keeps either for
+ * five minutes shows the next reader a failure they already retried.
+ */
 export function send(res: ServerResponse, code: number, body: string, type = "text/html; charset=utf-8"): void {
-  res.writeHead(code, { "content-type": type, "cache-control": "public, max-age=300" });
+  const cacheable = code >= 200 && code < 300;
+  res.writeHead(code, {
+    "content-type": type,
+    "cache-control": cacheable ? "public, max-age=300" : "no-store",
+  });
   res.end(body);
 }
 
@@ -30,6 +41,6 @@ export function sendBinary(res: ServerResponse, code: number, body: Buffer, type
 }
 
 export function redirect(res: ServerResponse, location: string): void {
-  res.writeHead(302, { location });
+  res.writeHead(302, { location, "cache-control": "no-store" });
   res.end();
 }
