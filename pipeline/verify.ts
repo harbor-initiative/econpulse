@@ -46,17 +46,42 @@ function main(): void {
   );
   checks.push({ name: "population values are plausible", ok: badPop === 0, detail: `${badPop} out of range` });
 
-  // 5. Margins never equal their estimate.
-  const { n: badMoe } = one<{ n: number }>(
-    "SELECT COUNT(*) n FROM fact WHERE moe IS NOT NULL AND abs(moe - value) < 0.0001",
+  // 5. A margin is never the estimate in disguise. The first run of the loader
+  // read the margin column as the estimate, and every row of a level repeated
+  // its own margin. One coincidence is real data: a place of two people has a
+  // margin of two, and the agency publishes exactly that. A whole geography
+  // level of one table repeating is a parse failure, so the test looks at the
+  // level rather than the row.
+  const repeatedMargins = q<{ table_id: string; rows: number; same: number }>(
+    `SELECT table_id, COUNT(*) rows,
+            SUM(CASE WHEN abs(moe - value) < 0.0001 THEN 1 ELSE 0 END) same
+       FROM fact WHERE moe IS NOT NULL
+      GROUP BY table_id, length(geoid)
+     HAVING COUNT(*) >= 10 AND same = COUNT(*)`,
   );
   checks.push({
-    name: "no margin duplicates its estimate",
-    ok: badMoe === 0,
-    detail: `${badMoe} suspect`,
+    name: "no table puts its margin in the estimate",
+    ok: repeatedMargins.length === 0,
+    detail: repeatedMargins.length
+      ? repeatedMargins.map((r) => `${r.table_id} (${r.same} rows)`).join(", ")
+      : "none",
   });
 
-  // 6. The database has a version and a build date.
+  // 6. No sentinel is published as a value. Census writes a negative code
+  // where no number exists, and a value of -666666666 reads as a number to
+  // anyone who opens the file. A margin cannot be negative either.
+  const { n: sentinels } = one<{ n: number }>(
+    `SELECT COUNT(*) n FROM fact
+      WHERE value IN (-666666666, -999999999, -888888888, -222222222, -555555555)
+         OR (moe IS NOT NULL AND moe < 0)`,
+  );
+  checks.push({
+    name: "no Census sentinel is published",
+    ok: sentinels === 0,
+    detail: `${sentinels} sentinels`,
+  });
+
+  // 7. The database has a version and a build date.
   const meta = getBuildMeta(db);
   checks.push({
     name: "the file names its own version",
@@ -64,7 +89,7 @@ function main(): void {
     detail: `${meta["data.version"] ?? "none"} / ${meta["build.finished_at"]?.slice(0, 10) ?? "none"}`,
   });
 
-  // 7. No metric name is published by two agencies. Two numbers under one name
+  // 8. No metric name is published by two agencies. Two numbers under one name
   // is the fastest way to lose a reader's trust, so it fails the build.
   const { n: multiAgency } = one<{ n: number }>(
     `SELECT COUNT(*) n FROM (SELECT metric FROM fact GROUP BY metric
@@ -76,7 +101,7 @@ function main(): void {
     detail: multiAgency === 0 ? "none" : `${multiAgency} ambiguous`,
   });
 
-  // 8. ZIP coverage. A missing zcta table means nobody can type a ZIP, which is
+  // 9. ZIP coverage. A missing zcta table means nobody can type a ZIP, which is
   // how most people name where they live.
   let zctaCount = 0;
   try {
@@ -90,7 +115,36 @@ function main(): void {
     detail: zctaCount < 0 ? "no zcta table" : `${zctaCount.toLocaleString()} mapped`,
   });
 
-  // 9. Golden numbers. Pinned to the 2024 ACS 5-year release. These guard the
+  // 10. Every place above 1,000 people has at least one fact. A loader that
+  // silently skips a level leaves a report with a name and nothing under it.
+  const { n: emptyPlaces } = one<{ n: number }>(
+    `SELECT COUNT(*) n FROM place p
+      WHERE p.kind = 'place' AND p.population >= 1000
+        AND NOT EXISTS (SELECT 1 FROM fact f WHERE f.geoid = p.geoid)`,
+  );
+  checks.push({
+    name: "every place above 1,000 people has a fact",
+    ok: emptyPlaces === 0,
+    detail: `${emptyPlaces} empty`,
+  });
+
+  // 11. Every place row the Census file returned reached the table. The loader
+  // writes down what it saw, so a row lost on the way to SQLite fails here. A
+  // file built before this record exists says so and passes on the measure it
+  // does not hold.
+  const returnedRows = Number(meta["census.place_rows"] ?? NaN);
+  const skippedRows = Number(meta["census.place_rows_skipped"] ?? 0);
+  const placeRows = one<{ n: number }>("SELECT COUNT(*) n FROM place WHERE kind = 'place'").n;
+  const rowsAgree = Number.isFinite(returnedRows) && placeRows + skippedRows === returnedRows;
+  checks.push({
+    name: "every place row in the file is a place",
+    ok: Number.isFinite(returnedRows) ? rowsAgree : true,
+    detail: Number.isFinite(returnedRows)
+      ? `${placeRows.toLocaleString()} of ${returnedRows.toLocaleString()} rows`
+      : "not recorded in this file",
+  });
+
+  // 12. Golden numbers. Pinned to the 2024 ACS 5-year release. These guard the
   // parsing and the joins. If Census revises, this test moves.
   const golden: Array<[string, string, string, number]> = [
     ["42101", "population", "2020-2024", 1579706],
@@ -115,7 +169,7 @@ function main(): void {
     });
   }
 
-  // 10. Aliases are unambiguous. A term with two GEOIDs has no correct answer,
+  // 13. Aliases are unambiguous. A term with two GEOIDs has no correct answer,
   // so this fails and names both. The CSVs are the whole table.
   const aliasProblems: string[] = [];
   let aliasCount = 0;
