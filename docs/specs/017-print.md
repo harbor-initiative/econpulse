@@ -40,4 +40,4 @@ Server-side PDF rendering, branded cover pages, CSV or JSON export.
 
 ## Files
 
-`server/view.ts` (the `@media print` block) · new `scripts/pdf-check.mjs`
+`server/views/css.ts` (the `@media print` block) · new `scripts/pdf-check.mjs`

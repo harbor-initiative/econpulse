@@ -68,5 +68,4 @@ Time series of percentile, national ranking tables, comparisons across kinds.
 
 ## Files
 
-`pipeline/schema.sql` · new `pipeline/percentile.ts` · `pipeline/build.ts` ·
-`pipeline/verify.ts` · new `tests/percentile.test.ts`
+`pipeline/schema.sql` · new `pipeline/percentile.ts` · `pipeline/build.ts` · `pipeline/verify.ts` · new `tests/percentile.test.ts`

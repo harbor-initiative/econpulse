@@ -44,4 +44,4 @@ Scores on the delta, severity bands, trending arrows.
 
 ## Files
 
-`server/view.ts` · `server/index.ts` · new `tests/delta.test.ts`
+`server/views/panel.ts` · `server/lib/panels.ts` · `server/views/css.ts` · new `tests/delta.test.ts`

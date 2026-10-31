@@ -44,4 +44,4 @@ Sparklines, heatmaps, small multiples.
 
 ## Files
 
-`server/view.ts` · `server/index.ts` · new `tests/panels.test.ts`
+`server/views/panel.ts` · `server/views/charts.ts` · `server/routes/place.ts` · new `tests/panels.test.ts`

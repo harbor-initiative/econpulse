@@ -36,4 +36,4 @@ Auto-rebuilding the data, paging anyone, Slack.
 
 ## Files
 
-new `.github/workflows/staleness.yml` · `scripts/data-age.mjs`
+new `.github/workflows/staleness.yml` · new `scripts/data-age.mjs`

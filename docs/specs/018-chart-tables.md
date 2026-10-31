@@ -44,4 +44,4 @@ CSV download of the table, sorting, column selection.
 
 ## Files
 
-`server/view.ts` · `server/index.ts` · new `tests/tables.test.ts`
+`server/views/panel.ts` · `server/views/charts.ts` · new `tests/tables.test.ts`

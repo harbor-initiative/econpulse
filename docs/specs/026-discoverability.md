@@ -43,5 +43,4 @@ Search-console verification, RSS, Open Graph images.
 
 ## Files
 
-new `server/structured.ts` · new `server/sitemap.ts` · `server/index.ts` ·
-new `tests/structured.test.ts`
+new `server/lib/structured.ts` · new `server/lib/sitemap.ts` · `server/routes/assets.ts` · `server/views/layout.ts` · new `tests/structured.test.ts`

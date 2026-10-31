@@ -40,4 +40,4 @@ An academic methodology paper, per-metric documentation pages.
 
 ## Files
 
-new `server/method.ts` · `server/index.ts` · `server/view.ts`
+new `server/routes/method.ts` · new `server/views/method.ts` · `server/app.ts`

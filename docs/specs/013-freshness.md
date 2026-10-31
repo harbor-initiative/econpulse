@@ -43,5 +43,4 @@ Per-fact ages, revision history, a public changelog of revisions.
 
 ## Files
 
-new `server/freshness.ts` · `server/view.ts` · `server/index.ts` ·
-new `tests/freshness.test.ts`
+new `server/lib/freshness.ts` · `server/views/panel.ts` · `server/views/header.ts` · new `tests/freshness.test.ts`

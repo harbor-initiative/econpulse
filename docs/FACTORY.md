@@ -108,6 +108,13 @@ Anything a reviewer needs that the spec did not anticipate.
 The acceptance list is copied from the spec and ticked. A reviewer should not
 have to open the issue to know what "done" means.
 
+## Paths in the specs
+
+Every spec's `## Files` section names the post-split tree (#35). `server/view.ts`
+is gone: the concern decides the file, so a panel change is `views/panel.ts` and
+a stylesheet change is `views/css.ts`. `server/index.ts` is the entry point only;
+a route change is `routes/<name>.ts`. Shared behaviour is `lib/<concern>.ts`.
+
 ## Collisions, after the split
 
 The split gives every issue a home:

@@ -37,4 +37,4 @@ Voice input, recent searches, keyboard shortcuts.
 
 ## Files
 
-`server/view.ts` · `server/index.ts`
+`server/views/layout.ts` · `server/views/css.ts`

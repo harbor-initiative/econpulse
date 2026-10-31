@@ -57,4 +57,4 @@ Trend of the score over time, percentile rank display, sharing.
 
 ## Files
 
-`server/view.ts` · `server/index.ts` · new `server/score.ts`
+new `server/views/header.ts` · new `server/lib/score.ts` · `server/routes/place.ts` · `server/views/report.ts`

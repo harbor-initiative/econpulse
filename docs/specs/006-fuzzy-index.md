@@ -56,5 +56,4 @@ Stemming, phonetics, non-Latin scripts.
 
 ## Files
 
-new `server/search-index.ts` · `server/store.ts` · `server/index.ts` ·
-new `tests/search.test.ts`
+new `server/lib/search-index.ts` · `server/store.ts` · `server/routes/home.ts` · new `tests/search.test.ts`

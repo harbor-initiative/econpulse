@@ -48,5 +48,4 @@ Per-metric commentary, generated comparisons, multi-paragraph narrative.
 
 ## Files
 
-new `server/summary.ts` · `server/view.ts` · `server/index.ts` ·
-new `tests/summary.test.ts`
+new `server/lib/summary.ts` · `server/views/header.ts` · `server/routes/place.ts` · new `tests/summary.test.ts`

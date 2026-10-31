@@ -43,5 +43,4 @@ Streaming, token-level retries, per-user model choice, spend caps.
 
 ## Files
 
-new `server/model.ts` · `server/ask.ts` · `server/index.ts` ·
-new `tests/model.test.ts`
+`server/lib/model.ts` · `server/routes/ask.ts` · new `tests/model.test.ts`
