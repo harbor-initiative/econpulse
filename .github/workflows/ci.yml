@@ -36,6 +36,9 @@ jobs:
       - name: The type gate
         run: npx tsc --noEmit
 
+      - name: Fetch the county outlines
+        run: node scripts/fetch-boundaries.mjs
+
       - name: The test suite
         run: npm test
 
@@ -44,9 +47,6 @@ jobs:
 
       - name: The rendered HTML has not moved
         run: node scripts/snapshot-html.mjs --check
-
-      - name: Fetch the county outlines
-        run: node scripts/fetch-boundaries.mjs
 
       - name: The design gate
         run: node scripts/design-check.mjs
