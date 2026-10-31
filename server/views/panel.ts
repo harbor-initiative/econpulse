@@ -10,6 +10,7 @@ import type { Fact } from "../store.ts";
 import { esc } from "./layout.ts";
 import { formatValue } from "./format.ts";
 import { lineChart, barChart, compareBars } from "./charts.ts";
+import { ageInDays, bandOf } from "../lib/freshness.ts";
 export interface Panel {
   metric: string;
   label: string;
@@ -64,11 +65,19 @@ export function renderPanel(panel: Panel): string {
   const prev = history.length > 1 ? (history[history.length - 2] ?? null) : null;
   const deltaText = prev ? delta(fact, prev) : "";
 
-  return `<div class="metric${full}">
+  // Staleness is a property of this panel's source, so it is announced here and
+  // nowhere else. A page with one old series is not a stale page.
+  const band = bandOf(fact.retrieved_at);
+  const stale = band === "stale"
+    ? `<p class="stale"><b>Stale</b> ${esc(fact.agency)} reported this figure on ${esc(fact.retrieved_at)}, ${ageInDays(fact.retrieved_at)} days ago.</p>`
+    : "";
+
+  return `<div class="metric${full}" data-freshness="${band}">
+    ${stale}
     <p class="label">${esc(panel.label)}</p>
     <p class="value">${esc(formatValue(fact.value, fact.unit))}</p>
     ${deltaText ? `<p class="delta">${deltaText}</p>` : ""}
     ${chart}
-    <p class="rec"><b>Receipt</b> ${esc(fact.agency)} · ${esc(fact.dataset)}${fact.table_id ? ` · ${esc(fact.table_id)}` : ""} · ${esc(fact.period)}${fact.moe !== null ? ` · ±${Math.round(fact.moe).toLocaleString("en-US")}` : ""} · pulled ${esc(fact.retrieved_at)}</p>
+    <p class="rec"><b>Receipt</b> ${esc(fact.agency)} · ${esc(fact.dataset)}${fact.table_id ? ` · ${esc(fact.table_id)}` : ""} · ${esc(fact.period)}${fact.moe !== null ? ` · ±${Math.round(fact.moe).toLocaleString("en-US")}` : ""} · pulled ${esc(fact.retrieved_at)}${band === "aging" ? ` · ${ageInDays(fact.retrieved_at)} days old` : ""}</p>
   </div>`;
 }

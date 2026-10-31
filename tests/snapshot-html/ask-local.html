@@ -4,7 +4,7 @@
 <title>Population of Cook County — EconPulse</title>
 <meta name="description" content="Every number about a place, with its receipt.">
 <style>
-:root{--paper:#FCFBF8;--ink:#16161E;--muted:#52555B;--rec:#566669;--rule:#E4E2DC;--rule2:#C9C7C0;--teal:#009689;--teal-ink:#0B5C55;--blue:#104E64;
+:root{--paper:#FCFBF8;--ink:#16161E;--muted:#52555B;--rec:#566669;--rule:#E4E2DC;--rule2:#C9C7C0;--teal:#009689;--teal-ink:#0B5C55;--blue:#104E64;--stale:#8A6A00;--stale-bg:#FFF9EC;
 --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--serif:Georgia,"Times New Roman",serif;--mono:ui-monospace,"SF Mono",Menlo,monospace}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
@@ -39,6 +39,8 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 .years{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.55rem;color:#6B7578;margin:.1rem 0 0}
 .rec{margin:.6rem 0 0;padding-left:.55rem;border-left:2px solid #BFDBD7;font-family:var(--mono);font-size:.58rem;line-height:1.5;color:var(--rec)}
 .rec b{font-weight:400;text-transform:uppercase;letter-spacing:.09em;color:var(--teal-ink)}
+.stale{margin:0 0 .7rem;padding:.45rem .6rem;background:var(--stale-bg);border:1px solid var(--stale);color:var(--stale);font-size:.74rem;line-height:1.45}
+.stale b{font-weight:600;text-transform:uppercase;letter-spacing:.09em}
 .notice{background:#F2F7F6;border-left:3px solid var(--teal);padding:.6rem .8rem;margin:0 0 1rem;font-size:.82rem;color:var(--teal-ink)}
 .compare{margin:.9rem 0 .2rem}
 .crow{display:flex;align-items:center;gap:.6rem;margin:.28rem 0;font-size:.76rem;color:var(--muted)}
@@ -68,7 +70,8 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);font-fa
 <p class="crumb">You asked · Cook County, Illinois, IL</p>
      
      <h1 class="place" style="font-size:1.6rem;max-width:24ch">Population of Cook County</h1>
-     <div class="grid" style="grid-template-columns:1fr;margin-top:1.2rem"><div class="metric">
+     <div class="grid" style="grid-template-columns:1fr;margin-top:1.2rem"><div class="metric" data-freshness="fresh">
+    
     <p class="label">Population</p>
     <p class="value">5,182,090</p>
     

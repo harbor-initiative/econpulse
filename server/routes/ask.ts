@@ -14,6 +14,7 @@ import { db, meta } from "../lib/runtime.ts";
 import { redirect, send } from "../lib/http.ts";
 import { METRICS, REPORT_ORDER } from "../lib/metrics.ts";
 import { buildPanels, contextFor, panelFor } from "../lib/panels.ts";
+import { factDateSpan } from "../lib/freshness.ts";
 import { parseLocally, parseQuestion } from "../ask.ts";
 import { isQuestion } from "../lib/rules.ts";
 import { report } from "../views/report.ts";
@@ -79,7 +80,7 @@ export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> 
 
   if (!metric) {
     if (ctx.available.size > 1) {
-      send(res, 200, report(place, buildPanels(place), meta));
+      send(res, 200, report(place, buildPanels(place), meta, undefined, factDateSpan(db)));
       return true;
     }
     const offered = REPORT_ORDER
