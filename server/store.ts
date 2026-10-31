@@ -1,6 +1,11 @@
 import { DatabaseSync } from "node:sqlite";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { aliasGeoid, loadAliases } from "./lib/aliases.ts";
+
+// Read the three alias CSVs once, before the first request. A malformed file
+// fails the process at boot instead of returning an empty search.
+loadAliases();
 
 /**
  * Read-only access to the published file.
@@ -68,6 +73,28 @@ export function searchPlaces(db: DatabaseSync, query: string, limit = 12): Place
     if (exact) return [exact];
   }
 
+  // An exact name is an exact answer, and an alias never displaces it.
+  const exact = db
+    .prepare(
+      `SELECT geoid, kind, name, short_name, state_code, parent_geoid, population
+       FROM place
+       WHERE name = ? COLLATE NOCASE OR short_name = ? COLLATE NOCASE
+       ORDER BY
+         CASE kind WHEN 'county' THEN 0 WHEN 'place' THEN 1 WHEN 'state' THEN 2 ELSE 3 END,
+         population DESC
+       LIMIT ?`,
+    )
+    .all(q, q, limit) as unknown as Place[];
+  if (exact.length) return exact;
+
+  // An alias is an exact answer too, so it beats a substring match.
+  const aliased = aliasGeoid(q);
+  if (aliased) {
+    const place = getPlace(db, aliased);
+    if (place) return limit > 0 ? [place] : [];
+  }
+
+  // Fuzzy last: the LIKE scan this issue exists to get in front of.
   const like = `%${q.replace(/[%_]/g, "")}%`;
   return db
     .prepare(
