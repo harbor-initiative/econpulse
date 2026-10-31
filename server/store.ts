@@ -126,6 +126,24 @@ export function latest(db: DatabaseSync, geoid: string, metric: string): Fact | 
   return rows.length ? (rows[rows.length - 1] ?? null) : null;
 }
 
+/**
+ * Which way is better for a measure, as recorded in the file.
+ *
+ * `metric.direction` is `neutral`, `higher_is_better` or `lower_is_better`. It is
+ * read from the database rather than restated in code so the editorial judgement
+ * sits where a reviewer can see it and where a data change can correct it.
+ */
+const DIRECTIONS = new Map<string, string>();
+
+export function directionOf(db: DatabaseSync, metric: string): string {
+  const cached = DIRECTIONS.get(metric);
+  if (cached) return cached;
+  const row = db.prepare("SELECT direction FROM metric WHERE id = ?").get(metric) as { direction?: string } | undefined;
+  const direction = row?.direction ?? "neutral";
+  DIRECTIONS.set(metric, direction);
+  return direction;
+}
+
 export function metricsFor(db: DatabaseSync, geoid: string): string[] {
   const rows = db
     .prepare("SELECT DISTINCT metric FROM fact WHERE geoid = ? ORDER BY metric")

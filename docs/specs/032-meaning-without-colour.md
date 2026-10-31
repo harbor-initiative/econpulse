@@ -33,6 +33,19 @@ printed page, and colour blindness. It is read by a screen reader as text.
 - [ ] The mark is text
 - [ ] The mark survives a greyscale screenshot
 
+### What changed while building it
+
+The direction comes from `metric.direction` in the file, as the spec said it
+would: `higher_is_better`, `lower_is_better` or `neutral`. Nothing is restated in
+code, so correcting an editorial judgement is a data change.
+
+A gap has to be big enough to be a difference. A tenth of a point for a rate and
+half a percent for a quantity are the floor; below that the place is the country
+and the page says nothing rather than awarding a word for noise.
+
+Where a mark has no delta beside it, it says what it is better or worse than.
+`BETTER` alone above a rent comparison is a word without a referent.
+
 ## Risks
 
 The judgement is editorial. The direction comes from `metric.direction`, which is

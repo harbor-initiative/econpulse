@@ -51,6 +51,7 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 .chart-table th,.chart-table td{text-align:right;font-weight:400;padding:.22rem .4rem;border-bottom:1px solid var(--rule);font-variant-numeric:tabular-nums}
 .chart-table th:first-child,.chart-table td:first-child{text-align:left}
 .chart-table thead th{color:var(--rec);font-family:var(--mono);font-size:.54rem;letter-spacing:.06em;text-transform:uppercase}
+.mark{font-family:var(--mono);font-size:.55rem;text-transform:uppercase;letter-spacing:.09em;color:var(--ink);border-bottom:1px solid var(--ink);padding:0 .12rem .06rem;margin-left:.45rem;vertical-align:.05em}
 .legend{display:flex;gap:1rem;font-family:var(--mono);font-size:.58rem;letter-spacing:.04em;color:var(--rec);margin:.3rem 0 0}
 .legend span{display:inline-flex;align-items:center;gap:.35rem}
 .legend .sw{display:inline-block;width:16px;height:0;border-top-width:1.7px;border-top-style:solid}
