@@ -43,6 +43,14 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 .years{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.55rem;color:#6B7578;margin:.1rem 0 0}
 .rec{margin:.6rem 0 0;padding-left:.55rem;border-left:2px solid #BFDBD7;font-family:var(--mono);font-size:.58rem;line-height:1.5;color:var(--rec)}
 .rec b{font-weight:400;text-transform:uppercase;letter-spacing:.09em;color:var(--teal-ink)}
+.chart-table{margin:.5rem 0 0;font-size:.7rem}
+.chart-table summary{font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--rec);cursor:pointer;padding:.2rem 0}
+.chart-table summary:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.chart-table table{border-collapse:collapse;width:100%;margin:.4rem 0 .2rem}
+.chart-table caption{text-align:left;font-family:var(--mono);font-size:.56rem;letter-spacing:.06em;text-transform:uppercase;color:var(--rec);padding:0 0 .3rem}
+.chart-table th,.chart-table td{text-align:right;font-weight:400;padding:.22rem .4rem;border-bottom:1px solid var(--rule);font-variant-numeric:tabular-nums}
+.chart-table th:first-child,.chart-table td:first-child{text-align:left}
+.chart-table thead th{color:var(--rec);font-family:var(--mono);font-size:.54rem;letter-spacing:.06em;text-transform:uppercase}
 .bench-share{font-family:var(--mono);font-size:.62rem;line-height:1.5;color:var(--muted);margin:.55rem 0 0}
 .bench-note{font-family:var(--mono);font-size:.6rem;letter-spacing:.03em;color:var(--rec);margin:.55rem 0 0}
 .stale{margin:0 0 .7rem;padding:.45rem .6rem;background:var(--stale-bg);border:1px solid var(--stale);color:var(--stale);font-size:.74rem;line-height:1.45}
