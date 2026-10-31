@@ -38,8 +38,13 @@ npm install
 curl -sSL -o /tmp/ep.db.gz \
   https://github.com/harbor-initiative/econpulse/releases/download/v0.1.0-data/econpulse-2026.10.db.gz
 mkdir -p data && gunzip -c /tmp/ep.db.gz > data/econpulse.db
+node scripts/fetch-boundaries.mjs   # county and place outlines, 16 MB, four minutes
 npm run serve          # http://127.0.0.1:3100
 ```
+
+The outlines are build output and are not in the repository. Without them every
+map draws its fallback, and the HTML snapshot gate fails on three routes because
+the committed baseline has the map in it. Fetch them before you capture or check.
 
 Running the app needs no API key. The released database is the whole product:
 19,142 places, 321,295 facts, 14 metrics, 109.8 MB, data version 2026.10.
