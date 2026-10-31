@@ -28,5 +28,18 @@ export const METRICS: Record<string, MetricSpec> = {
   unemployment_rate_acs: { label: "Unemployment rate, five-year average", compare: false, countyFallback: false },
 };
 
+/**
+ * Labels for measures the report does not panel.
+ *
+ * The two national series are real facts in the file and appear in the quick
+ * facts and on the method page, so they need a name. They are kept out of
+ * `METRICS`, which is the menu the question box offers: a county has no CPI, and
+ * offering it would produce a question the box cannot answer.
+ */
+export const METRIC_LABELS: Record<string, string> = {
+  cpi: "Consumer price index",
+  mortgage_rate_30y: "30-year fixed mortgage rate",
+};
+
 /** The order the one-page report uses. */
 export const REPORT_ORDER = ["population", "unemployment_rate", "median_gross_rent", "gdp", "federal_obligations"];

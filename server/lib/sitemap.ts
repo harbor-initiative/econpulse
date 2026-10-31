@@ -71,6 +71,7 @@ ${[...states.keys()].map((geoid) => `  <sitemap><loc>${absolute(`/sitemap/state-
 
   const pages = document([
     urlEntry(absolute("/"), lastmod, "1.0"),
+    urlEntry(absolute("/method"), lastmod, "0.5"),
     urlEntry(absolute("/status"), lastmod, "0.3"),
   ]);
 

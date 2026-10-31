@@ -29,6 +29,25 @@ which is fatal for a product whose only claim is provenance.
 - [ ] Names every agency in the file
 - [ ] Reads at a general-audience level, no jargon without a gloss
 
+### What changed while building it
+
+**Section 3 documents the score, and there is no score yet.** #10 builds it. A
+method page that explains a number the site does not show is a page that lies
+in the other direction, so the section is written from the data that exists and
+the score paragraph lands with #10.
+
+**The agency table is a query.** A hand-written list of sources drifts the moment
+a loader changes; this one names what the file actually holds, so a new agency
+appears on the page the day it appears in the data.
+
+**Two national series needed names.** `cpi` and `mortgage_rate_30y` are real
+facts with raw ids. They are labelled in `METRIC_LABELS` rather than added to
+`METRICS`, because `METRICS` is the menu the question box offers and a county
+has no CPI.
+
+**The design gate does not visit this page.** Six routes are measured; `/method`
+is a seventh and belongs there. It is a `scripts/` change, outside this issue.
+
 ## Risks
 
 A method page drifts from the code. The weights are imported from the same module
