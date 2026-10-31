@@ -18,6 +18,10 @@ COPY pipeline/schema.sql ./pipeline/schema.sql
 # nothing to fetch at boot and works with no network at all.
 COPY data/econpulse.db ./data/econpulse.db
 
+# The alias CSVs are read at boot. Without them the server throws before it
+# listens, which is the right failure and a bad deploy.
+COPY data/aliases ./data/aliases
+
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
   CMD node -e "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
