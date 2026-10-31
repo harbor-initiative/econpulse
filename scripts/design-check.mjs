@@ -135,6 +135,7 @@ async function main() {
   let warnings = 0;
 
   try {
+    await page.blockThirdParty();
     for (const route of ROUTES) {
       for (const size of WIDTHS) {
         await page.setViewport(size.width, size.height);
