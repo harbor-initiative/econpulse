@@ -5,6 +5,16 @@ How 35 issues get built by sub-agents without stepping on each other.
 The operator's model, chosen 2026-10-31: **one agent per issue, one branch, one
 pull request.** Everything below exists to make that survivable.
 
+## Decisions taken
+
+| # | Question | Answer |
+|---|---|---|
+| 1 | Who dispatches | the operator's agent, from the working session; sub-agents execute, the operator merges |
+| 2 | The score's peer group | **both** — a county reading and a place reading, shown together |
+| 3 | The name | EconPulse stays; the collision with three other projects is accepted |
+| 4 | Deploy cadence | every merged wave reaches production with a health check and a rollback tag |
+| 5 | The old domain | `econpulse.porbanderwala.cloud` 301s to `econpulse.harborgovcon.com` |
+
 ## The constraint that shapes everything
 
 Measured across the 29 per-issue specs, before the split:

@@ -19,7 +19,7 @@ crumb        10px mono uppercase
 place        28px serif, two-line clamp
 scope        13px: population · share of state · GEOID
 ───────────
-score 46px · label 10px mono · weights 10px mono
+score 46px · label 10px mono · peer reading 10px mono · weights 10px mono
 summary      15px, max 60ch
 ───────────
 receipt      11px, agency in ink, date in grey, 2px teal left rule
@@ -29,6 +29,10 @@ The place name drops from 35px to 28px so the score is the largest number on the
 page. The 90px of dead space above the crumb goes; the top bar owns 56px and the
 crumb begins 16px under it.
 
+The peer reading is the second sentence the operator asked for: **62 among
+counties · 55 among places**, in mono beside the label. The place's own kind is
+the primary score; the other is the secondary reading. A county shows one.
+
 The weights are visible without interaction: `jobs 30 · housing 25 · output 20 ·
 population 15 · federal 10`, linked to `/method`.
 
@@ -36,6 +40,7 @@ population 15 · federal 10`, linked to `/method`.
 
 - [ ] Renders in the order above at 1440×900
 - [ ] Score is the largest number; place name is 28px
+- [ ] Both peer readings render where both exist, labelled
 - [ ] Weights visible without interaction and match `/method`
 - [ ] One receipt above the fold, in ink
 - [ ] No empty band above the crumb

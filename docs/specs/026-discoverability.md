@@ -15,7 +15,10 @@ not a screenshot on social.
   not a review.
 - **Sitemap index** over 52 state files, because 51,158 URLs in one file is
   unwieldy for a crawler and for us.
-- **Canonical** on every page, absolute and self-referential.
+- **One canonical host.** `econpulse.harborgovcon.com` is canonical.
+  `econpulse.porbanderwala.cloud` returns a 301 to the same path on the canonical
+  host, added as one line in its Caddy block, and the link on
+  `porbanderwala.cloud` is updated to point at the new host.
 - **Meta description** per place, generated from the name, state and score,
   cached with the summary.
 
@@ -23,7 +26,9 @@ not a screenshot on social.
 
 - [ ] JSON-LD validates with a structured-data validator
 - [ ] `/sitemap.xml` is an index; every child resolves and every URL returns 200
-- [ ] Every page carries its own absolute canonical
+- [ ] Every page carries its own absolute canonical on the canonical host
+- [ ] `econpulse.porbanderwala.cloud/p/42101` 301s to the harborgovcon path
+- [ ] `porbanderwala.cloud` links to the canonical host
 - [ ] `robots.txt` points at the index and sets a crawl delay
 - [ ] No page claims an aggregate rating
 
