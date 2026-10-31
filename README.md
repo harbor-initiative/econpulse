@@ -158,6 +158,7 @@ published file; whoever maintains it holds the keys.
 - [x] Publish the file as a release asset with a checksum
 - [ ] ZIP code coverage
 - [x] Web app — the one-page report
+- [ ] `econpulse.harborgovcon.com` — blocked on a DNS record, see [deploy/README.md](deploy/README.md)
 - [ ] MCP server
 - [ ] Automated staleness check
 
@@ -166,6 +167,11 @@ published file; whoever maintains it holds the keys.
 Read [CONTRIBUTING.md](CONTRIBUTING.md). A new source is one file in
 `pipeline/sources/`, one entry in the CLI, and a fixture. The provenance rule is
 not negotiable.
+
+## Deploy
+
+One container, Caddy in front. [deploy/README.md](deploy/README.md) has the
+build, the vhost, and the rollback.
 
 ## Licence
 
