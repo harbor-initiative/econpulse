@@ -24,6 +24,17 @@ describes the previous month while the dashed line shows the nation.
 - [ ] The delta names the comparison it is against
 - [ ] Chart and delta are produced by one function, asserted in a test
 
+### What changed while building it
+
+The delta now measures the comparison the chart draws. It used to read
+`−0.9 pts vs 2026-08`, a change since the previous month, beside a dashed line
+that showed the nation. Both statements were true and together they were
+misleading, which is the failure mode the spec named.
+
+With two series the delta is `+0.3 pts above the United States`. With one series
+it stays a change since the previous period. `seriesReadout()` returns the chart,
+the legend and the delta from the same two arrays, so they cannot disagree.
+
 ## Risks
 
 A legend that lists series in a different order from the draw order is worse than

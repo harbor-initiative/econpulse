@@ -9,7 +9,7 @@
 import type { Fact } from "../store.ts";
 import { esc } from "./layout.ts";
 import { formatValue } from "./format.ts";
-import { lineChart, barChart, compareBars, shareBar } from "./charts.ts";
+import { seriesReadout, compareBars, shareBar } from "./charts.ts";
 import { ageInDays, bandOf } from "../lib/freshness.ts";
 /**
  * Units where three values belong on one axis.
@@ -115,22 +115,18 @@ export function renderPanel(panel: Panel): string {
   const { fact, history, comparison, comparisonLabel } = panel;
   const full = panel.metric === "federal_obligations" ? " full" : "";
 
-  let chart = "";
-  if (history.length > 1) {
-    const values = history.map((h) => h.value);
-    const compareValues = comparison.length === history.length ? comparison.map((c) => c.value) : [];
-    const isCount = panel.metric === "federal_obligations";
-    chart = isCount
-      ? barChart(values, history.map((h) => h.period))
-      : lineChart(values, compareValues) +
-        `<div class="years"><span>${esc(history[0]?.period ?? "")}</span><span>${esc(history[history.length - 1]?.period ?? "")}</span></div>`;
-  }
+  const readout = history.length > 1
+    ? seriesReadout(history, comparison, comparisonLabel, { isCount: panel.metric === "federal_obligations" })
+    : null;
+  const chart = readout ? readout.chart + readout.legend : "";
   // A panel with one value used to draw a two-row comparison here. The
   // benchmark block below is that comparison, with the state added and with the
   // absent rows named, so drawing it twice would be two scales for one fact.
 
+  // One source for the chart, the legend and the delta. `delta()` is the
+  // fallback for a panel with a series but no comparison to draw.
   const prev = history.length > 1 ? (history[history.length - 2] ?? null) : null;
-  const deltaText = prev ? delta(fact, prev) : "";
+  const deltaText = readout ? readout.delta : prev ? delta(fact, prev) : "";
 
   // Staleness is a property of this panel's source, so it is announced here and
   // nowhere else. A page with one old series is not a stale page.
