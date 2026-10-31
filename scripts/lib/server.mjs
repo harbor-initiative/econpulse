@@ -24,7 +24,10 @@ export async function startServer({ port, env = {}, timeoutMs = 30_000 } = {}) {
     throw new Error("data/econpulse.db is missing. See AGENTS.md for where it comes from.");
   }
 
-  const child = spawn("npx", ["tsx", "server/index.ts"], {
+  // The local binary rather than npx: `npx` in a clean container can decide to
+  // resolve a package over the network, and a gate that waits on npm is a gate
+  // that hangs in CI.
+  const child = spawn(path.join(ROOT, "node_modules", ".bin", "tsx"), ["server/index.ts"], {
     cwd: ROOT,
     env: {
       ...process.env,

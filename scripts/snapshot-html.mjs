@@ -77,7 +77,9 @@ async function main() {
     await mkdir(OUT, { recursive: true });
 
     for (const route of ROUTES) {
-      const response = await fetch(`${server.base}${route.path}`, { redirect: "manual" });
+      // Bounded. A server that accepts a connection and never answers used to
+      // hang this script for the length of undici's default timeout, per route.
+      const response = await fetch(`${server.base}${route.path}`, { redirect: "manual", signal: AbortSignal.timeout(20_000) });
       const body = await response.text();
       index[route.slug] = {
         status: response.status,
