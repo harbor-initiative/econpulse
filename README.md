@@ -67,7 +67,7 @@ FROM fact_view WHERE geoid = '42101';
 ```
 
 Geographies use the Census GEOID: a county is `42101`, a state is `42`, a place
-is `4210100000`, and the country is `0100000US`.
+is `4260000` (Philadelphia city), and the country is `0100000US`.
 
 ## Rebuild it
 
@@ -86,6 +86,23 @@ npm run verify            # the gate
 
 `npm run load` rebuilds from zero. `npm run load --only=bls` adds one source
 without touching the rest. `npm run load --keep` adds without clearing.
+
+## Ask a question
+
+The box takes a place or a question. A place gets the full report. A question
+gets one card.
+
+```
+Is rent going up in Austin
+Population of Cook County
+Federal money in Philadelphia
+```
+
+Most questions are answered **without a model**. The parser finds the measure
+from a keyword table and the place from the local index, then runs a query. A
+model is consulted only when that fails, only when `OPENROUTER_API_KEY` is set,
+and it may only choose an id from a menu. It never sees a value and never
+produces one, so a wrong choice yields the wrong question, not a wrong number.
 
 ## Run the site
 
@@ -158,8 +175,8 @@ published file; whoever maintains it holds the keys.
 - [x] Publish the file as a release asset with a checksum
 - [ ] ZIP code coverage
 - [x] Web app — the one-page report
-- [ ] `econpulse.harborgovcon.com` — blocked on a DNS record, see [deploy/README.md](deploy/README.md)
-- [ ] MCP server
+- [x] `econpulse.harborgovcon.com` behind Caddy
+- [x] MCP server
 - [ ] Automated staleness check
 
 ## Contributing
@@ -167,6 +184,35 @@ published file; whoever maintains it holds the keys.
 Read [CONTRIBUTING.md](CONTRIBUTING.md). A new source is one file in
 `pipeline/sources/`, one entry in the CLI, and a fixture. The provenance rule is
 not negotiable.
+
+## Use it from an agent
+
+`server/mcp.ts` speaks MCP over stdio and exposes seven tools:
+
+| Tool | What it answers |
+|---|---|
+| `search_places` | GEOIDs for a name, county, or ZIP |
+| `get_place` | Everything about one place, with a receipt on each value |
+| `get_metric` | One series, oldest first |
+| `compare_places` | Two to five places side by side |
+| `list_metrics` | Every measure, its unit, and its direction |
+| `describe_data` | What is in the file, and what it does not cover |
+| `county_for_place` | The county a city sits in |
+
+```json
+{
+  "mcpServers": {
+    "econpulse": {
+      "command": "npx",
+      "args": ["tsx", "/absolute/path/to/econpulse/server/mcp.ts"]
+    }
+  }
+}
+```
+
+Every tool returns the agency, the dataset, the vintage, and the retrieval date
+alongside the number. An agent that quotes a figure without those is doing the
+thing this project exists to prevent.
 
 ## Deploy
 

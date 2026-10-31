@@ -116,7 +116,7 @@ export function countyForPlace(db: DatabaseSync, place: Place): Place | null {
        WHERE kind = 'county' AND state_code = ? AND name LIKE ? COLLATE NOCASE
        ORDER BY population DESC LIMIT 1`,
     )
-    .get(place.state_code, `${base} County`) as unknown as Place | undefined;
+    .get(place.state_code, `%${base} County%`) as unknown as Place | undefined;
   return row ?? null;
 }
 

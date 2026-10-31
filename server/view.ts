@@ -181,15 +181,15 @@ export function home(): string {
     `<div class="hero">
       <h1>How is your town doing?</h1>
       <p class="lede">Type a place. Every number carries its source and the date it was pulled.</p>
-      <form class="search" action="/s" method="get">
-        <input type="search" name="q" placeholder="Philadelphia, Cook County, or 19104" autofocus aria-label="Place">
+      <form class="search" action="/ask" method="get">
+        <input type="search" name="q" placeholder="Philadelphia, or is rent going up here?" autofocus aria-label="Place or question">
         <div class="hint"><span>No account</span><span>·</span><span>Runs offline</span><span>·</span><span>Free</span></div>
       </form>
       <div class="chips">
-        <a class="chip" href="/s?q=Philadelphia">Philadelphia</a>
-        <a class="chip" href="/s?q=Cook%20County">Cook County</a>
-        <a class="chip" href="/s?q=19104">19104</a>
-        <a class="chip" href="/s?q=Kansas%20City">Kansas City</a>
+        <a class="chip" href="/ask?q=Philadelphia">Philadelphia</a>
+        <a class="chip" href="/ask?q=Cook%20County">Cook County</a>
+        <a class="chip" href="/ask?q=Is%20rent%20going%20up%20in%20Austin">Is rent going up in Austin?</a>
+        <a class="chip" href="/ask?q=Federal%20money%20in%20Philadelphia">Federal money in Philadelphia</a>
       </div>
     </div>`,
   );
@@ -296,5 +296,52 @@ export function status(counts: { places: number; facts: number; metrics: number 
     `<p class="crumb">Status</p><h1 style="font-size:1.6rem">What is in the file</h1>
      <p class="sub">${counts.places.toLocaleString("en-US")} places · ${counts.facts.toLocaleString("en-US")} facts · ${counts.metrics} metrics</p>
      <ul class="results">${rows}</ul>`,
+  );
+}
+
+export function askCard(
+  question: string,
+  place: Place,
+  panel: Panel,
+  followUps: Array<{ label: string; href: string }>,
+): string {
+  const body = renderPanel(panel);
+  return shell(
+    `${question} — EconPulse`,
+    `<p class="crumb">You asked · ${esc(place.name)}${place.state_code ? `, ${esc(place.state_code)}` : ""}</p>
+     <h1 class="place" style="font-size:1.6rem;max-width:24ch">${esc(question)}</h1>
+     <div class="grid" style="grid-template-columns:1fr;margin-top:1.2rem">${body}</div>
+     <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:1.2rem">
+       ${followUps.map((f) => `<a class="chip" href="${esc(f.href)}">${esc(f.label)}</a>`).join("")}
+       <a class="chip" href="/p/${esc(place.geoid)}">Full report</a>
+     </div>`,
+  );
+}
+
+export function askNeedPlace(question: string, metricLabel: string | null, examples: string[]): string {
+  return shell(
+    `Which place? — EconPulse`,
+    `<p class="crumb">You asked</p>
+     <h1 class="place" style="font-size:1.6rem">${esc(question)}</h1>
+     <p class="sub">${metricLabel ? `I can answer that with ${esc(metricLabel.toLowerCase())}, but I need a place.` : "I need a place to answer that."}</p>
+     <form class="search" action="/ask" method="get" style="margin-left:0">
+       <input type="search" name="q" value="${esc(question)}" aria-label="Try again with a place">
+     </form>
+     <div class="chips" style="justify-content:flex-start">${examples
+       .map((e) => `<a class="chip" href="/ask?q=${encodeURIComponent(e)}">${esc(e)}</a>`)
+       .join("")}</div>`,
+  );
+}
+
+export function askNeedMetric(question: string, place: Place, metrics: Array<{ id: string; label: string }>): string {
+  return shell(
+    `${place.name} — EconPulse`,
+    `<p class="crumb">You asked</p>
+     <h1 class="place" style="font-size:1.6rem">${esc(question)}</h1>
+     <p class="sub">I found ${esc(place.name)}. Pick a measure, or open the full report.</p>
+     <div class="chips" style="justify-content:flex-start;margin-top:1rem">
+       ${metrics.map((m) => `<a class="chip" href="/ask?q=${encodeURIComponent(`${m.label} in ${place.name}`)}">${esc(m.label)}</a>`).join("")}
+       <a class="chip" href="/p/${esc(place.geoid)}">Full report</a>
+     </div>`,
   );
 }
