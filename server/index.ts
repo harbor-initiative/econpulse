@@ -3,7 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import { URL } from "node:url";
 import {
   openStore, storePath, getPlace, searchPlaces, series, metricsFor,
-  countyForPlace, counts, buildMeta, type Place, type Fact,
+  countyForPlace, lookupZip, counts, buildMeta, type Place, type Fact,
 } from "./store.ts";
 import { home, searchResults, report, status, shell, askCard, askNeedPlace, askNeedMetric, type Panel } from "./view.ts";
 import { parseQuestion, askModel } from "./ask.ts";
@@ -127,6 +127,14 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
       const question = (url.searchParams.get("q") ?? "").trim();
       if (!question) return redirect(res, "/");
 
+      if (/^\d{5}$/.test(question)) {
+        const county = lookupZip(db, question);
+        if (county) return redirect(res, `/p/${county.geoid}?zip=${question}`);
+        return send(res, 404, askNeedPlace(question, null, [
+          "Try a county name instead", "20744", "Is rent going up in Austin",
+        ]));
+      }
+
       const parsed = parseQuestion(db, question);
       let place = parsed.place;
       let metric = parsed.metric;
@@ -148,6 +156,7 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
         return send(res, 404, askNeedPlace(question, metric ? (METRICS[metric]?.label ?? metric) : null, examples));
       }
 
+      const notice: string | undefined = undefined;
       const ctx = contextFor(place);
 
       if (!metric) {
@@ -178,7 +187,7 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
           href: `/ask?q=${encodeURIComponent(`${METRICS[m]?.label ?? m} in ${place?.name}`)}`,
         }));
 
-      return send(res, 200, askCard(question, place, panel, followUps));
+      return send(res, 200, askCard(question, place, panel, followUps, notice));
     }
 
     const match = path.match(/^\/p\/(\d{2,11})$/);
@@ -187,7 +196,11 @@ async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> 
       if (!place) {
         return send(res, 404, shell("Not found", `<h1 class="place">Not found</h1><p class="sub">No place with GEOID ${match[1]}.</p>`));
       }
-      return send(res, 200, report(place, buildPanels(place), meta));
+      const zip = url.searchParams.get("zip");
+      const notice = zip && /^\d{5}$/.test(zip)
+        ? `ZIP ${zip}. ZIP codes are postal, not civic, so these figures are for ${place.name}.`
+        : undefined;
+      return send(res, 200, report(place, buildPanels(place), meta, notice));
     }
 
     return send(res, 404, shell("Not found", `<h1 class="place">Not found</h1><p class="sub">That page does not exist. <a href="/">Start again</a>.</p>`));

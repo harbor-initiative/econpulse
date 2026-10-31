@@ -1,4 +1,4 @@
-import { fetchJson, requireEnv, today } from "../fetch.ts";
+import { fetchJson, fetchText, requireEnv, today } from "../fetch.ts";
 import type { DatabaseSync } from "node:sqlite";
 import { insertPlaces, makeFactWriter, type FactRow } from "../db.ts";
 
@@ -72,6 +72,9 @@ const STATE_CODES: Record<string, string> = {
   "54": "WV", "55": "WI", "56": "WY", "60": "AS", "66": "GU", "69": "MP", "72": "PR", "78": "VI",
 };
 
+const ZCTA_COUNTY_URL =
+  "https://www2.census.gov/geo/docs/maps-data/data/rel2020/zcta520/tab20_zcta520_county20_natl.txt";
+
 type Level = "state" | "county" | "place" | "us";
 type Row = Record<string, string>;
 
@@ -114,6 +117,40 @@ async function getLevel(level: Level, dataset: "acs5" | "acs5/profile", variable
   const geography = level === "us" ? "for=us:1" : `for=${level}:*`;
   const url = `https://api.census.gov/data/${YEAR}/acs/${dataset}?get=${get}&${geography}&key=${key}`;
   return parseTable(await fetchJson<unknown>(url, { retries: 2 }));
+}
+
+/**
+ * ZIP codes are postal, not civic, so a ZCTA does not get its own facts. It
+ * gets a parent: the county that holds most of its land. The report for a ZIP
+ * is then the county report, labelled with the ZIP, which is both honest and
+ * what the person typing their ZIP actually wanted.
+ */
+export async function loadZctaCounties(db: DatabaseSync, counties: Set<string>): Promise<number> {
+  const text = await fetchText(ZCTA_COUNTY_URL);
+  const lines = text.replace(/^\uFEFF/, "").split("\n");
+  const header = lines[0]?.split("|") ?? [];
+  const zIdx = header.indexOf("GEOID_ZCTA5_20");
+  const cIdx = header.indexOf("GEOID_COUNTY_20");
+  const landIdx = header.indexOf("AREALAND_PART");
+  if (zIdx < 0 || cIdx < 0 || landIdx < 0) throw new Error("ZCTA relationship file changed shape");
+
+  // One county per ZIP: whichever holds the most land.
+  const best = new Map<string, { county: string; land: number }>();
+  for (const line of lines.slice(1)) {
+    const cells = line.split("|");
+    const zcta = cells[zIdx]?.trim();
+    const county = cells[cIdx]?.trim();
+    if (!zcta || !county || !counties.has(county)) continue;
+    const land = Number(cells[landIdx] ?? 0) || 0;
+    const current = best.get(zcta);
+    if (!current || land > current.land) best.set(zcta, { county, land });
+  }
+
+  const stmt = db.prepare(
+    "INSERT INTO zcta (zcta, county_geoid) VALUES (?, ?) ON CONFLICT(zcta) DO UPDATE SET county_geoid = excluded.county_geoid",
+  );
+  for (const [zcta, { county }] of best) stmt.run(zcta, county);
+  return best.size;
 }
 
 export async function loadCensus(db: DatabaseSync): Promise<{ places: number; facts: number; skipped: number }> {
@@ -200,6 +237,14 @@ export async function loadCensus(db: DatabaseSync): Promise<{ places: number; fa
   for (const level of levels) emit(level, PROFILE, profile[level], `${DATASET}, Data Profile`);
 
   writer.commit();
+
+  const counties = new Set(
+    (db.prepare("SELECT geoid FROM place WHERE kind = 'county'").all() as unknown as Array<{ geoid: string }>)
+      .map((r) => r.geoid),
+  );
+  const zctas = await loadZctaCounties(db, counties);
+  console.log(`  zcta    ${zctas.toLocaleString()} ZIP codes mapped to counties`);
+
   if (skipped) console.log(`  dropped ${skipped.toLocaleString()} places under ${MIN_PLACE_POPULATION.toLocaleString()} people`);
-  return { places: places.length, facts, skipped };
+  return { places: places.length + zctas, facts, skipped };
 }

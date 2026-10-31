@@ -122,6 +122,10 @@ export async function askModel(
   const key = process.env.OPENROUTER_API_KEY;
   if (!key) return null;
 
+  // openrouter/free is a router, not a model: it picks whichever free model is
+  // available, so one provider going down does not break the box.
+  const model = process.env.ECONPULSE_MODEL ?? process.env.OPENROUTER_MODEL ?? "openrouter/free";
+
   const candidates = searchPlaces(db, question.slice(0, 60), 5);
   const placeMenu = candidates.map((p) => `${p.geoid}: ${p.name}${p.state_code ? `, ${p.state_code}` : ""}`);
   const metricMenu = metrics.map((m) => `${m.id}: ${m.label}`);
@@ -142,7 +146,10 @@ export async function askModel(
       signal: controller.signal,
       headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
       body: JSON.stringify({
-        model: process.env.OPENROUTER_MODEL ?? "google/gemini-2.0-flash-exp:free",
+        model,
+        // Do not train on a civic question. Providers that cannot comply are
+        // skipped rather than silently used.
+        provider: { data_collection: "deny" },
         messages: [{ role: "user", content: prompt }],
         temperature: 0,
         max_tokens: 120,

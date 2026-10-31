@@ -52,6 +52,19 @@ export async function fetchJson<T>(url: string, options: FetchOptions = {}): Pro
   throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
+/** Plain text, for the Census relationship files. */
+export async function fetchText(url: string, timeoutMs = 120_000): Promise<string> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) throw new FetchError(`${response.status} ${response.statusText}`, response.status, url);
+    return await response.text();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -16,6 +16,7 @@ export interface Place {
   name: string;
   short_name: string | null;
   state_code: string | null;
+  parent_geoid?: string | null;
   population: number | null;
 }
 
@@ -50,7 +51,7 @@ export function storePath(): string {
 
 export function getPlace(db: DatabaseSync, geoid: string): Place | null {
   const row = db
-    .prepare("SELECT geoid, kind, name, short_name, state_code, population FROM place WHERE geoid = ?")
+    .prepare("SELECT geoid, kind, name, short_name, state_code, parent_geoid, population FROM place WHERE geoid = ?")
     .get(geoid) as unknown as Place | undefined;
   return row ?? null;
 }
@@ -62,7 +63,7 @@ export function searchPlaces(db: DatabaseSync, query: string, limit = 12): Place
   // A GEOID or a ZIP is an exact lookup, not a name match.
   if (/^\d{2,11}$/.test(q)) {
     const exact = db
-      .prepare("SELECT geoid, kind, name, short_name, state_code, population FROM place WHERE geoid = ?")
+      .prepare("SELECT geoid, kind, name, short_name, state_code, parent_geoid, population FROM place WHERE geoid = ?")
       .get(q) as unknown as Place | undefined;
     if (exact) return [exact];
   }
@@ -70,7 +71,7 @@ export function searchPlaces(db: DatabaseSync, query: string, limit = 12): Place
   const like = `%${q.replace(/[%_]/g, "")}%`;
   return db
     .prepare(
-      `SELECT geoid, kind, name, short_name, state_code, population
+      `SELECT geoid, kind, name, short_name, state_code, parent_geoid, population
        FROM place
        WHERE name LIKE ? COLLATE NOCASE OR short_name LIKE ? COLLATE NOCASE
        ORDER BY
@@ -112,12 +113,21 @@ export function countyForPlace(db: DatabaseSync, place: Place): Place | null {
   if (base.length < 3) return null;
   const row = db
     .prepare(
-      `SELECT geoid, kind, name, short_name, state_code, population FROM place
+      `SELECT geoid, kind, name, short_name, state_code, parent_geoid, population FROM place
        WHERE kind = 'county' AND state_code = ? AND name LIKE ? COLLATE NOCASE
        ORDER BY population DESC LIMIT 1`,
     )
     .get(place.state_code, `%${base} County%`) as unknown as Place | undefined;
   return row ?? null;
+}
+
+/** A ZIP resolves to the county that holds most of its land. */
+export function lookupZip(db: DatabaseSync, zip: string): Place | null {
+  if (!/^\d{5}$/.test(zip)) return null;
+  const row = db.prepare("SELECT county_geoid FROM zcta WHERE zcta = ?").get(zip) as unknown as
+    | { county_geoid: string }
+    | undefined;
+  return row ? getPlace(db, row.county_geoid) : null;
 }
 
 export function counts(db: DatabaseSync): { places: number; facts: number; metrics: number } {

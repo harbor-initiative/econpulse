@@ -98,6 +98,10 @@ Population of Cook County
 Federal money in Philadelphia
 ```
 
+The model is pinned to `openrouter/free`, a router that picks whichever free
+model is up, so no single provider going down breaks the box. Override with
+`ECONPULSE_MODEL`. Provider data collection is denied.
+
 Most questions are answered **without a model**. The parser finds the measure
 from a keyword table and the place from the local index, then runs a query. A
 model is consulted only when that fails, only when `OPENROUTER_API_KEY` is set,

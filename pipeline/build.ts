@@ -72,7 +72,7 @@ async function main(): Promise<void> {
   // A single-source run adds to the file; only a full rebuild wipes it.
   if (!only) {
     db.exec("BEGIN");
-    db.exec("DELETE FROM fact; DELETE FROM place; DELETE FROM metric;");
+    db.exec("DELETE FROM fact; DELETE FROM place; DELETE FROM metric; DELETE FROM zcta;");
     db.exec("COMMIT");
   }
 

@@ -39,6 +39,16 @@ CREATE TABLE IF NOT EXISTS metric (
   description  TEXT
 );
 
+-- ZIP codes are postal, not civic. A ZCTA is mapped to the county that holds
+-- most of its land, and is kept out of `place` so a 5-digit ZCTA can never
+-- collide with a 5-digit county FIPS.
+CREATE TABLE IF NOT EXISTS zcta (
+  zcta         TEXT PRIMARY KEY,
+  county_geoid TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS zcta_county_idx ON zcta(county_geoid);
+
 -- ---------------------------------------------------------------------------
 -- Facts
 -- ---------------------------------------------------------------------------

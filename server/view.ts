@@ -137,6 +137,7 @@ svg{display:block;width:100%;height:54px;margin:.85rem 0 .1rem;overflow:visible}
 .years{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.55rem;color:#6B7578;margin:.1rem 0 0}
 .rec{margin:.6rem 0 0;padding-left:.55rem;border-left:2px solid #BFDBD7;font-family:var(--mono);font-size:.58rem;line-height:1.5;color:var(--rec)}
 .rec b{font-weight:400;text-transform:uppercase;letter-spacing:.09em;color:var(--teal-ink)}
+.notice{background:#F2F7F6;border-left:3px solid var(--teal);padding:.6rem .8rem;margin:0 0 1rem;font-size:.82rem;color:var(--teal-ink)}
 .compare{margin:.9rem 0 .2rem}
 .crow{display:flex;align-items:center;gap:.6rem;margin:.28rem 0;font-size:.76rem;color:var(--muted)}
 .cl{width:7.5rem;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -227,7 +228,7 @@ export interface Panel {
   note?: string;
 }
 
-export function report(place: Place, panels: Panel[], meta: Record<string, string>): string {
+export function report(place: Place, panels: Panel[], meta: Record<string, string>, notice?: string): string {
   const cards = panels.map((panel) => renderPanel(panel)).join("");
   const placeSub = [
     place.state_code,
@@ -238,6 +239,7 @@ export function report(place: Place, panels: Panel[], meta: Record<string, strin
   return shell(
     `${place.name} — EconPulse`,
     `<p class="crumb">${esc(place.kind)}</p>
+     ${notice ? `<p class="notice">${esc(notice)}</p>` : ""}
      <h1 class="place">${esc(place.name)}</h1>
      <p class="sub">${esc(placeSub)}</p>
      <div class="tools"><span class="tv">data ${esc(meta["data.version"] ?? "?")} · built ${esc((meta["build.finished_at"] ?? "").slice(0, 10))}</span>
@@ -304,11 +306,13 @@ export function askCard(
   place: Place,
   panel: Panel,
   followUps: Array<{ label: string; href: string }>,
+  notice?: string,
 ): string {
   const body = renderPanel(panel);
   return shell(
     `${question} — EconPulse`,
     `<p class="crumb">You asked · ${esc(place.name)}${place.state_code ? `, ${esc(place.state_code)}` : ""}</p>
+     ${notice ? `<p class="notice">${esc(notice)}</p>` : ""}
      <h1 class="place" style="font-size:1.6rem;max-width:24ch">${esc(question)}</h1>
      <div class="grid" style="grid-template-columns:1fr;margin-top:1.2rem">${body}</div>
      <div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:1.2rem">
