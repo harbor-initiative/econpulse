@@ -57,7 +57,8 @@ time, always.
 | **L6 Infra** | #20 → #24 → #28 → #27 → #25 → #26 | `lib/ratelimit.ts`, `routes/*`, `deploy/`, `.github/` |
 | **L7 Location** | #16 → #9 | `pipeline/sources/boundaries.ts`, `public/map.js` |
 
-Wave 0 (#35) lands before any lane starts.
+Wave 0 is two steps: #37 (the measurement gate) lands first, then #35 (the
+server split). Neither lane starts until both are on `main`.
 
 **L3 and L4 are the long poles** at eight and five issues. If either becomes the
 constraint, the answer is a second split — `panel.ts` into a shell plus `views/visuals/*`. Adding agents makes the collision worse. Four agents against one file is four people
