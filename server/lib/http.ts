@@ -14,6 +14,21 @@ export function send(res: ServerResponse, code: number, body: string, type = "te
   res.end(body);
 }
 
+/**
+ * A font, or any other byte body that never changes under the same name.
+ *
+ * One year and immutable: the filename is the version, so a changed face is a
+ * changed name and a stale cache cannot serve the wrong glyphs.
+ */
+export function sendBinary(res: ServerResponse, code: number, body: Buffer, type: string): void {
+  res.writeHead(code, {
+    "content-type": type,
+    "content-length": String(body.length),
+    "cache-control": "public, max-age=31536000, immutable",
+  });
+  res.end(body);
+}
+
 export function redirect(res: ServerResponse, location: string): void {
   res.writeHead(302, { location });
   res.end();

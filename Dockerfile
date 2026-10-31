@@ -11,6 +11,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --no-audit --no-fund
 
 COPY server ./server
+COPY public ./public
 COPY pipeline/schema.sql ./pipeline/schema.sql
 
 # The database is the payload. It ships inside the image so the container has
