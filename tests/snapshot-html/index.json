@@ -7,12 +7,12 @@
   "place-county": {
     "status": 200,
     "type": "text/html; charset=utf-8",
-    "bytes": 29991
+    "bytes": 29689
   },
   "place-city": {
     "status": 200,
     "type": "text/html; charset=utf-8",
-    "bytes": 30278
+    "bytes": 29974
   },
   "ask-local": {
     "status": 200,

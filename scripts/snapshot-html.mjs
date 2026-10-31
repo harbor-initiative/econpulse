@@ -39,6 +39,16 @@ const ROUTES = [
 
 const check = process.argv.includes("--check");
 
+/**
+ * The clock the baseline was captured against.
+ *
+ * `/healthz` and `/status` print an age in days, so their HTML changes every
+ * morning. Pinning the clock here makes the comparison about the code rather
+ * than about the date — and a gate that fails for a reason nobody changed is a
+ * gate that gets ignored.
+ */
+const PINNED_NOW = process.env.ECONPULSE_NOW ?? "2026-10-31T12:00:00Z";
+
 function fail(message) {
   console.error(`\n  ${message}\n`);
   process.exit(1);
@@ -58,9 +68,10 @@ function describeDifference(expected, actual) {
 }
 
 async function main() {
-  const server = await startServer({ port: process.env.SNAPSHOT_PORT ?? 3198 });
+  const server = await startServer({ port: process.env.SNAPSHOT_PORT ?? 3198, env: { ECONPULSE_NOW: PINNED_NOW } });
   const failures = [];
   const index = {};
+  console.log(`  clock ${PINNED_NOW}`);
 
   try {
     await mkdir(OUT, { recursive: true });

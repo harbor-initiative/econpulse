@@ -32,6 +32,10 @@ export async function startServer({ port, env = {}, timeoutMs = 30_000 } = {}) {
       HOST: "127.0.0.1",
       // Deterministic output: no model in the loop.
       OPENROUTER_API_KEY: "",
+      // The health and status pages print an age in days. Without a pinned clock
+      // the snapshot gate fails every morning for a reason that is not a
+      // regression, and a gate that cries wolf gets ignored.
+      ECONPULSE_NOW: process.env.ECONPULSE_NOW ?? "",
       ...env,
     },
     stdio: ["ignore", "pipe", "pipe"],
