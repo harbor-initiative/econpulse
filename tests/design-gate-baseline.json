@@ -1,0 +1,488 @@
+[
+  {
+    "slug": "home",
+    "path": "/",
+    "viewport": "desktop",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1 at 40px (\"How is your town doing?\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "home",
+    "path": "/",
+    "viewport": "tablet",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1 at 40px (\"How is your town doing?\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "home",
+    "path": "/",
+    "viewport": "phone",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1 at 32px (\"How is your town doing?\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "place-county",
+    "path": "/p/42101",
+    "viewport": "desktop",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 35.2px (\"Philadelphia County, Pennsylvania\")"
+        ]
+      },
+      {
+        "rule": "G4",
+        "problems": [
+          "svg draws 2 marks and no legend"
+        ]
+      },
+      {
+        "rule": "G6",
+        "problems": [
+          "no [data-number] element on a report page"
+        ]
+      },
+      {
+        "rule": "G8",
+        "problems": [
+          "div.metric (\"Population\") is a value and a receipt"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0.0222
+  },
+  {
+    "slug": "place-county",
+    "path": "/p/42101",
+    "viewport": "tablet",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 35.2px (\"Philadelphia County, Pennsylvania\")"
+        ]
+      },
+      {
+        "rule": "G4",
+        "problems": [
+          "svg draws 2 marks and no legend"
+        ]
+      },
+      {
+        "rule": "G6",
+        "problems": [
+          "no [data-number] element on a report page"
+        ]
+      },
+      {
+        "rule": "G8",
+        "problems": [
+          "div.metric (\"Population\") is a value and a receipt"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0.00798
+  },
+  {
+    "slug": "place-county",
+    "path": "/p/42101",
+    "viewport": "phone",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 25.6px (\"Philadelphia County, Pennsylvania\")"
+        ]
+      },
+      {
+        "rule": "G4",
+        "problems": [
+          "svg draws 2 marks and no legend"
+        ]
+      },
+      {
+        "rule": "G6",
+        "problems": [
+          "no [data-number] element on a report page"
+        ]
+      },
+      {
+        "rule": "G8",
+        "problems": [
+          "div.metric (\"Population\") is a value and a receipt"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0.0113
+  },
+  {
+    "slug": "place-city",
+    "path": "/p/4260000",
+    "viewport": "desktop",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 35.2px (\"Philadelphia city, Pennsylvania\")"
+        ]
+      },
+      {
+        "rule": "G4",
+        "problems": [
+          "svg draws 2 marks and no legend"
+        ]
+      },
+      {
+        "rule": "G6",
+        "problems": [
+          "no [data-number] element on a report page"
+        ]
+      },
+      {
+        "rule": "G8",
+        "problems": [
+          "div.metric (\"Population\") is a value and a receipt"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0.0222
+  },
+  {
+    "slug": "place-city",
+    "path": "/p/4260000",
+    "viewport": "tablet",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 35.2px (\"Philadelphia city, Pennsylvania\")"
+        ]
+      },
+      {
+        "rule": "G4",
+        "problems": [
+          "svg draws 2 marks and no legend"
+        ]
+      },
+      {
+        "rule": "G6",
+        "problems": [
+          "no [data-number] element on a report page"
+        ]
+      },
+      {
+        "rule": "G8",
+        "problems": [
+          "div.metric (\"Population\") is a value and a receipt"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0.00798
+  },
+  {
+    "slug": "place-city",
+    "path": "/p/4260000",
+    "viewport": "phone",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 25.6px (\"Philadelphia city, Pennsylvania\")"
+        ]
+      },
+      {
+        "rule": "G4",
+        "problems": [
+          "svg draws 2 marks and no legend"
+        ]
+      },
+      {
+        "rule": "G6",
+        "problems": [
+          "no [data-number] element on a report page"
+        ]
+      },
+      {
+        "rule": "G8",
+        "problems": [
+          "div.metric (\"Population\") is a value and a receipt"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0.0113
+  },
+  {
+    "slug": "ask-question",
+    "path": "/ask?q=Is+rent+going+up+in+Austin",
+    "viewport": "desktop",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 25.6px (\"Is rent going up in Austin\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "ask-question",
+    "path": "/ask?q=Is+rent+going+up+in+Austin",
+    "viewport": "tablet",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 25.6px (\"Is rent going up in Austin\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "ask-question",
+    "path": "/ask?q=Is+rent+going+up+in+Austin",
+    "viewport": "phone",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 25.6px (\"Is rent going up in Austin\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "status",
+    "path": "/status",
+    "viewport": "desktop",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1 at 25.6px (\"What is in the file\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "status",
+    "path": "/status",
+    "viewport": "tablet",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1 at 25.6px (\"What is in the file\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "status",
+    "path": "/status",
+    "viewport": "phone",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1 at 25.6px (\"What is in the file\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "not-found",
+    "path": "/nope",
+    "viewport": "desktop",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 35.2px (\"Not found\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "not-found",
+    "path": "/nope",
+    "viewport": "tablet",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 35.2px (\"Not found\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  },
+  {
+    "slug": "not-found",
+    "path": "/nope",
+    "viewport": "phone",
+    "failures": [
+      {
+        "rule": "G3",
+        "problems": [
+          "h1.place at 25.6px (\"Not found\")"
+        ]
+      },
+      {
+        "rule": "G9",
+        "problems": [
+          "the top bar carries no search input"
+        ]
+      }
+    ],
+    "warnings": [],
+    "colour": 0
+  }
+]

@@ -29,6 +29,7 @@ file.
 | **#36** | **The factory** | **P0** | [../FACTORY.md](../FACTORY.md) |
 | **#35** | **Server split** | **P0** | [035-server-split.md](035-server-split.md) |
 | **#34** | **Design clean-up** | **P1** | [epic](../remediation/specs/05-design-system.md) |
+| #37 | The measurement gate | P1 | [037-design-gate.md](037-design-gate.md) |
 | #29 | Panel substance | P1 | [029-panel-substance.md](029-panel-substance.md) |
 | #30 | Legends | P1 | [030-legends.md](030-legends.md) |
 | #31 | Docked search | P1 | [031-docked-search.md](031-docked-search.md) |
