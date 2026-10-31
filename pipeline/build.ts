@@ -2,6 +2,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { openDb, migrate, setBuildMeta, getBuildMeta, ROOT, DB_PATH } from "./db.ts";
+import { loadPercentiles } from "./percentile.ts";
 import { loadCensus } from "./sources/census.ts";
 import { loadBls } from "./sources/bls.ts";
 import { loadBea } from "./sources/bea.ts";
@@ -102,6 +103,11 @@ async function main(): Promise<void> {
     "build.sources": loaded.join(" · "),
     "build.source_count": String(loaded.length),
   });
+
+  // Percentiles come after every source, because they describe the whole file.
+  const percentiles = loadPercentiles(db);
+  const scored = new Set(percentiles.map((row) => row.geoid)).size;
+  console.log(`\n  ${percentiles.length.toLocaleString()} percentiles across ${scored.toLocaleString()} places`);
 
   db.exec("ANALYZE");
   db.exec("VACUUM");
