@@ -44,13 +44,26 @@ export interface Fact {
 
 export function openStore(path: string): DatabaseSync {
   if (!existsSync(path)) {
-    throw new Error(`No database at ${path}. Download the release file or run \`npm run load\`.`);
+    throw new Error(
+      [
+        `No database at ${path}.`,
+        "Set ECONPULSE_DB to the file, or put it at data/econpulse.db.",
+        "Download the release artifact from the data release, or run `npm run load` with the four API keys.",
+      ].join(" "),
+    );
   }
   const db = new DatabaseSync(path, { readOnly: true });
   db.exec("PRAGMA query_only = ON;");
   return db;
 }
 
+/**
+ * Where the file is.
+ *
+ * `ECONPULSE_DB` wins, so a container can mount a release at `/data` and swap it
+ * without rebuilding the image. The default is the baked copy, which is what a
+ * single-container reader gets.
+ */
 export function storePath(): string {
   return process.env.ECONPULSE_DB ?? resolve(import.meta.dirname, "..", "data", "econpulse.db");
 }

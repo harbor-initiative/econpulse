@@ -58,12 +58,56 @@ ssh wala-srv '
 '
 ```
 
+## Two ways to carry the file
+
+The database is 110 MB and it changes on a different schedule from the code. Both
+of these are supported; production uses the second.
+
+### Baked, the default
+
+The Dockerfile copies `data/econpulse.db` into the image. One artifact, nothing
+to mount, and it works with no network at all. Refreshing the data means
+rebuilding, which is the reason the second path exists.
+
+### Mounted, production
+
+```bash
+docker run -d --name econpulse --restart unless-stopped \
+  -p 127.0.0.1:3001:3000 \
+  -v /srv/econpulse:/data:ro \
+  -e ECONPULSE_DB=/data/econpulse.db \
+  econpulse:0.11.0
+```
+
+The server opens the file read-only at boot, so a swap needs a restart and that
+is acceptable: a restart is two seconds and a rebuild is ten minutes.
+
+## Refreshing the data without a rebuild
+
+```bash
+ssh wala-srv '
+  set -e
+  curl -sSL -o /tmp/econpulse.db.gz \
+    https://github.com/harbor-initiative/econpulse/releases/latest/download/econpulse-2026.10.db.gz
+  gunzip -c /tmp/econpulse.db.gz > /srv/econpulse/econpulse.db.new
+  mv /srv/econpulse/econpulse.db.new /srv/econpulse/econpulse.db
+  docker restart econpulse
+  sleep 3
+  curl -s http://127.0.0.1:3001/healthz
+'
+```
+
+`mv` rather than a write in place, so the container never opens a half-written
+file. The restart is what picks the new one up.
+
 ## Checks after a deploy
 
 ```bash
-curl -s https://econpulse.porbanderwala.cloud/healthz
-curl -s https://econpulse.porbanderwala.cloud/p/42101 | grep -o '<title>[^<]*'
+curl -s https://econpulse.harborgovcon.com/healthz
+curl -s https://econpulse.harborgovcon.com/p/42101 | grep -o '<title>[^<]*'
 ```
 
 The health check returns the data version, which is the number that tells you
-whether the file inside the container is the one you meant to ship.
+whether the file inside the container is the one you meant to ship. It also
+returns the age in days and the band, so a swap that served an old file shows up
+in the same request.
