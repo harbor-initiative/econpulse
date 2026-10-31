@@ -19,16 +19,33 @@ export type FreshnessBand = "fresh" | "aging" | "stale";
 const DAY_MS = 86_400_000;
 
 /**
+ * The clock, with one override.
+ *
+ * `/healthz` and `/status` print an age in days, which means their rendered HTML
+ * changes every day and the snapshot gate would fail every morning for a reason
+ * that is not a regression. `ECONPULSE_NOW` pins the clock for the snapshot run;
+ * the product never sets it.
+ */
+export function now(): Date {
+  const pinned = process.env.ECONPULSE_NOW;
+  if (pinned) {
+    const parsed = new Date(pinned);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  return new Date();
+}
+
+/**
  * Whole days between a retrieval date and now.
  *
  * A retrieval date in the future clamps to zero. The build date and the machine
  * clock disagree often enough that a negative age would otherwise render as
  * "-1 days ago" on a page a reader is meant to trust.
  */
-export function ageInDays(retrievedAt: string, now: Date = new Date()): number {
+export function ageInDays(retrievedAt: string, at: Date = now()): number {
   const then = Date.parse(`${retrievedAt}T00:00:00Z`);
   if (Number.isNaN(then)) return 0;
-  return Math.max(0, Math.floor((now.getTime() - then) / DAY_MS));
+  return Math.max(0, Math.floor((at.getTime() - then) / DAY_MS));
 }
 
 export function bandFor(ageDays: number): FreshnessBand {
@@ -37,8 +54,8 @@ export function bandFor(ageDays: number): FreshnessBand {
   return "fresh";
 }
 
-export function bandOf(retrievedAt: string, now: Date = new Date()): FreshnessBand {
-  return bandFor(ageInDays(retrievedAt, now));
+export function bandOf(retrievedAt: string, at: Date = now()): FreshnessBand {
+  return bandFor(ageInDays(retrievedAt, at));
 }
 
 export interface DateSpan {
@@ -55,9 +72,9 @@ export function factDateSpan(db: DatabaseSync): DateSpan {
 }
 
 /** The file's band, for `/healthz` and for the status page. */
-export function spanBand(span: DateSpan, now: Date = new Date()): FreshnessBand {
+export function spanBand(span: DateSpan, at: Date = now()): FreshnessBand {
   if (!span.newest) return "fresh";
-  return bandOf(span.newest, now);
+  return bandOf(span.newest, at);
 }
 
 /** An age said out loud. A page that prints "0 days old" reads like a machine. */
