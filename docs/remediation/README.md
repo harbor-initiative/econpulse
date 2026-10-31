@@ -32,12 +32,30 @@ Interview on 2026-10-30, recorded here because they bound every spec.
 | Spec | Epic | Feature issues |
 |---|---|---|
 | [01 — Finding a place](specs/01-finding-a-place.md) | #1 | #5 aliases · #6 fuzzy index · #7 autocomplete · #8 full coverage · #9 location |
-| [02 — The report](specs/02-the-report.md) | #2 | #10 score and weights · #11 percentiles · #12 AI summary · #13 freshness · #14 benchmarks · #15 quick facts · #16 map · #17 print · #18 chart tables |
+| [02 — The report](specs/02-the-report.md) | #2 | #10 header block and score · #11 percentiles · #12 AI summary · #13 freshness · #14 benchmarks · #15 quick facts · #16 map · #17 print · #18 chart tables · #29 panel substance · #30 legends · #31 docked search · #32 meaning without colour · #33 typefaces |
 | [03 — The question box](specs/03-the-question-box.md) | #3 | #19 model reliability · #20 rate limit · #21 six states · #22 progressive loading · #23 comparison |
 | [04 — Trust and reach](specs/04-trust-and-reach.md) | #4 | #24 health and status · #25 method · #26 discoverability · #27 refresh · #28 staleness |
 
 Twenty-four feature issues, one per deliverable, each linking its parent epic and
 its spec section. The three P0 clusters are #1, #2 and #3.
+
+## The design pass
+
+[DESIGN-AUDIT.md](DESIGN-AUDIT.md) measures the live report against two agent
+design skills — `Leonxlnx/taste-skill` and `jakubkrehel/skills` — and records
+eight findings. The measurable ones:
+
+| Rule | Measured on the live report | Verdict |
+|---|---|---|
+| Colour on data, not chrome (median 3%, ceiling 5%) | 2.2% of the viewport | pass |
+| No icon tiles on a KPI | none | pass |
+| Flat surfaces, no card shadows | none | pass |
+| No heading over 24px on an app screen | place name at 35px | fail |
+| Two series need a legend | unemployment chart has none | fail |
+| The most frequent job is one click away | no search on a place page | fail |
+
+[Docs/design/report-v3.html](../design/report-v3.html) is the report that answers
+them, and #29 to #33 are the work items.
 
 ## What is deliberately not here
 
