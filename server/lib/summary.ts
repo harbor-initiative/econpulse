@@ -75,7 +75,10 @@ export function template(input: SummaryInput): string {
     if (parts.length === 2) break;
   }
   if (!parts.length) return "Every measure on this page is within the national range, or has no national figure to compare with.";
-  return `${parts.join(". ")}.`.replace(/\.\./g, ".");
+  // A panel label is lower case by design; the start of a sentence is not.
+  return `${parts.join(". ")}.`
+    .replace(/\.\./g, ".")
+    .replace(/(^|\. )([a-z])/g, (_match, start: string, letter: string) => `${start}${letter.toUpperCase()}`);
 }
 
 function keyFor(placeName: string, dataVersion: string): string {
