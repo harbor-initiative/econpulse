@@ -1,8 +1,8 @@
 /**
- * The two states that ask a clarifying question instead of guessing.
+ * The states that say what is missing.
  *
  * A box that cannot answer has to say which part it is missing. These are the
- * pages for “I need a place” and “I need a measure”.
+ * pages for “I need a place”, “I need a measure”, and “the model is down”.
  */
 
 
@@ -33,5 +33,21 @@ export function askNeedMetric(question: string, place: Place, metrics: Array<{ i
        ${metrics.map((m) => `<a class="chip" href="/ask?q=${encodeURIComponent(`${m.label} in ${place.name}`)}">${esc(m.label)}</a>`).join("")}
        <a class="chip" href="/p/${esc(place.geoid)}">Full report</a>
      </div>`,
+  );
+}
+
+/** The model could not be reached, so the page says so. */
+export function askModelBusy(question: string, examples: string[]): string {
+  return shell(
+    `Model unavailable — EconPulse`,
+    `<p class="crumb">You asked</p>
+     <h1 class="place" style="font-size:1.6rem">${esc(question)}</h1>
+     <p class="sub">The model that reads questions is unavailable right now. Try again in a minute, or ask with a place name and a measure.</p>
+     <form class="search" action="/ask" method="get" style="margin-left:0">
+       <input type="search" name="q" value="${esc(question)}" aria-label="Try again in a minute">
+     </form>
+     <div class="chips" style="justify-content:flex-start">${examples
+       .map((e) => `<a class="chip" href="/ask?q=${encodeURIComponent(e)}">${esc(e)}</a>`)
+       .join("")}</div>`,
   );
 }

@@ -1,14 +1,43 @@
 /**
- * The one place this server talks to a model.
- *
- * The model names a place and picks a measure. It never receives a GEOID and
- * never returns one, so the index resolves the name afterwards and a
- * hallucinated identifier cannot put a wrong number on a page.
+ * The one place this server talks to a model. It names a place and picks a
+ * measure, never a GEOID. The free router answers 429 under load, so a model
+ * list, one retry, a breaker and an hour-long cache sit in front of it. Every
+ * outcome logs one line, so the failure rate is visible in `docker logs`.
  */
-
-
 export interface ModelAnswer { placeName: string | null; metric: string | null }
+/** What became of one question. The route turns this into a page state. */
+export type ModelStatus = "ok" | "cached" | "unreadable" | "unavailable" | "failed" | "off";
+export interface ModelOutcome { answer: ModelAnswer | null; status: ModelStatus }
+export interface ModelContext {
+  /** The build the answer is about. A new build is a new cache entry. */
+  dataVersion: string;
+  /** Injected clock and pause, so the breaker and the cache are testable. */
+  now?: () => number;
+  sleep?: (ms: number) => Promise<void>;
+}
 
+const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
+const DEFAULT_MODEL = "openrouter/free";
+const REQUEST_TIMEOUT_MS = 12_000;
+const RETRY_PAUSE_MS = 500;
+const BREAKER_FAILURES = 3;
+const BREAKER_OPEN_MS = 60_000;
+const CACHE_TTL_MS = 60 * 60 * 1000;
+const CACHE_LIMIT = 500;
+const cache = new Map<string, { answer: ModelAnswer; at: number }>();
+let failures = 0;
+let openedAt: number | null = null;
+
+/** Clear the breaker and the cache. Production never calls this; tests do. */
+export function resetModelState(): void {
+  cache.clear();
+  failures = 0;
+  openedAt = null;
+}
+/** True when an answer is missing because the model could not be reached. */
+export function isModelUnavailable(outcome: ModelOutcome | undefined): boolean {
+  return outcome?.status === "unavailable" || outcome?.status === "failed";
+}
 /** First balanced JSON object in a string, ignoring anything around it. */
 export function extractJson(text: string): unknown | null {
   const start = text.indexOf("{");
@@ -37,77 +66,135 @@ export function extractJson(text: string): unknown | null {
 }
 
 /**
- * The model names a place and picks a measure. It never sees a GEOID, so it
- * cannot invent one, and the answer is resolved against the index afterwards.
+ * `ECONPULSE_MODEL` is a comma-separated list in priority order, sent as
+ * OpenRouter's `models` array so its router tries the next id on an error.
  */
+function modelIds(): string[] {
+  const raw = process.env.ECONPULSE_MODEL ?? process.env.OPENROUTER_MODEL ?? DEFAULT_MODEL;
+  const ids = [...new Set(raw.split(",").map((id) => id.trim()).filter(Boolean))];
+  return ids.length ? ids : [DEFAULT_MODEL];
+}
+
+function log(ids: string[], status: ModelStatus, detail = ""): void {
+  const line = `[ask] model ${ids.join(",")} status ${status}${detail ? ` ${detail}` : ""}`;
+  if (status === "ok" || status === "cached") console.log(line);
+  else console.error(line);
+}
+
+function promptFor(question: string, metrics: Array<{ id: string; label: string }>): string {
+  const metricMenu = metrics.map((m) => `${m.id} (${m.label})`).join(", ");
+  return `You turn a question about a United States place into two fields.
+Reply with JSON only, no prose: {"place":"...","metric":"..."}
+place: the US city, county, or state the question is about, as a plain name. Use your knowledge. If none is implied, null.
+metric: one id from this list, or null if the question is not about a measure: ${metricMenu}
+Examples:
+Q: How are things going where the Liberty Bell is -> {"place":"Philadelphia","metric":null}
+Q: Is rent going up in Austin? -> {"place":"Austin","metric":"median_gross_rent"}
+Q: Are people leaving the city of brotherly love -> {"place":"Philadelphia","metric":"population"}
+Q: ${question}`;
+}
+
+function retryable(status: number): boolean {
+  return status === 408 || status === 429 || status >= 500;
+}
+/** Null when the content holds no JSON object. An empty object is an answer. */
+function parseAnswer(content: string): ModelAnswer | null {
+  const parsed = extractJson(content) as { place?: unknown; metric?: unknown } | null;
+  if (!parsed) return null;
+  const text = (value: unknown): string | null =>
+    typeof value === "string" && value.trim() ? value.trim() : null;
+  return { placeName: text(parsed.place), metric: text(parsed.metric) };
+}
+
+/** One attempt, one retry on a rate limit, a 5xx or a timeout; then give up. */
 export async function askModel(
   question: string,
   metrics: Array<{ id: string; label: string }>,
-): Promise<ModelAnswer | null> {
+  context: ModelContext,
+): Promise<ModelOutcome> {
   const key = process.env.OPENROUTER_API_KEY;
-  if (!key) return null;
+  const ids = modelIds();
+  if (!key) return { answer: null, status: "off" };
 
-  // openrouter/free is a router: it picks whichever free model is
-  // available, so one provider going down does not break the box.
-  const model = process.env.ECONPULSE_MODEL ?? process.env.OPENROUTER_MODEL ?? "openrouter/free";
-  const metricMenu = metrics.map((m) => `${m.id} (${m.label})`).join(", ");
+  const now = context.now ?? Date.now;
+  const sleep = context.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+  const askedAt = now();
+  const cacheKey = `${context.dataVersion}\u0000${question.trim().toLowerCase().replace(/\s+/g, " ")}`;
+  const hit = cache.get(cacheKey);
+  // A cache hit is served even while the breaker is open: the data has not moved.
+  if (hit && askedAt - hit.at < CACHE_TTL_MS) {
+    log(ids, "cached");
+    return { answer: hit.answer, status: "cached" };
+  }
+  if (hit) cache.delete(cacheKey);
+  if (openedAt !== null) {
+    if (askedAt - openedAt < BREAKER_OPEN_MS) {
+      log(ids, "unavailable", "breaker open");
+      return { answer: null, status: "unavailable" };
+    }
+    // Half-open: the count stays at the threshold, so one failed probe reopens.
+    openedAt = null;
+  }
+  const prompt = promptFor(question, metrics);
+  let status: ModelStatus = "unavailable";
+  let detail = "network error";
+  let attempts = 0;
 
-  const prompt = [
-    "You turn a question about a United States place into two fields.",
-    'Reply with JSON only, no prose: {"place":"...","metric":"..."}',
-    "place: the US city, county, or state the question is about, as a plain name. Use your knowledge. If none is implied, null.",
-    `metric: one id from this list, or null if the question is not about a measure: ${metricMenu}`,
-    "Examples:",
-    'Q: How are things going where the Liberty Bell is -> {"place":"Philadelphia","metric":null}',
-    'Q: Is rent going up in Austin? -> {"place":"Austin","metric":"median_gross_rent"}',
-    'Q: Are people leaving the city of brotherly love -> {"place":"Philadelphia","metric":"population"}',
-    `Q: ${question}`,
-  ].join("\n");
-
-  // The free router is occasionally out of capacity. One retry costs a second
-  // and turns a visible failure into an invisible one.
-  for (let attempt = 0; attempt < 2; attempt += 1) {
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    attempts = attempt;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 12_000);
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    let retry = false;
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const response = await fetch(ENDPOINT, {
         method: "POST",
         signal: controller.signal,
         headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
         body: JSON.stringify({
-          model,
+          models: ids,
           messages: [{ role: "user", content: prompt }],
           temperature: 0,
-          // The free router can land on a reasoning model that spends tokens
-          // thinking before it answers. 120 produced an empty answer with
-          // finish_reason "length" every time. 400 leaves room for both.
+          // A reasoning model on the free router spends tokens before it answers.
+          // 120 produced an empty answer with finish_reason "length"; 400 leaves
+          // room for both.
           max_tokens: 400,
           provider: { data_collection: "deny" },
         }),
       });
       if (!response.ok) {
-        console.error(`[ask] model ${model} returned ${response.status} (attempt ${attempt + 1})`);
-        if (response.status >= 500 && attempt === 0) continue;
-        return null;
+        detail = `http ${response.status}`;
+        status = retryable(response.status) ? "unavailable" : "failed";
+        retry = retryable(response.status) && attempt < 2;
+      } else {
+        let payload: { choices?: Array<{ message?: { content?: string } }>; model?: string };
+        try { payload = (await response.json()) as typeof payload; }
+        catch { failures = 0; log(ids, "unreadable", "http 200, unreadable body"); return { answer: null, status: "unreadable" }; }
+        const answer = parseAnswer(payload.choices?.[0]?.message?.content ?? "");
+        if (!answer) {
+          // The provider answered: an availability success and a content
+          // failure, so the breaker resets and nothing is cached.
+          failures = 0;
+          log(ids, "unreadable", "http 200, no JSON");
+          return { answer: null, status: "unreadable" };
+        }
+        failures = 0;
+        cache.set(cacheKey, { answer, at: now() });
+        if (cache.size > CACHE_LIMIT) cache.delete(cache.keys().next().value as string);
+        log(ids, "ok", payload.model ? `used ${payload.model}` : "");
+        return { answer, status: "ok" };
       }
-      const payload = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
-      const content = payload.choices?.[0]?.message?.content ?? "";
-      const parsed = extractJson(content) as { place?: unknown; metric?: unknown } | null;
-      if (!parsed) {
-        console.error("[ask] model returned no JSON");
-        return null;
-      }
-      return {
-        placeName: typeof parsed.place === "string" && parsed.place.trim() ? parsed.place.trim() : null,
-        metric: typeof parsed.metric === "string" && parsed.metric.trim() ? parsed.metric.trim() : null,
-      };
     } catch (error) {
-      console.error("[ask] model call failed:", (error as Error).message);
-      if (attempt === 0) continue;
-      return null;
+      detail = (error as Error).name === "AbortError" ? "timeout" : "network error";
+      status = "unavailable";
+      retry = attempt < 2;
     } finally {
       clearTimeout(timer);
     }
+    if (retry) await sleep(RETRY_PAUSE_MS); else break;
   }
-  return null;
+
+  failures += 1;
+  if (failures >= BREAKER_FAILURES) openedAt = now();
+  log(ids, status, `${detail} after ${attempts} attempt${attempts === 1 ? "" : "s"}`);
+  return { answer: null, status };
 }

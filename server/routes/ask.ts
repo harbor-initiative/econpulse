@@ -17,10 +17,11 @@ import { buildPanels, contextFor, panelFor } from "../lib/panels.ts";
 import { factDateSpan } from "../lib/freshness.ts";
 import { parseLocally, parseQuestion } from "../ask.ts";
 import { isQuestion } from "../lib/rules.ts";
+import { isModelUnavailable } from "../lib/model.ts";
 import { report } from "../views/report.ts";
 import { searchResults } from "../views/search.ts";
 import { askCard } from "../views/ask.ts";
-import { askNeedMetric, askNeedPlace } from "../views/states.ts";
+import { askModelBusy, askNeedMetric, askNeedPlace } from "../views/states.ts";
 
 export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> {
   if (url.pathname !== "/ask") return false;
@@ -44,17 +45,34 @@ export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> 
   }
 
   const menu = Object.entries(METRICS).map(([id, spec]) => ({ id, label: spec.label }));
+  const dataVersion = meta["data.version"] ?? "?";
+  const examples = ["Is rent going up in Austin", "Population of Cook County", "Federal money in Philadelphia"];
 
   // A question goes to the model. A name goes to the index. Mixing the two is
   // how "the Liberty Bell" became Bell County, Texas.
   let parsed = isQuestion(question)
-    ? await parseQuestion(db, question, menu)
+    ? await parseQuestion(db, question, menu, dataVersion)
     : parseLocally(db, question);
 
   // A name the index could not place may still be a nickname. Ask the model only
   // after the index has failed.
   if (!parsed.place && !isQuestion(question) && process.env.OPENROUTER_API_KEY) {
-    parsed = await parseQuestion(db, question, menu);
+    parsed = await parseQuestion(db, question, menu, dataVersion);
+  }
+
+  // A model that could not be reached is a busy network, not a question the box
+  // read and rejected. Answer from the grammar where it can, and say why;
+  // otherwise show the busy state in place of "which place".
+  let notice: string | undefined;
+  if (isModelUnavailable(parsed.model)) {
+    const local = parseLocally(db, question);
+    if (local.place) {
+      parsed = local;
+      notice = "The model is unavailable right now. This answer comes from the local vocabulary.";
+    } else {
+      send(res, 503, askModelBusy(question, examples));
+      return true;
+    }
   }
 
   let place = parsed.place;
@@ -70,12 +88,10 @@ export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> 
       redirect(res, `/p/${candidates[0].geoid}`);
       return true;
     }
-    const examples = ["Is rent going up in Austin", "Population of Cook County", "Federal money in Philadelphia"];
     send(res, 404, askNeedPlace(question, metric ? (METRICS[metric]?.label ?? metric) : null, examples));
     return true;
   }
 
-  const notice: string | undefined = undefined;
   const ctx = contextFor(place);
 
   if (!metric) {
