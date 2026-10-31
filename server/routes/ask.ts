@@ -5,6 +5,10 @@
  * question goes to the model, which may only name a place and pick a measure;
  * the index resolves the name afterwards. A model that cannot answer gets asked
  * which place, because guessing produced Bell County for "the Liberty Bell".
+ *
+ * Six states come out of this, and each names the part that is missing: the
+ * card, a place, a measure, a model that is busy, an answer the box could not
+ * read, and a place that is not in the file.
  */
 
 
@@ -17,11 +21,11 @@ import { buildPanels, contextFor, panelFor } from "../lib/panels.ts";
 import { factDateSpan } from "../lib/freshness.ts";
 import { parseLocally, parseQuestion } from "../ask.ts";
 import { isQuestion } from "../lib/rules.ts";
-import { isModelUnavailable } from "../lib/model.ts";
+import { isModelUnavailable, type ModelOutcome } from "../lib/model.ts";
 import { report } from "../views/report.ts";
 import { searchResults } from "../views/search.ts";
 import { askCard } from "../views/ask.ts";
-import { askModelBusy, askNeedMetric, askNeedPlace } from "../views/states.ts";
+import { askModelBusy, askNeedMetric, askNeedPlace, askNoMatch, askUnreadable } from "../views/states.ts";
 
 export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> {
   if (url.pathname !== "/ask") return false;
@@ -32,21 +36,20 @@ export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> 
     return true;
   }
 
+  const menu = Object.entries(METRICS).map(([id, spec]) => ({ id, label: spec.label }));
+  const dataVersion = meta["data.version"] ?? "?";
+  const examples = ["Is rent going up in Austin", "Population of Cook County", "Federal money in Philadelphia"];
+
   if (/^\d{5}$/.test(question)) {
     const county = lookupZip(db, question);
     if (county) {
       redirect(res, `/p/${county.geoid}?zip=${question}`);
       return true;
     }
-    send(res, 404, askNeedPlace(question, null, [
-      "Try a county name instead", "20744", "Is rent going up in Austin",
-    ]));
+    // A ZIP that resolves to no county is a place the file does not carry.
+    send(res, 404, askNoMatch(question, examples));
     return true;
   }
-
-  const menu = Object.entries(METRICS).map(([id, spec]) => ({ id, label: spec.label }));
-  const dataVersion = meta["data.version"] ?? "?";
-  const examples = ["Is rent going up in Austin", "Population of Cook County", "Federal money in Philadelphia"];
 
   // A question goes to the model. A name goes to the index. Mixing the two is
   // how "the Liberty Bell" became Bell County, Texas.
@@ -75,8 +78,16 @@ export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> 
     }
   }
 
-  let place = parsed.place;
-  let metric = parsed.metric;
+  const place = parsed.place;
+  const metric = parsed.metric;
+
+  // The model answered, but the answer carried no place and no measure. The
+  // network worked; the box could not read what came back. That is a different
+  // page from a busy network, because trying again can change this one.
+  if (!place && modelAnsweredNothing(parsed.model)) {
+    send(res, 502, askUnreadable(question, examples));
+    return true;
+  }
 
   if (!place) {
     const candidates = searchPlaces(db, question);
@@ -86,6 +97,12 @@ export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> 
     }
     if (candidates.length === 1 && candidates[0]) {
       redirect(res, `/p/${candidates[0].geoid}`);
+      return true;
+    }
+    // Neither the index nor a model produced a place, and no measure was read.
+    // The place is not in this release.
+    if (!metric && !modelWasAsked(parsed.model)) {
+      send(res, 404, askNoMatch(question, examples));
       return true;
     }
     send(res, 404, askNeedPlace(question, metric ? (METRICS[metric]?.label ?? metric) : null, examples));
@@ -127,4 +144,23 @@ export async function routeAsk(url: URL, res: ServerResponse): Promise<boolean> 
 
   send(res, 200, askCard(question, place, panel, followUps, notice));
   return true;
+}
+
+/**
+ * The model answered, but the answer carried no place and no measure.
+ *
+ * Two shapes reach here. `unreadable` is a body with no JSON. An `ok` or cached
+ * answer with both fields null is the same failure with valid JSON, and it reads
+ * the same to a person.
+ */
+function modelAnsweredNothing(outcome: ModelOutcome | undefined): boolean {
+  if (!outcome) return false;
+  if (outcome.status === "unreadable") return true;
+  if (outcome.status !== "ok" && outcome.status !== "cached") return false;
+  return !outcome.answer?.placeName && !outcome.answer?.metric;
+}
+
+/** True when a model was in the loop at all. `off` means no key was set. */
+function modelWasAsked(outcome: ModelOutcome | undefined): boolean {
+  return outcome !== undefined && outcome.status !== "off";
 }
